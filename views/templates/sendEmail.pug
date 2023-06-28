@@ -1,0 +1,15 @@
+extends ../layout/index
+
+block contenido
+    main(class="w-8/12").h-screen.flex.flex-col.justify-between.m-auto 
+        .py-10.text-center
+            p.text-secondary-gray.text-2xl Gracias por Registrarte en 
+                span.font-extrabold Fotaza
+
+        .text-center 
+            img(src="/img/project/email.svg", alt="").m-auto.w-60
+
+        .text-center.mb-20 
+            h1.text-4xl.font-bold.text-principal-gray.mb-4 Verifica tu correo electrónico
+            p.text-secondary-gray Hemos enviado un correo electrónico a la dirección proporcionada para verificar tu identidad. 
+            p.text-secondary-gray Por favor, revisa tu bandeja de entrada y sigue las instrucciones para completar el proceso de validación

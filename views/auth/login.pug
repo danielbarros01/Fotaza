@@ -1,0 +1,39 @@
+extends ../layout/index
+
+block contenido
+    div.flex.h-screen
+        div(class="w-1/2") 
+            include ../layout/header 
+            main.flex.items-center.flex-col.mx-24
+                .mt-10.mb-5
+                    h2.text-3xl.text-hard-gray.text-center Bienvenido a 
+                        span.font-bold Fotaza
+                    p.text-xl.text-secondary-gray.mt-2 Busca las imagenes mas hermosas
+
+                form(method="POST" action="").w-full
+                    .inputs.flex.flex-col.justify-evenly.h-52
+                        .input 
+                            label.block
+                            span(class="block text-sm font-medium text-slate-700") Email
+                            input(type="email" name="email" class="mt-1 px-3 py-2 bg-transparent border-2 shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="you@example.com")
+                        .input 
+                            label.block
+                            span(class="block text-sm font-medium text-slate-700") Contraseña
+                            input(type="password" name="password" class="mt-1 px-3 py-2 bg-transparent border-2 shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="********")
+                        a(href="").ml-auto.text-principal-gray Olvide mi contraseña
+
+                    .btns.w-full.mt-10    
+                        button(class="bg-principal-gray text-white py-3 px-4 w-full mb-4").w-full Iniciar Sesion
+                        
+                        button(class="border-2 border-principal-gray text-principal-gray w-full py-3 px-4 inline-flex items-center")
+                            img(src="/img/project/google.svg", alt="").w-6.mr-2
+                            span.w-full Iniciar Sesion con Google
+
+                .w-64.flex.justify-between.mt-10 
+                    p No tienes una cuenta?
+                    a(href="/auth/signup").font-bold Registrate
+        
+        aside(class="w-1/2 bg-cover bg-center bg-no-repeat" style=`background-image: url(${imageUrl})`)
+            p(class="absolute bottom-8 right-8 text-white") Fotografía de 
+                span.font-bold= nameUserPhoto
+

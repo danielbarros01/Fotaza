@@ -1,0 +1,20 @@
+extends ./layout/index
+
+block contenido
+    div(class="h-screen flex flex-col")
+        include ./layout/header
+
+        main(class="h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center" style=`background-image: url(${imageUrl})`)
+            div.flex.items-center.flex-col
+                h2.text-5xl.text-polished-white Bienvenido a 
+                    span.font-bold Fotaza
+                p.text-xl.text-polished-white.mt-2 Busca las imagenes mas hermosas
+
+                label(class="relative block w-5/12 mx-auto mt-7")
+                    span(class="sr-only") Search
+                    span(class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
+                        img(src="/img/project/search.svg" alt="").w-6
+                    input(class="font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-polished-white w-full rounded-md py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1 sm:text-sm" placeholder="Buscar imágenes" type="text" name="search")
+            
+            p(class="absolute bottom-8 right-8 text-white") Fotografía de 
+                span.font-bold= nameUserPhoto
