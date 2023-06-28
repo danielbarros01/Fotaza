@@ -76,9 +76,39 @@ const register = async (req, res) => {
     })
 }
 
+// /confirm/:token
+const confirmAccount = async (req, res) => {
+    const { token } = req.params
+
+    //Verificar si el token es valido
+    const user = await User.findOne({ where: { token: token } })
+
+    //No se encontro el usuario, el token no era valido
+    if (!user) {
+        return res.render('auth/confirmAccount', {
+            pagina: "Error al confirmar tu cuenta",
+            mensaje: "Hubo un error al confirmar tu cuenta",
+            imagen: "/img/project/error.svg",
+            ocultarBtns: true,
+            error: true
+        })
+    }
+
+    user.token = null
+    user.confirmed = true
+    await user.save()
+
+    return res.render('auth/confirmAccount', {
+        pagina: "Cuenta confirmada",
+        mensaje: "La cuenta se confirmo correctamente",
+        imagen: "/img/project/success.svg",
+        ocultarBtns: true,
+    })
+}
 
 export {
     formLogin,
     formRegister,
-    register
+    register,
+    confirmAccount
 }

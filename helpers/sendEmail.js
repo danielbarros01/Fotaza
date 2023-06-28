@@ -25,7 +25,7 @@ const emailRegistro = async (datos) => {
             <p style="color: #333; font-size: 16px;">Gracias por registrarte en Fotaza.com.</p>
             <p style="color: #333; font-size: 16px;">Tu cuenta ya está lista, solo debes confirmarla en el siguiente enlace:</p>
             <p style="text-align: center;">
-            <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirmar/${token}"
+            <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirm/${token}"
                 style="display: inline-block; background-color: #007bff; color: #fff; text-decoration: none; font-size: 16px; padding: 10px 20px; border-radius: 4px; margin-top: 10px;">
                 Confirmar Cuenta
             </a>
