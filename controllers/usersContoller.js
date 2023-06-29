@@ -1,7 +1,8 @@
 import { check, validationResult } from 'express-validator'
 import { v4 as uuidv4 } from 'uuid'
+import bcrypt from 'bcrypt'
 import User from '../models/User.js'
-import { emailRegistro } from '../helpers/sendEmail.js'
+import { emailRegistro, emailRecoveryPassword } from '../helpers/sendEmail.js'
 
 // auth/login
 const formLogin = (req, res) => {
@@ -72,11 +73,11 @@ const register = async (req, res) => {
 
     res.render('templates/sendEmail', {
         pagina: "Cuenta creada correctamente",
-        mensaje: "Hemos enviado un Email de confirmacion, revisa tu email"
+        mensajePagina: "Gracias por Registrarte en "
     })
 }
 
-// /confirm/:token
+// /auth/confirm/:token
 const confirmAccount = async (req, res) => {
     const { token } = req.params
 
@@ -106,9 +107,131 @@ const confirmAccount = async (req, res) => {
     })
 }
 
+
+// /auth/forgot-password
+const recoverPassword = (req, res) => {
+    res.render('auth/recoverPassword', {
+        pagina: 'Recovery Password',
+        imageUrl: "/img/backgrounds/fondo5.jpg",
+        nameUserPhoto: "masbebet christianto",
+        ocultarBtns: true
+    })
+}
+// POST /auth/forgot-password
+const resetPassword = async (req, res) => {
+    await check('email').isEmail().withMessage('Formato de email no valido').run(req)
+    let resultadoValidaciones = validationResult(req)
+
+    if (!resultadoValidaciones.isEmpty()) {
+        return res.render('auth/recoverPassword', {
+            pagina: 'Recovery Password',
+            imageUrl: "/img/backgrounds/fondo5.jpg",
+            nameUserPhoto: "masbebet christianto",
+            ocultarBtns: true,
+            errores: resultadoValidaciones.array()
+        })
+    }
+
+    const { email } = req.body
+    const user = await User.findOne({ where: { email } })
+
+    if (!user) {
+        return res.render('auth/recoverPassword', {
+            pagina: 'Recovery Password',
+            imageUrl: "/img/backgrounds/fondo5.jpg",
+            nameUserPhoto: "masbebet christianto",
+            ocultarBtns: true,
+            user: { email },
+            errores: [{ msg: 'El email no pertenece a ningun usuario' }]
+        })
+    }
+
+    user.token = uuidv4()
+    await user.save()
+
+    //Enviar email de confirmacion
+    emailRecoveryPassword({
+        name: user.name, lastname: user.lastname, email: user.email, token: user.token
+    })
+
+    //Renderizar mensaje
+    res.render('templates/sendEmail', {
+        pagina: "Recovery Password",
+        mensajePagina: "Recupera tu contraseña en "
+    })
+}
+
+// /recover-password/:token
+const comprobarToken = async (req, res) => {
+    const { token } = req.params
+
+    const user = await User.findOne({ where: { token } })
+
+    if (!user) {
+        return res.render('auth/confirmAccount', {
+            pagina: "Reestablece tu contraseña",
+            mensaje: "Hubo un error al validar tu informacion",
+            imagen: "/img/project/error.svg",
+            ocultarBtns: true,
+            error: true
+        })
+    }
+
+    //Mostrar formulario para modificar el password
+    res.render('auth/resetPassword', {
+        pagina: "Reestablece tu contraseña",
+        imageUrl: "/img/backgrounds/fondo4.jpg",
+        nameUserPhoto: "Luise and Nic",
+        ocultarBtns: true
+    })
+}
+
+
+// POST /recover-password/:token
+const newPassword = async (req, res) => {
+    await check('password').isLength({ min: 6 }).withMessage('Contraseña minima de 6 caracteres').run(req)
+    await check('confirmPassword').equals(req.body.password).withMessage('Las contraseñas no coinciden').run(req);
+    let resultadoValidaciones = validationResult(req)
+
+    if (!resultadoValidaciones.isEmpty()) {
+        return res.render('auth/resetPassword', {
+            pagina: "Reestablece tu contraseña",
+            imageUrl: "/img/backgrounds/fondo4.jpg",
+            nameUserPhoto: "Luise and Nic",
+            ocultarBtns: true,
+            errores: resultadoValidaciones.array()
+        })
+    }
+
+    const { token } = req.params
+    const { password } = req.body
+
+    //verificar quien hace el cambio
+    const user = await User.findOne({ where: { token } })
+
+    //Hashear el nuevo password
+    const salt = await bcrypt.genSalt(10)
+    user.password = await bcrypt.hash(password, salt)
+    user.token = null
+
+    await user.save()
+
+    res.render('auth/confirmAccount', {
+        pagina: 'Contraseña reestablecida',
+        mensaje: 'El Password se guardo correctamente',
+        imagen: "/img/project/success.svg",
+        ocultarBtns: true,
+        error: false
+    })
+}
+
 export {
     formLogin,
     formRegister,
     register,
-    confirmAccount
+    confirmAccount,
+    recoverPassword,
+    resetPassword,
+    comprobarToken,
+    newPassword
 }
