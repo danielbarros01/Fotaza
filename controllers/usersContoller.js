@@ -1,6 +1,7 @@
 import { check, validationResult } from 'express-validator'
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
+import generateJWT from '../helpers/generateJwt.js'
 import User from '../models/User.js'
 import { emailRegistro, emailRecoveryPassword } from '../helpers/sendEmail.js'
 
@@ -13,6 +14,73 @@ const formLogin = (req, res) => {
         ocultarBtns: true
     })
 }
+
+// POST auth/login
+const authenticate = async (req, res) => {
+    await check('email').isEmail().withMessage('Formato de email no valido').run(req)
+    await check('password').notEmpty().withMessage('Ingresa la contraseña').run(req)
+    let resultadoValidaciones = validationResult(req)
+
+    if (!resultadoValidaciones.isEmpty()) {
+        return res.render('auth/login', {
+            pagina: 'Sign In',
+            imageUrl: "/img/backgrounds/fondo3.jpg",
+            nameUserPhoto: "Set.sj",
+            ocultarBtns: true,
+            errores: resultadoValidaciones.array(),
+            user: { email: req.body.email }
+        })
+    }
+
+
+    const { email, password } = req.body
+
+    const user = await User.findOne({ where: { email: email } })
+    if (!user) {
+        return res.render('auth/login', {
+            pagina: 'Sign In',
+            imageUrl: "/img/backgrounds/fondo3.jpg",
+            nameUserPhoto: "Set.sj",
+            ocultarBtns: true,
+            errUserLogin: "Parece que los datos no coinciden con un usuario registrado",
+            user: { email: req.body.email }
+        })
+    }
+
+    //Comprobar que esta confirmado el usuario
+    if (!user.confirmed) {
+        return res.render('auth/login', {
+            pagina: 'Sign In',
+            imageUrl: "/img/backgrounds/fondo3.jpg",
+            nameUserPhoto: "Set.sj",
+            ocultarBtns: true,
+            errUserLogin: "Tienes que validar tu cuenta, revisa tu correo electronico",
+            user: { email: req.body.email }
+        })
+    }
+
+    //verificar el password
+    if (!user.verificarPassword(password)) {
+        return res.render('auth/login', {
+            pagina: 'Sign In',
+            imageUrl: "/img/backgrounds/fondo3.jpg",
+            nameUserPhoto: "Set.sj",
+            ocultarBtns: true,
+            errores: [{ path: 'password', msg: "La contraseña es incorrecta" }],
+            user: { email: req.body.email }
+        })
+    }
+
+    //Autenticar con jwt
+    const token = generateJWT(user.id)
+
+    //Almacenar en cookie
+    return res.cookie('_token', token, {
+        httpOnly: true
+    }).redirect('/publications')
+}
+
+
 
 // auth/signup
 const formRegister = (req, res) => {
@@ -31,7 +99,7 @@ const register = async (req, res) => {
     const userExists = await User.findOne({ where: { email } })
 
     if (userExists) {
-        res.render('auth/register', {
+        return res.render('auth/register', {
             pagina: 'Sign Up',
             imageUrl: "/img/backgrounds/fondo4.jpg",
             nameUserPhoto: "Luise and Nic",
@@ -77,6 +145,7 @@ const register = async (req, res) => {
     })
 }
 
+
 // /auth/confirm/:token
 const confirmAccount = async (req, res) => {
     const { token } = req.params
@@ -117,6 +186,7 @@ const recoverPassword = (req, res) => {
         ocultarBtns: true
     })
 }
+
 // POST /auth/forgot-password
 const resetPassword = async (req, res) => {
     await check('email').isEmail().withMessage('Formato de email no valido').run(req)
@@ -161,6 +231,8 @@ const resetPassword = async (req, res) => {
     })
 }
 
+
+
 // /recover-password/:token
 const comprobarToken = async (req, res) => {
     const { token } = req.params
@@ -185,7 +257,6 @@ const comprobarToken = async (req, res) => {
         ocultarBtns: true
     })
 }
-
 
 // POST /recover-password/:token
 const newPassword = async (req, res) => {
@@ -227,6 +298,7 @@ const newPassword = async (req, res) => {
 
 export {
     formLogin,
+    authenticate,
     formRegister,
     register,
     confirmAccount,

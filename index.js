@@ -1,9 +1,11 @@
-import express from 'express';
-import startRoutes from './routes/startRoutes.js';
-import usersRoutes from './routes/usersRoutes.js';
+import express from 'express'
+import cookieParser from 'cookie-parser'
+import startRoutes from './routes/startRoutes.js'
+import usersRoutes from './routes/usersRoutes.js'
+import publicationsRoutes from './routes/publicationsRoutes.js'
 import db from './config/db.js'
 
-const app = express();
+const app = express()
 
 //conexion a base de datos
 try {
@@ -16,8 +18,11 @@ try {
 //Habilitar lectura de datos de formularios
 app.use(express.urlencoded({ extended: true }))
 
+//Habilitar cookieParser
+app.use(cookieParser())
+
 //Routing
-app.use('/', startRoutes)
+app.use('/', publicationsRoutes)
 app.use('/auth', usersRoutes)
 
 //Carpeta publica

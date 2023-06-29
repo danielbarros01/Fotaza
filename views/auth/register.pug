@@ -1,11 +1,5 @@
 extends ../layout/index
 
-mixin getErrorMsg( inputName )
-    if errores
-        each error in errores
-            if error.path == inputName
-                span.text-red-500.text-xs= error.msg
-
 block contenido
     div.flex.h-screen
         div(class="w-1/2") 

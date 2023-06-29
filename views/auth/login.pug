@@ -10,16 +10,25 @@ block contenido
                         span.font-bold Fotaza
                     p.text-xl.text-secondary-gray.mt-2 Busca las imagenes mas hermosas
 
-                form(method="POST" action="").w-full
+                if(errUserLogin)
+                    div(role="alert").bg-red-100.border.border-red-400.text-red-700.px-4.py-3.relative.w-full
+                        strong.font-bold Ooops! 
+                        span(class="block sm:inline")= errUserLogin
+                        span.absolute.top-0.bottom-0.right-0.px-4.py-3
+                            img(id="btnCloseAlert" src="/img/project/close.svg" alt="Close" class="fill-current h-6 w-6 text-red-500" role="button")
+
+                form(method="POST").w-full
                     .inputs.flex.flex-col.justify-evenly.h-52
                         .input 
                             label.block
                             span(class="block text-sm font-medium text-slate-700") Email
-                            input(type="email" name="email" class="mt-1 px-3 py-2 bg-transparent border-2 shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="you@example.com")
+                            input(type="email" name="email" class="mt-1 px-3 py-2 bg-transparent border-2 shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="you@example.com" value= user ? user.email : '')
+                            +getErrorMsg('email')
                         .input 
                             label.block
                             span(class="block text-sm font-medium text-slate-700") Contraseña
                             input(type="password" name="password" class="mt-1 px-3 py-2 bg-transparent border-2 shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="********")
+                            +getErrorMsg('password')
                         a(href="/auth/recover-password").ml-auto.text-principal-gray Olvide mi contraseña
 
                     .btns.w-full.mt-10    
@@ -37,3 +46,4 @@ block contenido
             p(class="absolute bottom-8 right-8 text-white") Fotografía de 
                 span.font-bold= nameUserPhoto
 
+    script(src='/js/closeAlert.js')

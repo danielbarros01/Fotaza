@@ -1,3 +1,9 @@
+mixin getErrorMsg( inputName )
+    if errores
+        each error in errores
+            if error.path == inputName
+                span.text-red-500.text-xs= error.msg
+
 doctype html
 html(lang="es")
     head
