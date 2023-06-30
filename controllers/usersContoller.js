@@ -11,7 +11,8 @@ const formLogin = (req, res) => {
         pagina: 'Sign In',
         imageUrl: "/img/backgrounds/fondo3.jpg",
         nameUserPhoto: "Set.sj",
-        ocultarBtns: true
+        ocultarBtns: true,
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -28,7 +29,8 @@ const authenticate = async (req, res) => {
             nameUserPhoto: "Set.sj",
             ocultarBtns: true,
             errores: resultadoValidaciones.array(),
-            user: { email: req.body.email }
+            user: { email: req.body.email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -43,7 +45,8 @@ const authenticate = async (req, res) => {
             nameUserPhoto: "Set.sj",
             ocultarBtns: true,
             errUserLogin: "Parece que los datos no coinciden con un usuario registrado",
-            user: { email: req.body.email }
+            user: { email: req.body.email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -55,7 +58,8 @@ const authenticate = async (req, res) => {
             nameUserPhoto: "Set.sj",
             ocultarBtns: true,
             errUserLogin: "Tienes que validar tu cuenta, revisa tu correo electronico",
-            user: { email: req.body.email }
+            user: { email: req.body.email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -67,7 +71,8 @@ const authenticate = async (req, res) => {
             nameUserPhoto: "Set.sj",
             ocultarBtns: true,
             errores: [{ path: 'password', msg: "La contraseña es incorrecta" }],
-            user: { email: req.body.email }
+            user: { email: req.body.email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -88,7 +93,8 @@ const formRegister = (req, res) => {
         pagina: 'Sign Up',
         imageUrl: "/img/backgrounds/fondo4.jpg",
         nameUserPhoto: "Luise and Nic",
-        ocultarBtns: true
+        ocultarBtns: true,
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -105,7 +111,8 @@ const register = async (req, res) => {
             nameUserPhoto: "Luise and Nic",
             ocultarBtns: true,
             errEmail: 'El usuario ya esta registrado',
-            user: { name, lastname, email }
+            user: { name, lastname, email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -125,7 +132,8 @@ const register = async (req, res) => {
             nameUserPhoto: "Luise and Nic",
             ocultarBtns: true,
             errores: resultadoValidaciones.array(), //convertimos el resultado a un array
-            user: { name, lastname, email }
+            user: { name, lastname, email },
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -177,17 +185,18 @@ const confirmAccount = async (req, res) => {
 }
 
 
-// /auth/forgot-password
+// /auth/recover-password
 const recoverPassword = (req, res) => {
     res.render('auth/recoverPassword', {
         pagina: 'Recovery Password',
         imageUrl: "/img/backgrounds/fondo5.jpg",
         nameUserPhoto: "masbebet christianto",
-        ocultarBtns: true
+        ocultarBtns: true,
+        csrfToken: req.csrfToken() 
     })
 }
 
-// POST /auth/forgot-password
+// POST /auth/recover-password
 const resetPassword = async (req, res) => {
     await check('email').isEmail().withMessage('Formato de email no valido').run(req)
     let resultadoValidaciones = validationResult(req)
@@ -198,7 +207,8 @@ const resetPassword = async (req, res) => {
             imageUrl: "/img/backgrounds/fondo5.jpg",
             nameUserPhoto: "masbebet christianto",
             ocultarBtns: true,
-            errores: resultadoValidaciones.array()
+            errores: resultadoValidaciones.array(),
+            csrfToken: req.csrfToken() 
         })
     }
 
@@ -212,7 +222,8 @@ const resetPassword = async (req, res) => {
             nameUserPhoto: "masbebet christianto",
             ocultarBtns: true,
             user: { email },
-            errores: [{ msg: 'El email no pertenece a ningun usuario' }]
+            errores: [{ msg: 'El email no pertenece a ningun usuario' }],
+            csrfToken: req.csrfToken() 
         })
     }
 
@@ -254,7 +265,8 @@ const comprobarToken = async (req, res) => {
         pagina: "Reestablece tu contraseña",
         imageUrl: "/img/backgrounds/fondo4.jpg",
         nameUserPhoto: "Luise and Nic",
-        ocultarBtns: true
+        ocultarBtns: true,
+        csrfToken: req.csrfToken() 
     })
 }
 

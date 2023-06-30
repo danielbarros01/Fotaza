@@ -18,6 +18,7 @@ block contenido
                             img(id="btnCloseAlert" src="/img/project/close.svg" alt="Close" class="fill-current h-6 w-6 text-red-500" role="button")
 
                 form(method="POST").w-full
+                    input(type="hidden" name="_csrf" value= csrfToken)
                     .inputs.flex.flex-col.justify-evenly.h-52
                         .input 
                             label.block

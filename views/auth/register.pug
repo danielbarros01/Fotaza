@@ -9,6 +9,7 @@ block contenido
                     h2.text-5xl.text-hard-gray Crear una Cuenta
                     p.text-xl.text-secondary-gray.mt-2 Escribe tus datos para registrarte
                 form(method="POST" action="").w-full.mt-8
+                    input(type="hidden" name="_csrf" value= csrfToken)
                     .inputs.flex.flex-col.justify-evenly.h-52
                         .flex.justify-between 
                             div(class="w-1/2").input.mr-4 

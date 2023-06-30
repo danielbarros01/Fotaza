@@ -1,5 +1,6 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import csurf from 'csurf'
 import startRoutes from './routes/startRoutes.js'
 import usersRoutes from './routes/usersRoutes.js'
 import publicationsRoutes from './routes/publicationsRoutes.js'
@@ -20,6 +21,9 @@ app.use(express.urlencoded({ extended: true }))
 
 //Habilitar cookieParser
 app.use(cookieParser())
+
+//Habilitar CSURF(Cross-Site Request Forgery)
+app.use(csurf({ cookie: true }))
 
 //Routing
 app.use('/', publicationsRoutes)

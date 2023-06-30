@@ -2,7 +2,7 @@ const home = (req, res) => {
     res.render('inicio', {
         pagina: 'Inicio',
         barra: true,
-        imageUrl: "/img/backgrounds/fondo2.jpeg",
+        imageUrl: "/img/backgrounds/fondo6.jpg",
         nameUserPhoto: "Khaled Ali"
     })
 }

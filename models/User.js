@@ -24,6 +24,10 @@ const User = db.define('users', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    image_url: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     token: DataTypes.STRING,
     confirmed: DataTypes.BOOLEAN
 }, {
