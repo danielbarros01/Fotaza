@@ -1,42 +1,42 @@
 const categorias = [
     {
-        nombre: 'Animales',
+        name: 'Animales',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/animals.jpg`
     },
     {
-        nombre: 'Arquitectura',
+        name: 'Arquitectura',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/architecture.jpg`
     },
     {
-        nombre: 'Arte',
+        name: 'Arte',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/art.jpg`
     },
     {
-        nombre: 'Moda',
+        name: 'Moda',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/fashion.jpg`
     },
     {
-        nombre: 'Alimentos',
+        name: 'Alimentos',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/food.jpg`
     },
     {
-        nombre: 'Salud',
+        name: 'Salud',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/health.jpg`
     },
     {
-        nombre: 'Naturaleza',
+        name: 'Naturaleza',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/nature.jpg`
     },
     {
-        nombre: 'Personas',
+        name: 'Personas',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/people.jpg`
     },
     {
-        nombre: 'Eventos',
+        name: 'Eventos',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/show.jpg`
     },
     {
-        nombre: 'Deportes',
+        name: 'Deportes',
         image: `${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/img/backgroundsCategories/sports.jpg`
     }
 ]
