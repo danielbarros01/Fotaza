@@ -11,7 +11,6 @@ const formLogin = (req, res) => {
         pagina: 'Sign In',
         imageUrl: "/img/backgrounds/fondo3.jpg",
         nameUserPhoto: "Set.sj",
-        ocultarBtns: true,
         csrfToken: req.csrfToken()
     })
 }
@@ -27,7 +26,6 @@ const authenticate = async (req, res) => {
             pagina: 'Sign In',
             imageUrl: "/img/backgrounds/fondo3.jpg",
             nameUserPhoto: "Set.sj",
-            ocultarBtns: true,
             errores: resultadoValidaciones.array(),
             user: { email: req.body.email },
             csrfToken: req.csrfToken()
@@ -93,7 +91,6 @@ const formRegister = (req, res) => {
         pagina: 'Sign Up',
         imageUrl: "/img/backgrounds/fondo4.jpg",
         nameUserPhoto: "Luise and Nic",
-        ocultarBtns: true,
         csrfToken: req.csrfToken()
     })
 }
@@ -109,7 +106,6 @@ const register = async (req, res) => {
             pagina: 'Sign Up',
             imageUrl: "/img/backgrounds/fondo4.jpg",
             nameUserPhoto: "Luise and Nic",
-            ocultarBtns: true,
             errEmail: 'El usuario ya esta registrado',
             user: { name, lastname, email },
             csrfToken: req.csrfToken()
@@ -167,7 +163,6 @@ const confirmAccount = async (req, res) => {
             pagina: "Error al confirmar tu cuenta",
             mensaje: "Hubo un error al confirmar tu cuenta",
             imagen: "/img/project/error.svg",
-            ocultarBtns: true,
             error: true
         })
     }
@@ -191,7 +186,6 @@ const recoverPassword = (req, res) => {
         pagina: 'Recovery Password',
         imageUrl: "/img/backgrounds/fondo5.jpg",
         nameUserPhoto: "masbebet christianto",
-        ocultarBtns: true,
         csrfToken: req.csrfToken() 
     })
 }
@@ -206,7 +200,6 @@ const resetPassword = async (req, res) => {
             pagina: 'Recovery Password',
             imageUrl: "/img/backgrounds/fondo5.jpg",
             nameUserPhoto: "masbebet christianto",
-            ocultarBtns: true,
             errores: resultadoValidaciones.array(),
             csrfToken: req.csrfToken() 
         })
@@ -220,7 +213,6 @@ const resetPassword = async (req, res) => {
             pagina: 'Recovery Password',
             imageUrl: "/img/backgrounds/fondo5.jpg",
             nameUserPhoto: "masbebet christianto",
-            ocultarBtns: true,
             user: { email },
             errores: [{ msg: 'El email no pertenece a ningun usuario' }],
             csrfToken: req.csrfToken() 
@@ -255,7 +247,6 @@ const comprobarToken = async (req, res) => {
             pagina: "Reestablece tu contraseña",
             mensaje: "Hubo un error al validar tu informacion",
             imagen: "/img/project/error.svg",
-            ocultarBtns: true,
             error: true
         })
     }
@@ -265,7 +256,6 @@ const comprobarToken = async (req, res) => {
         pagina: "Reestablece tu contraseña",
         imageUrl: "/img/backgrounds/fondo4.jpg",
         nameUserPhoto: "Luise and Nic",
-        ocultarBtns: true,
         csrfToken: req.csrfToken() 
     })
 }
@@ -303,7 +293,6 @@ const newPassword = async (req, res) => {
         pagina: 'Contraseña reestablecida',
         mensaje: 'El Password se guardo correctamente',
         imagen: "/img/project/success.svg",
-        ocultarBtns: true,
         error: false
     })
 }
