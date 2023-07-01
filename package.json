@@ -23,6 +23,7 @@
   "author": "Daniel Eduardo Barros <danibelgranocab@hotmail.com>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",

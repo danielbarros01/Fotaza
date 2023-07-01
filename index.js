@@ -1,9 +1,9 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import csurf from 'csurf'
-import startRoutes from './routes/startRoutes.js'
 import usersRoutes from './routes/usersRoutes.js'
 import publicationsRoutes from './routes/publicationsRoutes.js'
+import categoriesRoutes from './routes/categoriesRoutes.js'
 import db from './config/db.js'
 
 const app = express()
@@ -25,9 +25,13 @@ app.use(cookieParser())
 //Habilitar CSURF(Cross-Site Request Forgery)
 app.use(csurf({ cookie: true }))
 
+// Configurar el middleware para analizar el cuerpo de la solicitud JSON
+app.use(express.json());
+
 //Routing
 app.use('/', publicationsRoutes)
 app.use('/auth', usersRoutes)
+app.use('/categories', categoriesRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))

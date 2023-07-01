@@ -8,7 +8,8 @@ export default {
         'principal-gray': '#393E46',
         'secondary-gray': '#929AAB',
         'hard-gray': '#1E1E1E',
-        'polished-white': '#F7F7F7'
+        'polished-white': '#F7F7F7',
+        'neon-green': '#16FF00'
       },
     },
   },

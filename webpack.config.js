@@ -3,7 +3,8 @@ import path from 'path'
 export default {
     mode: 'development',
     entry:{
-        closeAlert: './src/js/closeAlert.js'
+        closeAlert: './src/js/closeAlert.js',
+        sendCategories: './src/js/sendCategories.js'
     },
     output:{
         filename: '[name].js',

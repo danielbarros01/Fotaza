@@ -39,6 +39,13 @@ const User = db.define('users', {
             const salt = await bcrypt.genSalt(10) //generar salt con 10 rondas
             user.password = await bcrypt.hash(user.password, salt)
         }
+    },
+    scopes:{
+        withoutPassword: {
+            attributes: {
+                exclude: ['password', 'token', 'confirmed']
+            }
+        }
     }
 })
 

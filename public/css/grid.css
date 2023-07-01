@@ -1,0 +1,6 @@
+.containerGrid{
+    display: grid;
+    grid-auto-flow: dense;
+    grid-auto-rows: 14rem;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+}
