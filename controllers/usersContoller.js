@@ -171,12 +171,13 @@ const confirmAccount = async (req, res) => {
     user.confirmed = true
     await user.save()
 
-    return res.render('auth/confirmAccount', {
-        pagina: "Cuenta confirmada",
-        mensaje: "La cuenta se confirmo correctamente",
-        imagen: "/img/project/success.svg",
-        ocultarBtns: true,
-    })
+    //Autenticar con jwt
+    const tokenJwt = generateJWT(user.id)
+
+    //Almacenar en cookie
+    return res.cookie('_token', token, {
+        httpOnly: true
+    }).redirect('/categories/select')
 }
 
 
