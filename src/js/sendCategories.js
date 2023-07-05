@@ -29,15 +29,10 @@ categories.forEach((category) => {
 
 })
 
-console.log(categoriesSelected)
-
 button.addEventListener('click', () => {
     const data = {
         categoriesSelected
     };
-
-    console.log(csrfToken)
-
 
     // Crear el objeto de opciones para la solicitud POST
     const options = {
@@ -53,7 +48,7 @@ button.addEventListener('click', () => {
     fetch('/categories/select', options)
         .then(response => {
             if (response.ok) {
-                return window.location.href = "/publications"
+                return window.location.href = "/"
             }
             throw new Error('Error en la solicitud');
         })

@@ -80,7 +80,7 @@ const authenticate = async (req, res) => {
     //Almacenar en cookie
     return res.cookie('_token', token, {
         httpOnly: true
-    }).redirect('/publications')
+    }).redirect('/')
 }
 
 
@@ -175,7 +175,7 @@ const confirmAccount = async (req, res) => {
     const tokenJwt = generateJWT(user.id)
 
     //Almacenar en cookie
-    return res.cookie('_token', token, {
+    return res.cookie('_token', tokenJwt, {
         httpOnly: true
     }).redirect('/categories/select')
 }

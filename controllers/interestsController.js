@@ -4,7 +4,7 @@ import Interest from '../models/Interest.js'
 import User from '../models/User.js'
 
 
-const selectCategories = async (req, res) => {
+const selectInterests = async (req, res) => {
     //Utilizar la opción raw: true en las consultas de Sequelize cuando solo necesites los datos sin instancias de modelos completas:
     //obtener las categorias
     const categories = await Category.findAll({ raw: true })
@@ -72,6 +72,6 @@ const saveInterests = async (req, res) => {
 }
 
 export {
-    selectCategories,
+    selectInterests,
     saveInterests
 }

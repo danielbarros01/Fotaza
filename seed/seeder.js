@@ -1,7 +1,9 @@
 import { exit } from 'node:process'
 import db from '../config/db.js'
-import Category from '../models/Category.js'
+import { Category } from '../models/Index.js'
+import RightOfUse from '../models/RightOfUse.js'
 import categories from "./categories.js";
+import rightsOfUse from "./rightsOfUse.js";
 
 
 const importData = async () => {
@@ -13,7 +15,10 @@ const importData = async () => {
         //await db.sync()
 
         //Insertamos los datos
-        await Promise.all([Category.bulkCreate(categories)])
+        await Promise.all([
+            Category.bulkCreate(categories),
+            //RightOfUse.bulkCreate(rightsOfUse)
+        ])
 
         console.log('Datos importados correctamente')
         exit(0)
@@ -29,8 +34,10 @@ const deleteData = async () => {
         // Desactivar la restricción de clave externa temporalmente
         await Category.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
 
-        await Promise.all([Category.destroy({ where: {}, truncate: true })])
-        
+        await Promise.all([
+            Category.destroy({ where: {}, truncate: true })
+        ])
+
         // Activar la restricción de clave externa
         await Category.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 

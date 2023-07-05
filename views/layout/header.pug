@@ -1,11 +1,17 @@
 header(class="mx-3.5")
-    .flex.justify-between.items-center.my-5.w-full
+    .flex.justify-between.items-center.my-5.w-full.pr-4.pl-2
         a(href="/") 
-            img(src="/img/project/logo.svg", alt="").w-32
+            img(src="/img/project/logo.svg", alt="Logo").w-32
 
-        if viewBtnsAuth
-            nav(class="text-sm md:flex md:items-center md:gap-5 font-bold")
+        nav(class="text-sm md:flex md:items-center md:gap-5 font-bold")
+            if viewBtnsAuth
                 a(href="/auth/login") 
                     button(class="bg-principal-gray text-white py-2 px-4 border-2 border-principal-gray") Iniciar Sesion
                 a(href="/auth/signup") 
                     button(class="bg-transparent border-2 text-principal-gray border-principal-gray py-2 px-4") Registrate
+            
+            if user 
+                a(href="/publications/create") 
+                    button(class="bg-principal-gray text-white py-2 px-8 border-2 border-principal-gray font-normal mr-2") Crear
+                div.w-16.border-2.border-principal-gray.cursor-pointer.shadow
+                    img(src=user.image_url , alt="Imagen de perfil")
