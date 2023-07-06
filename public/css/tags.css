@@ -1,0 +1,21 @@
+.tag {
+ background-color: #ccc;
+ border-radius: 10px;
+ padding: 4px 10px 4px 10px;
+ margin: 2px 0 2px;
+}
+
+.tag span {
+ margin-left: 10px;
+ padding: 5px;
+ cursor: pointer;
+}
+
+.tag span svg {
+ width: 15px;
+}
+
+.tag span:hover {
+ border-radius: 50%;
+ background-color: rgba(255, 70, 70, 0.824);
+}

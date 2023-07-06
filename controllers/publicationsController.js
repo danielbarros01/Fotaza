@@ -1,5 +1,5 @@
 import { body, validationResult, check } from 'express-validator'
-import { Category, RightOfUse, Publication } from '../models/Index.js'
+import { Category, RightOfUse, Publication, Tag, PublicationHasTag } from '../models/Index.js'
 import fs from 'fs'
 
 const viewPublications = (req, res) => {
@@ -21,66 +21,85 @@ const createPublication = async (req, res) => {
     })
 }
 
-const savePublication = 
-async (req, res) => {
-    /* Validaciones */
-    //Valido que venga la imagen
-    if (!req.file) {
-        return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
-    }
-
-    //Que los campos tambien vengan
-    const errors = []
-    for (let campo in req.body) {
-        if (!req.body[campo]) {
-            errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
+const savePublication =
+    async (req, res) => {
+        /* Validaciones */
+        //Valido que venga la imagen
+        if (!req.file) {
+            return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
         }
 
-        if (campo == 'category' || campo == 'rightsOfUse') {
-            if (!(!!Number(req.body[campo]))) { //Si no es numero
-                errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
+        //Que los campos tambien vengan
+        const errors = []
+        for (let campo in req.body) {
+            if (!req.body[campo]) {
+                errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
+            }
+
+            if (campo == 'category' || campo == 'rightsOfUse') {
+                if (!(!!Number(req.body[campo]))) { //Si no es numero
+                    errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
+                }
             }
         }
+
+        //Si hay campos vacios:
+        if (errors.length > 0) {
+            // Verificar si existe un archivo adjunto y eliminarlo
+            deleteImage(req)
+
+            //Retornar errores
+            return res.status(400).json(errors)
+        }
+        /* - - - - */
+
+        const { filename, mimetype } = req.file
+        const { title, category: category_id, rightsOfUse: rightId } = req.body
+        const { id } = req.user
+        const tags = JSON.parse(req.body.tags)
+
+        //Checkear que solo sean 3 tags
+        if (tags.length > 3) {
+            return res.status(400).json({ path: 'tags', msg: `Escribe maximo 3 categorias` })
+        }
+
+
+        try {
+            //Guardar publicacion
+            const publication = await Publication.create({
+                image: filename,
+                title,
+                date: new Date(),
+                format: mimetype,
+                resolution: null,
+                privacy: 'public', //que el usuario elija si quiere ocultar una foto
+                category_id,
+                rights_of_use_id: rightId,
+                user_id: id
+            })
+
+            //find or create para obtener el id del tag o crearlo y tambien obtener el id
+            const tagsBD = [] //instancias de tag
+            for (const tag of tags) {
+                const lowercaseTag = tag.toLowerCase(); //convierto en minuscula la palabra
+                tagsBD.push(await Tag.findOrCreate({ where: { name: lowercaseTag } }))
+            }
+
+            //agregar a la tabla intermedia
+            for (const tag of tagsBD) {
+                await PublicationHasTag.create({ publicationId: publication.id, tagId: tag[0].id })
+            }
+
+            res.status(201).json({ publicationId: publication.id })
+        } catch (error) {
+            //Si ocurrio un erro tambien eliminar la imagen
+            deleteImage(req)
+            console.error(error)
+        }
+
+
+        res.status(200)
     }
-
-    //Si hay campos vacios:
-    if (errors.length > 0) {
-        // Verificar si existe un archivo adjunto y eliminarlo
-        deleteImage(req)
-
-        //Retornar errores
-        return res.status(400).json(errors)
-    }
-    /* - - - - */
-
-    const { filename, mimetype } = req.file
-    const { title, category: category_id, rightsOfUse: rightId } = req.body
-    const { id } = req.user
-
-    try {
-        //Guardar publicacion
-        const publication = await Publication.create({
-            image: filename,
-            title,
-            date: new Date(),
-            format: mimetype,
-            resolution: null,
-            privacy: 'public', //que el usuario elija si quiere ocultar una foto
-            category_id,
-            rights_of_use_id: rightId,
-            user_id: id
-        })
-
-        res.status(201).json({ publicationId: publication.id })
-    } catch (error) {
-        //Si ocurrio un erro tambien eliminar la imagen
-        deleteImage(req)
-        console.error(error)
-    }
-
-
-    res.status(200)
-}
 
 const saveImage = async (req, res) => {
 

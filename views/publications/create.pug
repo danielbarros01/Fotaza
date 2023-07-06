@@ -2,11 +2,12 @@ extends ../layout/index
 
 block styles 
     meta(name="csrf-token" content= csrfToken)
+    link(rel="stylesheet", href="/css/tags.css")
 block contenido
     include ../layout/header
 
     main.bg-polished-white.h-screen.pt-10.h-full
-        div(class="w-3/6 rounded-md shadow-md m-auto p-4 bg-white md:px-16")
+        div(class="md:w-4/6 xl:w-3/6 rounded-md shadow-md m-auto p-4 bg-white md:px-16")
             h1(class="text-center text-2xl mt-4 mb-8 font-bold") Crear una nueva publicación 
             form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data") 
                 
@@ -22,15 +23,18 @@ block contenido
 
                     div 
                         label(for="category") Categoría
-                        select(id="categories" name="category" class="block w-64 h-10 rounded-md pl-4")
+                        select(id="categories" name="category" class="block w-64 h-10 rounded-md pl-4 border-2 border-principal-gray")
                             option(value="") - Seleccionar - 
                             each category in categories 
                                 option(value= category.id)= category.name
                         span(id="errCategory").text-red-500.text-xs.hidden
 
                     div 
-                        label(for="tags") Etiquetas 
-                        input(id="tags" type="text" placeholder="Ingrese sus etiquetas ( separalas con espacio )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
+                        .flex.justify-between.items-center
+                            label(for="tag") Etiquetas 
+                            span(id="errTag").text-red-500.text-xs.hidden
+                        input(id="tag" type="text" placeholder="Ingrese sus etiquetas ( presione enter para agregar )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
+                        ul(id="tags").w-full.flex.gap-2
 
                 div.flex.justify-between.items-center.mt-10.relative
                     div 
