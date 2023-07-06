@@ -14,9 +14,11 @@ block contenido
                     input(type="file" name="image" id="file")
                     div(class="preview w-1/2 h-full p-3 flex justify-center")
                         img(id="image" class="h-full float-right border-2 border-principal-gray rounded-md")
+                span(id="errImage").text-red-500.text-xs.hidden
 
                 div.px-6.flex.flex-col.gap-4.mt-8
                     input(id="title" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full")
+                    span(id="errTitle").text-red-500.text-xs.hidden
 
                     div 
                         label(for="category") Categoría
@@ -24,17 +26,19 @@ block contenido
                             option(value="") - Seleccionar - 
                             each category in categories 
                                 option(value= category.id)= category.name
+                        span(id="errCategory").text-red-500.text-xs.hidden
 
                     div 
                         label(for="tags") Etiquetas 
                         input(id="tags" type="text" placeholder="Ingrese sus etiquetas ( separalas con espacio )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
 
-                div.flex.justify-between.items-center.mt-10
+                div.flex.justify-between.items-center.mt-10.relative
                     div 
                         select#rightsOfUse(name="rightsOfUse" class="bg-principal-gray text-white py-2 px-4  font-normal text-sm").w-full
                             each right in rightsOfUse 
                                 option(value= right.id)= right.name
-                        
+                    span(id="errRightOfUse").text-red-500.text-xs.hidden.absolute.top-7.mt-3
+
                     button#btnSave(type="submit" class="bg-principal-gray text-white font-normal mr-2")
                         .my-3.mx-4.flex.justify-between
                             span.w-full.text-white.font-bold Subir
@@ -42,4 +46,4 @@ block contenido
 
 
 block scripts
-    script(src="/js/addImage.js")
+    script(src="/js/addPublication.js")

@@ -5,7 +5,7 @@ export default {
     entry:{
         closeAlert: './src/js/closeAlert.js',
         sendCategories: './src/js/sendCategories.js',
-        addImage: './src/js/addImage.js',
+        addPublication: './src/js/addPublication.js',
     },
     output:{
         filename: '[name].js',

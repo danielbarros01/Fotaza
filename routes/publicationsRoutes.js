@@ -10,6 +10,6 @@ router.get('/', viewPublications)
 router.get('/create', protectRoute, createPublication)
 router.post('/create', protectRoute, upload.single('image'), savePublication)
 
-router.post('/add-image', upload.single('image'), saveImage)
+router.get('/my-posts', protectRoute, viewPublications)
 
 export default router

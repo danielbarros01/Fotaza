@@ -71,8 +71,7 @@ async (req, res) => {
             user_id: id
         })
 
-        console.log('publicacion creada')
-        res.status(201)
+        res.status(201).json({ publicationId: publication.id })
     } catch (error) {
         //Si ocurrio un erro tambien eliminar la imagen
         deleteImage(req)

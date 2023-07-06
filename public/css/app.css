@@ -518,6 +518,9 @@ video {
 .top-0 {
   top: 0px;
 }
+.top-7 {
+  top: 1.75rem;
+}
 .float-right {
   float: right;
 }
@@ -607,6 +610,9 @@ video {
 }
 .mt-8 {
   margin-top: 2rem;
+}
+.mt-3 {
+  margin-top: 0.75rem;
 }
 .block {
   display: block;
