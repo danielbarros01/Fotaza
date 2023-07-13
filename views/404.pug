@@ -1,0 +1,20 @@
+extends ./layout/index
+
+block contenido
+    div(class="bg-cover bg-center bg-no-repeat h-screen" style=`background-image: url(/img/backgrounds/desert.jpg)`)
+        header(class="mx-6 text-")
+            a(href="/") 
+                img(src="/img/project/logo.svg" alt="Logo" class="py-4 w-36")
+
+        h3.text-center.text-4xl.font-bold.text-principal-gray= message
+
+        img(src="/img/project/404.png", alt="404" class="w-2/5 m-auto my-10")
+
+        p(for="palabra" class="text-2xl font-bold mb-5 text-center text-principal-gray") Prueba buscando una imagen
+
+        div(class="relative block w-5/12 mx-auto mt-7 shadow-2xl")
+            span(class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
+                img(src="/img/project/search.svg" alt="").w-6
+            input(class="font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-polished-white w-full rounded-full py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1 sm:text-sm bg-cover bg-center bg-no-repeat" placeholder="Ex. Lago" type="text" name="search" style=`background-image: url(/img/backgrounds/desert.jpg)`)
+
+            

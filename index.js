@@ -5,6 +5,7 @@ import homeRoutes from './routes/homeRoutes.js'
 import usersRoutes from './routes/usersRoutes.js'
 import publicationsRoutes from './routes/publicationsRoutes.js'
 import interestsRoutes from './routes/interestsRoutes.js'
+import ratingsRoutes from './routes/ratingsRoutes.js'
 import db from './config/db.js'
 
 const app = express()
@@ -34,6 +35,7 @@ app.use('/', homeRoutes)
 app.use('/publications', publicationsRoutes)
 app.use('/auth', usersRoutes)
 app.use('/categories', interestsRoutes)
+app.use('/rating', ratingsRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))

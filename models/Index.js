@@ -3,6 +3,7 @@ import Category from './Category.js'
 import Interest from './Interest.js'
 import RightOfUse from './RightOfUse.js'
 import Publication from './Publication.js'
+import Rating from './Rating.js'
 import Tag from './Tag.js'
 import PublicationHasTag from './PublicationHasTag.js'
 
@@ -19,6 +20,9 @@ RightOfUse.hasMany(Publication, { foreignKey: 'rights_of_use_id'})
 // Definir la relación muchos a muchos entre Publicacion y Tag
 Publication.belongsToMany(Tag, { through: PublicationHasTag });
 
+// Definir la relación de rating
+Publication.belongsToMany(User, { through: Rating})
+
 export {
     Interest,
     Category,
@@ -26,5 +30,6 @@ export {
     RightOfUse,
     Publication,
     Tag,
-    PublicationHasTag
+    PublicationHasTag,
+    Rating
 }

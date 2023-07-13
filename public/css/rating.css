@@ -1,0 +1,11 @@
+.star{
+    font-size: 30px;
+    color: #bbb;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.star:hover,
+.star.checked{
+    color: gold;
+}
