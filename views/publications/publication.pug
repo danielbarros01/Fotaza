@@ -16,13 +16,21 @@ block contenido
                     p.font-bold= `${userPost.name } ${userPost.lastname }`
                     p.text-secondary-gray= userPost.username
 
-            div.flex.items-center
+            div.flex.items-center.relative
                 button#btnSendCategories(class="bg-principal-gray flex items-center justify-between hover:bg-secondary-gray h-11 w-40")
                     span.w-full.text-white Descargar
                     img(src="/img/project/download.svg", alt="").w-6.mr-2
                 if user
                     button#btnOptions(class="bg-transparent")
                         img(src="/img/project/options.svg", alt="").w-8.ml-2
+                    div#optionsPublication(class="hidden absolute bg-secondary-gray top-16 right-4 w-2/3 rounded-[10px] rounded-tr-[0px] p-3 shadow-md")
+                        a(href=`/publications/${publication.id}/edit` class="flex justify-around items-center hover:transform hover:scale-110")
+                            p.text-white Editar 
+                            i(class="fa-solid fa-pen text-white")
+                        hr.my-2
+                        a(href=`/publications/${publication.id}/delete` class="flex justify-around items-center hover:transform hover:scale-110")  
+                            p.text-red-700 Eliminar 
+                            i(class="fa-solid fa-trash text-red-700")
 
         div(class="flex flex-col items-center mt-3") 
             div(class="flex justify-between items-center w-2/3 mb-2")
@@ -44,9 +52,11 @@ block contenido
                     a(href="#") 
                         p(class="text-slate-500 bg-slate-200 w-24 rounded-lg text-center")= tag.name
 
-            .rightOfUse.text-principal-gray.text-xl.underline.flex.items-center
-                p= rightOfUse.name
-                img#btnInfo(src="/img/project/info.svg", alt="" class="ml-2 w-5")
+            .rightOfUse.flex.items-center.relative
+                div#infoRightOfUse(class="hidden absolute bottom-10 bg-secondary-gray text-xs p-2 text-polished-white rounded-[10px] rounded-br-[0px]")
+                    p= rightOfUse.description
+                p.text-principal-gray.text-xl.underline= rightOfUse.name
+                img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
 
     div#alertLogin(class="w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40").hidden
@@ -61,3 +71,4 @@ block contenido
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     script(src="/js/rating.js")
+    script(src="/js/clicksPublication.js")
