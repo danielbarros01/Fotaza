@@ -1,6 +1,7 @@
 import { body, validationResult, check } from 'express-validator'
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag } from '../models/Index.js'
 import fs from 'fs'
+import path from 'path'
 
 // GET /publications
 const viewPublications = (req, res) => {
@@ -136,7 +137,7 @@ const viewPublication = async (req, res) => {
         //comentarios
         //calificacion
         //otras imagenes parecidas
-        
+
 
         //si el userId del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
@@ -169,10 +170,31 @@ const deleteImage = (req) => {
     }
 }
 
+const downloadImage = async (req, res) => {
+    const { id: idPublication } = req.params
+    const publication = await Publication.findOne({ where: { id: idPublication } })
+
+    if (!publication) {
+        return res.status(404).render('404', { message: 'Uups, no encontramos esta publicación' })
+    }
+
+    const fileName = publication.image
+    const filePath = path.join(process.cwd(), 'public', 'uploads', fileName)
+
+
+    res.download(filePath, fileName, (err) => {
+        if (err) {
+            console.error('Error al descargar un archivo:', err);
+            res.status(500).send('Ocurrió un error al descargar el archivo.');
+        }
+    })
+}
+
 export {
     viewPublications,
     createPublication,
     savePublication,
     viewMyPublications,
-    viewPublication
+    viewPublication,
+    downloadImage
 }

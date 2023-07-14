@@ -17,9 +17,10 @@ block contenido
                     p.text-secondary-gray= userPost.username
 
             div.flex.items-center.relative
-                button#btnSendCategories(class="bg-principal-gray flex items-center justify-between hover:bg-secondary-gray h-11 w-40")
-                    span.w-full.text-white Descargar
-                    img(src="/img/project/download.svg", alt="").w-6.mr-2
+                a(href=`/publications/${publication.id}/download`) 
+                    button#btnSendCategories(class="bg-principal-gray flex items-center justify-between hover:bg-secondary-gray h-11 w-40")
+                        span.w-full.text-white Descargar
+                        img(src="/img/project/download.svg", alt="").w-6.mr-2
                 if user
                     button#btnOptions(class="bg-transparent")
                         img(src="/img/project/options.svg", alt="").w-8.ml-2
@@ -60,7 +61,7 @@ block contenido
 
 
     div#alertLogin(class="w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40").hidden
-        div(class="w-2/3 bg-white p-10 text-center relative")
+        div(class="w-2/5 bg-white p-10 text-center relative")
             i#btnCloseAlertLogin(class="fa-solid fa-xmark absolute left-3 top-3 cursor-pointer")
             div 
                 h4.font-medium.text-4xl.mb-2 Inicia Sesion 

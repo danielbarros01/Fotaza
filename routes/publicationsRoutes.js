@@ -1,5 +1,5 @@
 import express from 'express'
-import { viewPublications, createPublication, savePublication, viewMyPublications,viewPublication } from '../controllers/publicationsController.js'
+import { viewPublications, createPublication, savePublication, viewMyPublications,viewPublication, downloadImage } from '../controllers/publicationsController.js'
 import protectRoute from '../Middlewares/protectRoute.js'
 import authenticateUser from "../Middlewares/authenticateUser.js"
 import upload from "../Middlewares/uploadImage.js"
@@ -16,5 +16,7 @@ router.get('/my-posts', protectRoute, viewMyPublications)
 //Si el post es publico lo puede ver cualquiera
 //Si el post es mio lo puedo modificar
 router.get('/:id', authenticateUser, viewPublication)
+
+router.get('/:id/download', downloadImage)
 
 export default router
