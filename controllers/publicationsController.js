@@ -1,5 +1,6 @@
+import db from '../config/db.js'
 import { body, validationResult, check } from 'express-validator'
-import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag } from '../models/Index.js'
+import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -134,12 +135,18 @@ const viewPublication = async (req, res) => {
         const tags = await publication.getTags()
         const rightOfUse = await RightOfUse.findByPk(publication.rights_of_use_id)
         const category = await Category.findByPk(publication.category_id)
-        //comentarios
+        const comments = await Comment.findAll({
+            where: { publication_id: publication.id },
+            include: [{ model: User, as: 'user' }],
+            order: [
+                db.literal(`(user_id = ${user.id}) DESC`), // 
+                ['date', 'DESC']
+            ]
+        })
         //calificacion
         //otras imagenes parecidas
 
-
-        //si el userId del post es el mismo del user.id, mostrar para modificar
+        //si el user_id del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
             publication,
             viewBtnsAuth: user ? false : true,
@@ -148,6 +155,7 @@ const viewPublication = async (req, res) => {
             tags,
             rightOfUse,
             category,
+            comments,
             csrfToken: req.csrfToken(),
         })
     } catch (error) {

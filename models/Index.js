@@ -5,6 +5,7 @@ import RightOfUse from './RightOfUse.js'
 import Publication from './Publication.js'
 import Rating from './Rating.js'
 import Tag from './Tag.js'
+import Comment from './Comment.js'
 import PublicationHasTag from './PublicationHasTag.js'
 
 
@@ -23,6 +24,16 @@ Publication.belongsToMany(Tag, { through: PublicationHasTag });
 // Definir la relación de rating
 Publication.belongsToMany(User, { through: Rating})
 
+// Definir las relaciones de comment
+User.hasMany(Comment, {foreignKey:'user_id'})
+//Para poder utilizar usuario en comentario
+Comment.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
+Publication.hasMany(Comment, {foreignKey:'publication_id'})
+
+
+/* Publication.belongsToMany(User, { through: Comment})
+Comment.belongsTo(User, {foreignKey: 'user_id'}) */
+
 export {
     Interest,
     Category,
@@ -31,5 +42,6 @@ export {
     Publication,
     Tag,
     PublicationHasTag,
-    Rating
+    Rating,
+    Comment
 }
