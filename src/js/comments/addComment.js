@@ -62,7 +62,7 @@ $btnComment.addEventListener('click', () => {
 
             $commentText.value = ''
             $countText.textContent = 0;
-
+            verifyNoComments()
         })
         .catch(function (error) {
             console.log(error);
@@ -78,6 +78,7 @@ function addOptionsToButton(btn, commentId) {
         const $btnDelete = $options.querySelector('.btnCommentDelete');
 
         $btnDelete.addEventListener('click', () => {
+            const myId = document.querySelector('meta[name="my-id"]').getAttribute('content')
             axios
                 .delete('/comments/delete', {
                     headers: {
@@ -86,11 +87,13 @@ function addOptionsToButton(btn, commentId) {
                     data: {
                         commentId,
                         publicationId,
+                        myId
                     },
                 })
                 .then((response) => {
                     console.log(response.data);
                     btn.closest('.comment').remove();
+                    verifyNoComments()
                 })
                 .catch((error) => {
                     console.error(error);
@@ -134,3 +137,11 @@ $commentText.addEventListener('paste', (event) => {
         }
     }, 0);
 });
+
+function verifyNoComments(){
+    if($sectionComments.childElementCount === 0){
+        $noComments.classList.remove('hidden')
+    }else{
+        $noComments.classList.add('hidden')
+    }
+}

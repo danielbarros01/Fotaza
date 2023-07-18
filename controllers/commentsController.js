@@ -47,7 +47,7 @@ const deleteComment = async (req, res) => {
     //obtener el id del comentario
     const { commentId, publicationId, myId } = req.body
 
-    if(myId != user.id){
+    if(parseInt(myId) != user.id){
         return res.sendStatus(403);
     }
 

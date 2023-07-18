@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 
+const $noComments = document.getElementById('noComments')
 const $sectionComments = document.getElementById('generalComments')
 const $template = document.getElementById('templateComment2').content
 const $fragment = document.createDocumentFragment()
@@ -14,8 +15,8 @@ const publicationId = parts[parts.length - 1];
 let page = 1;
 const pageSize = 4;
 
-//Apenas carga mi pagina
-getMoreComments()
+//Traigo los comentarios
+getMoreComments(verifyNoComments)
 
 //Cuando le doy click a ver más
 $seeMoreButton.addEventListener('click', () => {
@@ -23,7 +24,7 @@ $seeMoreButton.addEventListener('click', () => {
 })
 
 //Traer mas comentarios
-function getMoreComments() {
+function getMoreComments(cb) {
     axios.get(`/comments/${publicationId}?page=${page}&pageSize=${pageSize}`)
         .then(response => {
             const comentarios = response.data;
@@ -41,6 +42,10 @@ function getMoreComments() {
                 $seeMoreButton.classList.add('hidden')
             } else {
                 $seeMoreButton.classList.remove('hidden')
+            }
+
+            if(page == 1){
+                cb()
             }
 
             page++
@@ -103,4 +108,12 @@ function addOptionsToButton(btn, commentId) {
                 });
         });
     });
+}
+
+function verifyNoComments(){
+    if($sectionComments.childElementCount === 0){
+        $noComments.classList.remove('hidden')
+    }else{
+        $noComments.classList.add('hidden')
+    }
 }

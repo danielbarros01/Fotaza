@@ -60,7 +60,7 @@ block contenido
                 p.text-principal-gray.text-xl.underline= rightOfUse.name
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
-        #sectionBottom(class="w-full flex px-10") 
+        #sectionBottom(class="w-full flex px-10 mt-14 mb-8") 
             if user
                 #comments(class="w-2/6") 
                     h2(class="text-3xl my-4") Comentarios 
@@ -74,11 +74,24 @@ block contenido
                                     span /500
                                 span#commentError(class="invisible text-red-600 ml-4 text-xs")
                                 button#btnComment(class="rounded-lg shadow-lg border border-principal-gray float-right p-[5px] px-4 m-2 mr-4 hover:bg-gray-input") Comentar
-
-                    #generalComments(class="h-96 overflow-auto pt-2 pr-4")
+                
+                    #generalComments(class="h-fit max-h-96 overflow-auto pt-2 pr-4")
                     div#seeMoreButton(class="w-fit m-auto text-center cursor-pointer rounded-3xl p-2 hover:bg-gray-200")
                         p(class="mb-[-5px]") Ver más
                         i(class="fa-solid fa-angles-down")
+
+                    div#noComments(class="hidden")
+                        p(class="text-2xl text-gray-500 text-center") Todavia no hay comentarios 
+                        img(src="/img/project/comments.svg", alt="No comments" class="m-auto my-5 w-40")
+            else  
+                div(class="w-2/6 bg-gray-300 flex flex-col justify-around items-center h-96 rounded p-6")
+                    h4.text-center
+                        span(class="font-bold text-3xl") 
+                            a(href="/auth/signup" class="hover:opacity-60") Registrate 
+                            span o 
+                            a(href="/auth/login" class="hover:opacity-60") Inicia Sesión
+                        span(class="block text-xl") para ver los comentarios
+                    img(src="/img/project/comments.svg", alt="" class="h-48")
 
             #rightSectionBottom(class="w-3/5") 
                 #ratingSection 
