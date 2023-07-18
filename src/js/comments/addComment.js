@@ -16,11 +16,10 @@ const url = window.location.href;
 const parts = url.split("/");
 const publicationId = parts[parts.length - 1];
 
-//apenas se carga la pagina
-addOptionsForComments()
 
-
+//Agregar comentario
 $btnComment.addEventListener('click', () => {
+    debugger
     const text = $commentText.value.trim()
 
     if (text === '') {
@@ -45,14 +44,12 @@ $btnComment.addEventListener('click', () => {
         .then(function (response) {
             $template.querySelector(".commentTimeThatPassed").textContent = 'Recién'
             $template.querySelector(".commentDescription").textContent = text
-            $template.querySelector(".btnCommentDelete").setAttribute('data-comment-id', response.data.commentId);
-
 
             let $clone = document.importNode($template, true)
 
             // Obtén el nuevo botón de opciones del comentario recién agregado
             const $newButton = $clone.querySelector('.btnCommentOptions');
-            
+
             $fragment.appendChild($clone)
 
             const $existingElement = $sectionComments.firstChild;
@@ -62,8 +59,7 @@ $btnComment.addEventListener('click', () => {
                 $sectionComments.appendChild($fragment)
             }
 
-
-            addOptionsToButton($newButton);
+            addOptionsToButton($newButton, response.data.commentId);
 
             $commentText.value = ''
             $countText.textContent = 0;
@@ -74,13 +70,13 @@ $btnComment.addEventListener('click', () => {
         });
 })
 
-function addOptionsToButton(btn) {
+//Opciones de eliminacion para el comentario
+function addOptionsToButton(btn, commentId) {
     btn.addEventListener('click', () => {
         const $options = btn.parentElement.querySelector('.commentOptions');
         $options.classList.toggle('hidden');
 
         const $btnDelete = $options.querySelector('.btnCommentDelete');
-        const commentId = $btnDelete.dataset.commentId;
 
         $btnDelete.addEventListener('click', () => {
             axios
@@ -104,14 +100,7 @@ function addOptionsToButton(btn) {
     });
 }
 
-//Funcion que permite eliminar comentario
-function addOptionsForComments() {
-    const $btnOptions = document.querySelectorAll('.btnCommentOptions')
-    // Opciones de comentario
-    $btnOptions.forEach(addOptionsToButton);
-}
-
-
+//Reseteo el input
 $commentText.addEventListener('keydown', () => {
     $commentError.classList.add('invisible')
     $commentError.textContent = null

@@ -2,6 +2,7 @@ extends ../layout/index
 
 block styles 
     meta(name="csrf-token" content= csrfToken)
+    meta(name="my-id" content= myId)
     link(rel="stylesheet", href="/css/rating.css", attr)
 
 
@@ -80,30 +81,6 @@ block contenido
                                 p(class="text-2xl text-gray-500 text-center") Todavia no hay comentarios 
                                 img(src="/img/project/comments.svg", alt="No comments" class="m-auto my-5 w-40")
                         
-                        if comments.length > 0
-                            each comment in comments 
-                                div(class="comment mb-8")
-                                    div.flex                
-                                        div(class="w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat" style=`background-image: url(${comment.user.image_url})`) 
-                                        
-                                        div(class="flex flex-col w-full")
-                                            div(class="flex justify-between w-full mt-[-10px]")
-                                                p.font-bold.text-principal-gray= `${comment.user.name} ${comment.user.lastname}`
-                                                p.text-gray-600.text-sm= comment.timeThatPassed
-                                            div(class="bg-gray-200 rounded-[10px] rounded-tl-[0px] min-h-[50px] p-3 pl-5 relative") 
-                                                if comment.user_id == user.id
-                                                    button(class="btnCommentOptions absolute right-2 top-0")
-                                                        img(src="/img/project/options-horizontal.svg", alt="comment options" class="w-4 cursor-hover")
-                                                    div(class="hidden commentOptions absolute bg-gray-200 top-4 right-0 w-28 shadow-xl border border-gray-400 rounded") 
-                                                        div(class="btnCommentDelete flex justify-around items-center hover:bg-gray-300 p-3 cursor-pointer" data-comment-id= comment.id)
-                                                            i(class="fa-solid fa-trash text-red-700 text-xs")
-                                                            p.text-red-700.text-xs Eliminar 
-                                                           
-                                                p= comment.description
-
-                            div(class="seeMore w-fit m-auto text-center cursor-pointer rounded-3xl p-2 hover:bg-gray-200")
-                                p(class="mb-[-5px]") Ver más
-                                i(class="fa-solid fa-angles-down")
 
             #rightSectionBottom(class="w-3/5") 
                 #ratingSection 
@@ -132,7 +109,7 @@ block contenido
                         p.commentFullName.font-bold.text-principal-gray= `${user.name} ${user.lastname}`
                         p.commentTimeThatPassed.text-gray-600.text-sm
 
-                    div(class="bg-gray-200 rounded-[10px] rounded-tl-[0px] min-h-[50px] p-3 pl-5 relative") 
+                    div(class="divCommentOptions bg-gray-200 rounded-[10px] rounded-tl-[0px] min-h-[50px] p-3 pl-5 relative") 
                         button(class="btnCommentOptions absolute right-2 top-0")
                             img(src="/img/project/options-horizontal.svg", alt="comment options" class="w-4 cursor-hover")
                         div(class="hidden commentOptions absolute bg-gray-200 top-4 right-0 w-28 shadow-xl border border-gray-400 rounded") 
@@ -141,9 +118,35 @@ block contenido
                                 p.text-red-700.text-xs Eliminar 
 
                         p.commentDescription
+
+    template#templateComment2
+        div(class="comment mb-8")
+            div.flex                
+                div(class="commentUserImage w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat") 
+                
+                div(class="flex flex-col w-full")
+                    div(class="flex justify-between w-full mt-[-10px]")
+                        p.commentFullName.font-bold.text-principal-gray
+                        p.commentTimeThatPassed.text-gray-600.text-sm
+
+                    div(class="divCommentOptions bg-gray-200 rounded-[10px] rounded-tl-[0px] min-h-[50px] p-3 pl-5 relative") 
+                        button(class="hidden btnCommentOptions absolute right-2 top-0")
+                            img(src="/img/project/options-horizontal.svg", alt="comment options" class="w-4 cursor-hover")
+                        div(class="hidden commentOptions absolute bg-gray-200 top-4 right-0 w-28 shadow-xl border border-gray-400 rounded") 
+                            div(class="btnCommentDelete flex justify-around items-center hover:bg-gray-300 p-3 cursor-pointer")
+                                i(class="fa-solid fa-trash text-red-700 text-xs")
+                                p.text-red-700.text-xs Eliminar 
+
+                        p.commentDescription
+
+    template#btnVerMas 
+        div(class="seeMore w-fit m-auto text-center cursor-pointer rounded-3xl p-2 hover:bg-gray-200")
+            p(class="mb-[-5px]") Ver más
+            i(class="fa-solid fa-angles-down")
                         
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     script(src="/js/rating.js")
     script(src="/js/clicksPublication.js")
+    script(src="/js/getComments.js")
     script(src="/js/addComment.js")

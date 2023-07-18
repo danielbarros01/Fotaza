@@ -1,4 +1,5 @@
 import db from '../config/db.js'
+import bcrypt from 'bcrypt'
 import { body, validationResult, check } from 'express-validator'
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
 import fs from 'fs'
@@ -156,6 +157,7 @@ const viewPublication = async (req, res) => {
             rightOfUse,
             category,
             comments,
+            myId: user.id,
             csrfToken: req.csrfToken(),
         })
     } catch (error) {

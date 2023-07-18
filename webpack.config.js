@@ -8,7 +8,8 @@ export default {
         addPublication: './src/js/addPublication.js',
         rating: './src/js/rating.js',
         clicksPublication: './src/js/clicksPublication.js',
-        addComment: './src/js/addComment.js',
+        addComment: './src/js/comments/addComment.js',
+        getComments: './src/js/comments/getComments.js',
     },
     output:{
         filename: '[name].js',
