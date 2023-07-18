@@ -705,6 +705,10 @@ video {
 .h-screen {
   height: 100vh;
 }
+.h-fit {
+  height: -moz-fit-content;
+  height: fit-content;
+}
 .min-h-\[50px\] {
   min-height: 50px;
 }
@@ -819,6 +823,9 @@ video {
 }
 .gap-4 {
   gap: 1rem;
+}
+.overflow-auto {
+  overflow: auto;
 }
 .rounded {
   border-radius: 0.25rem;
@@ -1039,6 +1046,9 @@ video {
 }
 .pt-10 {
   padding-top: 2.5rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
 }
 .text-center {
   text-align: center;

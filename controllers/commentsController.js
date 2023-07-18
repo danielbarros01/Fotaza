@@ -45,7 +45,11 @@ const deleteComment = async (req, res) => {
     }
 
     //obtener el id del comentario
-    const { commentId, publicationId } = req.body
+    const { commentId, publicationId, myId } = req.body
+
+    if(myId != user.id){
+        return res.sendStatus(403);
+    }
 
     try {
         //que comentario exista
@@ -70,6 +74,10 @@ const getComments = async (req, res) => {
     const { user } = req
 
     try {
+        if(!user){
+            return res.status(401).send('Autenticación necesaria para ver los comentarios')
+        }
+
         const publication = await Publication.findByPk(idPublication)
 
         if (!publication) {

@@ -19,7 +19,6 @@ const publicationId = parts[parts.length - 1];
 
 //Agregar comentario
 $btnComment.addEventListener('click', () => {
-    debugger
     const text = $commentText.value.trim()
 
     if (text === '') {
