@@ -36,9 +36,8 @@ const saveRating = async (req, res) => {
         //obtener el usuario
         const { user } = req
         //obtener la publicacion
-        const { idPublication } = req.params
         //obtener el numero
-        const { stars } = req.body
+        const { stars, idPublication } = req.body
 
         //Si no existe el usuario
         if (!user) {
@@ -75,8 +74,40 @@ const saveRating = async (req, res) => {
     }
 }
 
+//GET /rating/overall
+const getOverallRating = async (req, res) => {
+    try {
+        const { idPublication } = req.params
+
+        const publication = await Publication.findOne({ where: { id: idPublication } })
+
+        //Si no existe la publicacion
+        if (!publication) {
+            return res.status(400).json([{ path: '', msg: 'No existe la publicacion a calificar' }]);
+        }
+
+        //Contar cantidad de opiniones
+        const ratings = await Rating.findAll({ where: { publicationId: idPublication } })
+        const count = ratings.length
+
+        //Hacer un promedio
+        let total = 0
+        ratings.forEach(r => {
+            total += r.value
+        });
+
+        const average = count > 0 ? total / count : 0;
+
+        return res.status(200).json({ count, average })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ path: '', msg: 'No se pudo obtener la calificación general de la publicación' })
+    }
+}
+
 
 export {
     getRating,
-    saveRating
+    saveRating,
+    getOverallRating
 }

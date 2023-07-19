@@ -5,7 +5,24 @@
     cursor: pointer;
 }
 
+.starGeneral{
+    font-size: 30px;
+    color: #bbb;
+}
+
 .star:hover,
-.star.checked{
+.star.checked,
+.starGeneral.checked,
+.starGeneral.halfStar 
+{
     color: gold;
 }
+
+
+.halfStar:before {
+    content: "\f089";
+    position: absolute;
+    width: 50%;
+    overflow: hidden;
+    color: gold;
+  }

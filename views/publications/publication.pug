@@ -60,7 +60,7 @@ block contenido
                 p.text-principal-gray.text-xl.underline= rightOfUse.name
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
-        #sectionBottom(class="w-full flex px-10 mt-14 mb-8") 
+        #sectionBottom(class="w-full flex px-10 mt-10 mb-8") 
             if user
                 #comments(class="w-2/6") 
                     h2(class="text-3xl my-4") Comentarios 
@@ -93,8 +93,21 @@ block contenido
                         span(class="block text-xl") para ver los comentarios
                     img(src="/img/project/comments.svg", alt="" class="h-48")
 
-            #rightSectionBottom(class="w-3/5") 
-                #ratingSection 
+            #rightSectionBottom(class="w-3/5 ml-24") 
+                #ratingSection
+                    h4(class="text-3xl") Valoración de la imagen
+                    .flex.mt-2 
+                        p#averageRating(class="text-6xl")
+                        div(class="flex flex-col justify-center ml-4")
+                            .ratingGeneral.flex.gap-2
+                                i(class="fa-solid fa-star starGeneral")
+                                i(class="fa-solid fa-star starGeneral")
+                                i(class="fa-solid fa-star starGeneral")
+                                i(class="fa-solid fa-star starGeneral")
+                                i(class="fa-solid fa-star starGeneral")
+                            p(class="text-center text-gray-300") Basado en 
+                                span#totalOpinions
+
                 #recomendations
 
 
@@ -154,7 +167,8 @@ block contenido
                         
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
-    script(src="/js/rating.js")
+    script(src="/js/modifyRating.js")
     script(src="/js/clicksPublication.js")
     script(src="/js/getComments.js")
     script(src="/js/addComment.js")
+    script(src="/js/getOverallRating.js")

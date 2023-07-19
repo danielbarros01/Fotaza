@@ -16,11 +16,10 @@ stars.forEach((star, index) => {
     star.addEventListener("click", async () => {
         numero = index + 1
 
-        axios.post(`/rating/save/${idPublication}`, { stars: numero }, { headers: { 'CSRF-Token': token } })
+        axios.post(`/rating/save`, { idPublication, stars: numero }, { headers: { 'CSRF-Token': token } })
             .then(function (response) {
                 addChecked(stars, index)
                 deleteChecked(stars, index)
-                console.log(response.data);
             })
             .catch(function (error) {
                 const errKey = error.response.data.key
@@ -47,8 +46,8 @@ function deleteChecked(stars, index) {
 document.addEventListener("DOMContentLoaded", function () {
     axios.get(`/rating/${idPublication}`)
         .then(function (response) {
-            const rating = response.data.value;
-            addChecked(stars, rating - 1);
+            const rating = response.data.value
+            addChecked(stars, rating - 1)
         })
         .catch(function (error) {
             const errKey = error.response.data.key

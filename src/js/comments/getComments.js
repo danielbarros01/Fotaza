@@ -50,8 +50,8 @@ function getMoreComments(cb) {
 
             page++
         })
-        .catch(err => {
-            console.error(err);
+        .catch(() => {
+            console.error('Error al obtener los comentarios');
         })
 }
 
@@ -100,11 +100,10 @@ function addOptionsToButton(btn, commentId) {
                     },
                 })
                 .then((response) => {
-                    console.log(response.data);
                     btn.closest('.comment').remove();
                 })
                 .catch((error) => {
-                    console.error(error);
+                    console.error('Error al eliminar un comentario');
                 });
         });
     });

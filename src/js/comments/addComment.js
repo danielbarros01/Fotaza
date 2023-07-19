@@ -64,8 +64,8 @@ $btnComment.addEventListener('click', () => {
             $countText.textContent = 0;
             verifyNoComments()
         })
-        .catch(function (error) {
-            console.log(error);
+        .catch(function () {
+            console.log('Error al añadir un nuevo comentario');
         });
 })
 
@@ -90,13 +90,12 @@ function addOptionsToButton(btn, commentId) {
                         myId
                     },
                 })
-                .then((response) => {
-                    console.log(response.data);
+                .then(() => {
                     btn.closest('.comment').remove();
                     verifyNoComments()
                 })
-                .catch((error) => {
-                    console.error(error);
+                .catch(() => {
+                    console.error('Error al eliminar un comentario');
                 });
         });
     });
