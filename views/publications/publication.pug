@@ -4,6 +4,7 @@ block styles
     meta(name="csrf-token" content= csrfToken)
     meta(name="my-id" content= myId)
     link(rel="stylesheet", href="/css/rating.css", attr)
+    link(rel="stylesheet", href="/css/tags.css")
 
 
 block contenido
@@ -26,11 +27,11 @@ block contenido
                     button#btnOptions(class="bg-transparent")
                         img(src="/img/project/options.svg", alt="").w-8.ml-2
                     div#optionsPublication(class="hidden absolute bg-secondary-gray top-16 right-4 w-2/3 rounded-[10px] rounded-tr-[0px] p-3 shadow-md")
-                        a(href=`/publications/${publication.id}/edit` class="flex justify-around items-center hover:transform hover:scale-110")
+                        button#btnEdit(class="w-full flex justify-around items-center hover:transform hover:scale-110")
                             p.text-white Editar 
                             i(class="fa-solid fa-pen text-white")
                         hr.my-2
-                        a(href=`/publications/${publication.id}/delete` class="flex justify-around items-center hover:transform hover:scale-110")  
+                        button#btnDelete(class="w-full flex justify-around items-center hover:transform hover:scale-110")  
                             p.text-red-700 Eliminar 
                             i(class="fa-solid fa-trash text-red-700")
 
@@ -108,9 +109,58 @@ block contenido
                             p(class="text-center text-gray-300") Basado en 
                                 span#totalOpinions
 
-                #recomendations
+                #recomendations(class="mt-6")
+                    h3(class="text-3xl mb-5 text-principal-gray") Otras imágenes que pueden gustarte 
+                    #imgsRecomendations(class="flex h-max-96 justify-around")
+                        if recomendations.length > 0
+                            each recomendation in recomendations 
+                                a(href=`/publications/${recomendation.id}`) 
+                                    img(src=`/uploads/${recomendation.image}`, alt=`${recomendation.title}` class="max-h-80")
 
 
+    if user 
+        div#editPublication(class="hidden w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40")
+            div(class="bg-white py-4 px-8 w-2/5") 
+                div(class="flex justify-between") 
+                    p.text-gray-400 Editando 
+                    button#btnCloseEdit(class="fa-solid fa-xmark") 
+
+                form(id="formEdit" method="PUT" enctype="multipart/form-data" class="flex flex-col gap-4")
+                    div.flex.flex-col.gap-4.mt-8
+                        label(for="title") Titulo
+                        input(id="titleEdit" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full" value= publication.title)
+                        span(id="errTitle").text-red-500.text-xs.hidden
+
+                    div 
+                        label(for="category") Categoría
+                        select(id="categoriesEdit" name="category" class="block w-64 h-10 rounded-md pl-4 bg-gray-100")
+                            option(value="") - Seleccionar - 
+                            each category in categories 
+                                option(value= category.id selected=(category.id === publication.category_id))= category.name
+                        span(id="errCategory").text-red-500.text-xs.hidden
+
+                    div 
+                        .flex.justify-between.items-center
+                            label(for="tag") Etiquetas 
+                            span(id="errTag").text-red-500.text-xs.hidden
+                        input(id="tagEdit" type="text" placeholder="Ingrese sus etiquetas ( presione enter para agregar )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
+                        ul(id="tagsEdit").w-full.flex.gap-2
+                            each tag in tags
+                                div(class="tag flex justify-between items-center")
+                                    li= tag.name
+                                    span(class="btnDeleteTag") 
+                                        svg(style="enable-background:new 0 0 24 24;" version="1.1" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink")
+                                            g(id="info")
+                                                g(id="icons")
+                                                    path(d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" id="exit")
+                    
+                    div(class="w-1/3") 
+                        select#rightsOfUse(name="rightsOfUse" class="bg-principal-gray text-white py-2 px-4  font-normal text-sm").w-full
+                            each right in rightsOfUse 
+                                option(value= right.id selected=(right.id === publication.rights_of_use_id))= right.name
+                    span(id="errRightOfUse").text-red-500.text-xs.hidden.absolute.top-7.mt-3
+
+                    button#btnSave(type="submit" class="bg-green-700 text-white font-normal mt-4 mr-2 w-28 p-2") Guardar
 
 
     div#alertLogin(class="w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40").hidden
@@ -172,3 +222,4 @@ block scripts
     script(src="/js/getComments.js")
     script(src="/js/addComment.js")
     script(src="/js/getOverallRating.js")
+    script(src="/js/editPublication.js")

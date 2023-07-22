@@ -1,5 +1,10 @@
 import express from 'express'
-import { viewPublications, createPublication, savePublication, viewMyPublications,viewPublication, downloadImage } from '../controllers/publicationsController.js'
+
+import {
+    viewPublications, createPublication, savePublication,
+    viewMyPublications, viewPublication, downloadImage, editPublication
+} from '../controllers/publicationsController.js'
+
 import protectRoute from '../Middlewares/protectRoute.js'
 import authenticateUser from "../Middlewares/authenticateUser.js"
 import upload from "../Middlewares/uploadImage.js"
@@ -18,5 +23,7 @@ router.get('/my-posts', protectRoute, viewMyPublications)
 router.get('/:id', authenticateUser, viewPublication)
 
 router.get('/:id/download', downloadImage)
+
+router.patch('/:id', authenticateUser, editPublication)
 
 export default router

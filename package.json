@@ -38,6 +38,7 @@
     "nodemailer": "^6.9.3",
     "pug": "^3.0.2",
     "sequelize": "^6.32.1",
+    "sharp": "^0.32.3",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

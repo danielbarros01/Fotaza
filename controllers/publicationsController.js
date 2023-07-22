@@ -1,6 +1,6 @@
+import { Op } from 'sequelize'
 import db from '../config/db.js'
-import bcrypt from 'bcrypt'
-import { body, validationResult, check } from 'express-validator'
+import sharp from 'sharp'
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
 import fs from 'fs'
 import path from 'path'
@@ -24,6 +24,7 @@ const createPublication = async (req, res) => {
         rightsOfUse
     })
 }
+
 // POST /publications/create
 const savePublication = async (req, res) => {
     /* Validaciones */
@@ -56,7 +57,7 @@ const savePublication = async (req, res) => {
     }
     /* - - - - */
 
-    const { filename, mimetype } = req.file
+    const { filename, mimetype, path: imagePath } = req.file
     const { title, category: category_id, rightsOfUse: rightId } = req.body
     const { id } = req.user
     const tags = JSON.parse(req.body.tags)
@@ -68,18 +69,39 @@ const savePublication = async (req, res) => {
 
 
     try {
+        const rightOfUse = await RightOfUse.findByPk(rightId)
+
+        if (!rightOfUse) {
+            return res.status(400).json({ path: 'rightOfUse', msg: 'No existe este Derecho de uso' })
+        }
+
+        let privacy
+        switch (rightOfUse.name) {
+            case 'Dominio Público':
+                privacy = 'public'
+                break;
+            case 'Copyright':
+                privacy = 'private'
+                break;
+        }
+
+        //Obtener resolucion
+        const imageInfo = await sharp(imagePath).metadata();
+        const resolution = `${imageInfo.width}x${imageInfo.height}`;
+
         //Guardar publicacion
         const publication = await Publication.create({
             image: filename,
             title,
             date: new Date(),
             format: mimetype,
-            resolution: null,
-            privacy: 'public', //que el usuario elija si quiere ocultar una foto
+            resolution,
+            privacy, //que el usuario elija si quiere ocultar una foto
             category_id,
             rights_of_use_id: rightId,
             user_id: id
         })
+
 
         //find or create para obtener el id del tag o crearlo y tambien obtener el id
         const tagsBD = [] //instancias de tag
@@ -137,8 +159,23 @@ const viewPublication = async (req, res) => {
         const rightOfUse = await RightOfUse.findByPk(publication.rights_of_use_id)
         const category = await Category.findByPk(publication.category_id)
 
-        //calificacion
         //otras imagenes parecidas
+        const recomendations = await Publication.findAll({
+            include: [{
+                model: Tag,
+                where: {
+                    name: {
+                        [Op.in]: tags.map(tag => tag.name)
+                    }
+                }
+            }],
+            where: {
+                id: {
+                    [Op.not]: parseInt(publication.id) // Excluir el ID 19
+                }
+            },
+            limit: 2
+        })
 
         if (!user) {
             return res.render('publications/publication', {
@@ -148,11 +185,14 @@ const viewPublication = async (req, res) => {
                 tags,
                 rightOfUse,
                 category,
+                recomendations,
                 csrfToken: req.csrfToken(),
             })
         }
 
 
+        const categories = await Category.findAll()
+        const rightsOfUse = await RightOfUse.findAll()
         //si el user_id del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
             publication,
@@ -162,6 +202,9 @@ const viewPublication = async (req, res) => {
             tags,
             rightOfUse,
             category,
+            recomendations,
+            categories,
+            rightsOfUse,
             myId: user.id ?? '',
             csrfToken: req.csrfToken(),
         })
@@ -170,21 +213,7 @@ const viewPublication = async (req, res) => {
     }
 }
 
-//function helper
-const deleteImage = (req) => {
-    if (req.file) {
-        const filePath = req.file.path;
-
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error('Error al eliminar el archivo:', err);
-            } else {
-                console.log('Archivo eliminado exitosamente');
-            }
-        });
-    }
-}
-
+// GET /publications/:id/download 
 const downloadImage = async (req, res) => {
     const { id: idPublication } = req.params
     const publication = await Publication.findOne({ where: { id: idPublication } })
@@ -205,11 +234,120 @@ const downloadImage = async (req, res) => {
     })
 }
 
+//PATCH /publications/:id
+const editPublication = async (req, res) => {
+    const { user } = req
+    const { id: publicationId } = req.params
+    const updates = req.body
+
+    //Si no hay usuario
+    if (!user) {
+        return res.status(400).json({ key: 'no user', msg: 'Debe estar autenticado' });
+    }
+
+    // Iniciar la transacción
+    const transaction = await db.transaction();
+
+    try {
+        //valido publicacion
+        const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id }, transaction, })
+        if (!publication) {
+            return res.status(404).json({ key: 'no publication', msg: 'No existe la publicacion' });
+        }
+
+        if (updates.category != publication.category_id) publication.category_id = updates.category
+        if (updates.rightsOfUse != publication.rights_of_use_id) publication.rights_of_use_id = updates.rightsOfUse
+        if (updates.title != publication.title) publication.title = updates.title
+
+
+        let publicationTags = null
+        //si esta vacio tags eliminar los tags de la publicacion si existiesen
+        if (updates.tags.length === 0) {
+            await PublicationHasTag.destroy({ where: { publicationId }, transaction })
+        } else {
+            //Traer los tags de la publication de la bd si existiesen
+            publicationTags = await publication.getTags({ transaction })
+
+            //Comparar array del cliente con publicationTags
+            if (publicationTags.length > updates.tags.length) {
+
+                //array de ids que deben quedar
+                const idsOk = publicationTags
+                    .filter((tag, index) => {
+                        return tag.name == updates.tags[index]
+                    })
+                    .map(tag => tag.id)
+
+                //hay que borrar algun dato
+                await PublicationHasTag.destroy({
+                    where: {
+                        [Op.and]: [
+                            { tagId: { [Op.notIn]: idsOk } },
+                            { publication_id: publication.id }
+                        ]
+                    },
+                    include: [
+                        {
+                            model: Tag
+                        }
+                    ]
+                })
+            }
+
+            //Recorro los tags que traigo del cliente
+            for (const tag of updates.tags) {
+                let newTagBd = await Tag.findOrCreate({ where: { name: tag.toLowerCase() }, transaction }) //busco o creo en tabla TAGS
+
+                //si newTagBd NO esta en PublicationHasTag crearlo
+                const existingPublicationHasTag = await PublicationHasTag.findOne({
+                    where: {
+                        tag_id: newTagBd[0].id,
+                        publication_id: publication.id
+                    }, transaction
+                });
+
+                if (!existingPublicationHasTag) {
+                    await PublicationHasTag.create({ publicationId: publication.id, tagId: newTagBd[0].id }, { transaction })  //Relacionar con la tabla intermedia PublicationHasTag
+                }
+            }
+        }
+
+        // Guardamos los cambios
+        await publication.save({ transaction });
+        // Confirmar la transacción
+        await transaction.commit();
+
+        res.sendStatus(204)
+    } catch (error) {
+        // Si ocurre un error, deshacemos la transacción y manejamos el error
+        await transaction.rollback(); //redundante?
+        res.status(500).json({ error: 'Error en la actualización de la publicación.' });
+    }
+}
+
+//function helper
+const deleteImage = (req) => {
+    if (req.file) {
+        const filePath = req.file.path;
+
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Error al eliminar el archivo:', err);
+            } else {
+                console.log('Archivo eliminado exitosamente');
+            }
+        });
+    }
+}
+
+
+
 export {
     viewPublications,
     createPublication,
     savePublication,
     viewMyPublications,
     viewPublication,
-    downloadImage
+    downloadImage,
+    editPublication
 }

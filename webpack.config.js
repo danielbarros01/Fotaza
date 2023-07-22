@@ -11,6 +11,8 @@ export default {
         clicksPublication: './src/js/clicksPublication.js',
         addComment: './src/js/comments/addComment.js',
         getComments: './src/js/comments/getComments.js',
+        editPublication: './src/js/editPublication.js',
+        tags: './src/js/tags.js',
     },
     output:{
         filename: '[name].js',
