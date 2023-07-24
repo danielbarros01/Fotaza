@@ -240,10 +240,39 @@ const editPublication = async (req, res) => {
     const { id: publicationId } = req.params
     const updates = req.body
 
+    /* VALIDACIONES */
     //Si no hay usuario
     if (!user) {
         return res.status(400).json({ key: 'no user', msg: 'Debe estar autenticado' });
     }
+
+    //Que los campos tambien vengan
+    const errors = []
+    for (let campo in req.body) {
+        if (!req.body[campo]) {
+            errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
+        }
+
+        if (campo == 'category' || campo == 'rightsOfUse') {
+            if (!(!!Number(req.body[campo]))) { //Si no es numero
+                errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
+            }
+        }
+    }
+
+    //Si hay campos vacios:
+    if (errors.length > 0) {
+        //Retornar errores
+        return res.status(400).json(errors)
+    }
+
+    //Checkear que solo sean 3 tags
+    if (updates.tags.length > 3) {
+        return res.status(400).json({ path: 'tags', msg: `Escribe maximo 3 categorias` })
+    }
+    /* - - - - */
+
+    /*  */
 
     // Iniciar la transacción
     const transaction = await db.transaction();

@@ -56,29 +56,10 @@ function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false) {
         if (e.code == 'Enter') {
             e.preventDefault();
 
-            //$spanErrTag por parametro
-            if (maxTags(tags, $spanErrTag)) return
-
             const tagText = $tag.value
-
-            //que no exista el tag ya en el array
-            if (tags.includes(tagText)) return
-
-            //agregar al array el nuevo tag
-            tags.push(tagText)
-
-            //Crear tag en el dom
-            $fragment.appendChild(createTagElement(tagText));
-
-            //$tags por parametro
-            $tags.appendChild($fragment);
+            addTag(tags, tagText, $tags, $spanErrTag, $fragment)
             //Elimino el value~
             $tag.value = null
-
-
-            //ELIMINAR TAG del dom y del array
-            const $btnDeletesTag = document.querySelectorAll('.btnDeleteTag')
-            addDeleteButtons($btnDeletesTag, tags)
         }
     })
 }
@@ -95,10 +76,34 @@ function addDeleteButtons($btnDeletesTag, tags) {
     });
 }
 
+/* Agregar tag al dom */
+function addTag(tags, tagText, $tags, $spanErrTag, $fragment) {
+    //$spanErrTag por parametro
+    if (maxTags(tags, $spanErrTag)) return
+
+    //que no exista el tag ya en el array
+    if (tags.includes(tagText)) return
+
+    //agregar al array el nuevo tag
+    tags.push(tagText)
+
+    //Crear tag en el dom
+    $fragment.appendChild(createTagElement(tagText));
+
+    //$tags por parametro
+    $tags.appendChild($fragment);
+
+
+    //ELIMINAR TAG del dom y del array
+    const $btnDeletesTag = document.querySelectorAll('.btnDeleteTag')
+    addDeleteButtons($btnDeletesTag, tags)
+}
+
 export {
     maxTags,
     deleteTag,
     createTagElement,
     addTags,
-    addDeleteButtons
+    addDeleteButtons,
+    addTag
 }

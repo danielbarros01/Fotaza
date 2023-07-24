@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { addTags, addDeleteButtons } from './tags.js'
+import { addTags, addDeleteButtons, addTag } from './tags.js'
 
 const d = document
 const token = d.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -12,14 +12,20 @@ const $btnSave = d.getElementById('btnSave')
 const $form = d.querySelector("#formEdit")
 const $title = d.querySelector("#titleEdit")
 const $categories = d.querySelector("#categoriesEdit")
+const $rightsOfUse = d.querySelector("#rightsOfUse")
 const $tag = d.querySelector("#tagEdit")
 const $tags = d.querySelector("#tagsEdit")
+
+const title = $title.value
+const category = $categories.value
+const rightOfUse = $rightsOfUse.value
 
 const $spanErrTitle = d.getElementById('errTitle')
 const $spanErrCategory = d.getElementById('errCategory')
 const $spanErrRightOfUse = d.getElementById('errRightOfUse')
 const $spanErrTag = d.getElementById('errTag')
 
+const originalTags = []
 const tags = []
 
 const url = window.location.href;
@@ -33,18 +39,19 @@ $btnEdit.addEventListener('click', () => {
 
 //click boton ocultar seccion editar
 $btnClose.addEventListener('click', () => {
+    fillOriginalFields()
     $sectionEdit.classList.add('hidden')
 })
-
 
 //Insertar en tags
 d.querySelectorAll('.tag').forEach(tag => {
     tags.push(tag.querySelector('li').textContent);
+    originalTags.push(tag.querySelector('li').textContent);
 });
 
-console.log(tags)
 
 d.addEventListener('DOMContentLoaded', () => {
+    //Agrega funcionalidad de agregar tags al array con el teclado
     addTags(tags, $tag, $tags, $spanErrTag)
 
     //cargo los botones que ya existen
@@ -52,7 +59,6 @@ d.addEventListener('DOMContentLoaded', () => {
     const $btnsDeleteTag = d.querySelectorAll('.btnDeleteTag')
     addDeleteButtons($btnsDeleteTag, tags)
 })
-
 
 /* ENVIO */
 $form.addEventListener("submit", (e) => {
@@ -84,8 +90,14 @@ $form.addEventListener("submit", (e) => {
             console.log(response)
             window.location.reload()
         })
-        .catch(err => {
-            console.error('Error al enviar la solicitud:', err);
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                console.log('Errores de validación:', error.response.data);
+                // Muestra los errores de validación en la interfaz de usuario
+                viewErrors(error.response.data, 'server')
+            } else {
+                console.error('Error al enviar la solicitud:', error);
+            }
         })
 
 })
@@ -146,4 +158,17 @@ function viewErrors(errors, clientOrServer) {
                 break;
         }
     })
+}
+
+//Funcion para llenar con los datos originales
+function fillOriginalFields() {
+    $title.value = title
+    $categories.value = category
+    $rightsOfUse.value = rightOfUse
+
+    //Reinicio tags
+    let $fragment = document.createDocumentFragment();
+    originalTags.forEach(tag => {
+        addTag(tags, tag, $tags, $spanErrTag, $fragment)
+    });
 }
