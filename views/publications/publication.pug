@@ -5,6 +5,7 @@ block styles
     meta(name="my-id" content= myId)
     link(rel="stylesheet", href="/css/rating.css", attr)
     link(rel="stylesheet", href="/css/tags.css")
+    link(rel="stylesheet", href="/css/sliderRecomendations.css")
 
 
 block contenido
@@ -109,13 +110,14 @@ block contenido
                             p(class="text-center text-gray-300") Basado en 
                                 span#totalOpinions
 
-                #recomendations(class="mt-6")
+                #recomendations
                     h3(class="text-3xl mb-5 text-principal-gray") Otras imágenes que pueden gustarte 
-                    #imgsRecomendations(class="flex h-max-96 justify-around")
-                        if recomendations.length > 0
-                            each recomendation in recomendations 
-                                a(href=`/publications/${recomendation.id}`) 
-                                    img(src=`/uploads/${recomendation.image}`, alt=`${recomendation.title}` class="max-h-80")
+                    #imgsRecomendations
+                        #slideTrack
+                            if recomendations.length > 0
+                                each recomendation in recomendations 
+                                        a(href=`/publications/${recomendation.id}` class="slide") 
+                                            img(src=`/uploads/${recomendation.image}`, alt=`${recomendation.title}`)
 
 
     if user 
@@ -223,3 +225,4 @@ block scripts
     script(src="/js/addComment.js")
     script(src="/js/getOverallRating.js")
     script(src="/js/editPublication.js")
+    script(src="/js/sliderRecomendations.js")

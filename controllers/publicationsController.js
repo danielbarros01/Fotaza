@@ -174,7 +174,7 @@ const viewPublication = async (req, res) => {
                     [Op.not]: parseInt(publication.id) // Excluir el ID 19
                 }
             },
-            limit: 2
+            limit: 10
         })
 
         if (!user) {
