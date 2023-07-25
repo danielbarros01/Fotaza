@@ -159,8 +159,10 @@ const viewPublication = async (req, res) => {
         const rightOfUse = await RightOfUse.findByPk(publication.rights_of_use_id)
         const category = await Category.findByPk(publication.category_id)
 
+        /* RECOMENDACIONES */
         //otras imagenes parecidas
-        const recomendations = await Publication.findAll({
+        //Primero busco por las etiquetas
+        let recomendations = await Publication.findAll({
             include: [{
                 model: Tag,
                 where: {
@@ -171,11 +173,30 @@ const viewPublication = async (req, res) => {
             }],
             where: {
                 id: {
-                    [Op.not]: parseInt(publication.id) // Excluir el ID 19
+                    [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
                 }
             },
+            order: [['date_and_time', 'DESC']],
             limit: 10
-        })
+        });
+
+        //si la busqueda por etiquetas me devuelve 5 o menos publicaciones le agrego por categoria
+        if (recomendations.length < 6) {
+            const recomendationsByCategory = await Publication.findAll({
+                where: {
+                    id: {
+                        [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+                    },
+                    category_id: publication.category_id
+                },
+                order: [['date_and_time', 'DESC']],
+                limit: 5
+            });
+
+            //Unir los arrays
+            recomendations = [...recomendations, ...recomendationsByCategory]
+        }
+        /* RECOMENDACIONES */
 
         if (!user) {
             return res.render('publications/publication', {

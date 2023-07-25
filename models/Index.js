@@ -19,7 +19,7 @@ Category.hasMany(Publication, { foreignKey: 'category_id' })
 RightOfUse.hasMany(Publication, { foreignKey: 'rights_of_use_id'})
 
 // Definir la relación muchos a muchos entre Publicacion y Tag
-Publication.belongsToMany(Tag, { through: PublicationHasTag });
+Publication.belongsToMany(Tag, { through: PublicationHasTag});
 
 // Definir la relación de rating
 Publication.belongsToMany(User, { through: Rating})

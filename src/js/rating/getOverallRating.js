@@ -10,8 +10,6 @@ const idPublication = parts[parts.length - 1];
 
 axios.get(`/rating/overall/${idPublication}`)
     .then(response => {
-        console.log(response.data)
-
         const count = response.data.count
         const average = response.data.average
 

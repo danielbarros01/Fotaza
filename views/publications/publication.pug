@@ -13,8 +13,8 @@ block contenido
     
     main
         div(class="flex justify-between mx-10 mt-10")
-            div.w-16.border-2.border-principal-gray.cursor-pointer.shadow.flex
-                img(src=userPost.image_url , alt="Imagen de perfil") 
+            div.flex
+                div(class="w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat border-2 border-principal-gray cursor-pointer shadow" style=`background-image: url(${userPost.image_url})`) 
                 div(class="ml-3") 
                     p.font-bold= `${userPost.name } ${userPost.lastname }`
                     p.text-secondary-gray= userPost.username
@@ -110,15 +110,23 @@ block contenido
                             p(class="text-center text-gray-300") Basado en 
                                 span#totalOpinions
 
-                #recomendations
-                    h3(class="text-3xl mb-5 text-principal-gray") Otras imágenes que pueden gustarte 
-                    #imgsRecomendations
-                        #slideTrack
-                            if recomendations.length > 0
+
+                if recomendations.length > 0
+                    #recomendations
+                        h3(class="text-3xl mb-5 text-principal-gray") Otras imágenes que pueden gustarte 
+                        #imgsRecomendations
+                            #slideTrack
                                 each recomendation in recomendations 
                                         a(href=`/publications/${recomendation.id}` class="slide") 
                                             img(src=`/uploads/${recomendation.image}`, alt=`${recomendation.title}`)
-
+                else
+                    h3(class="text-3xl my-5 text-principal-gray") Otras imágenes que pueden gustarte 
+                    div(class="w-5/6 h-72 bg-gray-300 rounded p-6 flex flex-col justify-between")
+                        .flex.justify-between 
+                            p.text-3xl ¡Explora nuestras recomendaciones más adelante!"
+                            i(class="fa-solid fa-clock text-6xl")
+                        p.text-lg.text-secondary-gray Nuestras recomendaciones se renuevan constantemente. ¡Vuelve pronto para descubrir nuevas imágenes que podrían interesarte!
+                            
 
     if user 
         div#editPublication(class="hidden w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40")
@@ -218,11 +226,15 @@ block contenido
     
                         
 block scripts
+    if user
+        script(src="/js/getComments.js")
+        script(src="/js/addComment.js")
+        script(src="/js/editPublication.js")
+
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
-    script(src="/js/modifyRating.js")
     script(src="/js/clicksPublication.js")
-    script(src="/js/getComments.js")
-    script(src="/js/addComment.js")
-    script(src="/js/getOverallRating.js")
-    script(src="/js/editPublication.js")
     script(src="/js/sliderRecomendations.js")
+    script(src="/js/modifyRating.js")
+    script(src="/js/getOverallRating.js")
+    
+    
