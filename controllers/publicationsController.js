@@ -128,7 +128,6 @@ const savePublication = async (req, res) => {
 
 // GET /publications/my-posts
 const viewMyPublications = async (req, res) => {
-
 }
 
 // GET /publications/:id
@@ -264,7 +263,7 @@ const editPublication = async (req, res) => {
     /* VALIDACIONES */
     //Si no hay usuario
     if (!user) {
-        return res.status(400).json({ key: 'no user', msg: 'Debe estar autenticado' });
+        return res.status(401).json({ key: 'no user', msg: 'Debe estar autenticado' });
     }
 
     //Que los campos tambien vengan
@@ -375,6 +374,31 @@ const editPublication = async (req, res) => {
     }
 }
 
+//DELETE /publications/:id
+const deletePublication = async (req, res) => {
+    const { user } = req
+    const { id: publicationId } = req.params
+
+    if (!user) {
+        return res.status(401).json({ key: 'no user', msg: 'Debe estar autenticado' });
+    }
+
+    //valido publicacion
+    const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id } })
+    if (!publication) {
+        return res.status(404).json({ key: 'no publication', msg: 'No existe la publicacion' });
+    }
+
+    try {
+        await publication.destroy()
+
+        return res.status(200).json({ message: 'Publicación eliminada' })
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: 'Hubo un error al querer eliminar la publicación, intentalo más tarde' })
+    }
+}
+
 //function helper
 const deleteImage = (req) => {
     if (req.file) {
@@ -399,5 +423,6 @@ export {
     viewMyPublications,
     viewPublication,
     downloadImage,
-    editPublication
+    editPublication,
+    deletePublication
 }
