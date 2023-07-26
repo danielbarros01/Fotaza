@@ -51,7 +51,7 @@ const saveRating = async (req, res) => {
         }
 
         //validar que sea entre 1 y 5
-        if (stars < 1 || stars > 5) {
+        if (stars < 0 || stars > 5) {
             return res.status(400).json([{ path: 'rating', msg: 'La calificacion esta permitida entre 1 y 5 estrellas' }]);
         }
 
@@ -71,6 +71,37 @@ const saveRating = async (req, res) => {
     } catch (error) {
         console.log('Ocurrió un error al crear o actualizar el registro:', error);
         return res.status(500);
+    }
+}
+
+const deleteRating = async (req, res) => {
+    const { user } = req
+    const { idPublication } = req.params
+
+    //Si no existe el usuario
+    if (!user) {
+        return res.status(400).json({ key: 'not user', msg: 'Debe estar autenticado para poder calificar una publicacion' });
+    }
+
+    const publication = await Publication.findOne({ where: { id: idPublication } })
+    //Si no existe la publicacion
+    if (!publication) {
+        return res.status(400).json([{ path: '', msg: 'No existe la publicacion a calificar' }]);
+    }
+
+    //verificar si ya existe la calificacion por parte del usuario
+    const rating = await Rating.findOne({ where: { userId: user.id, publicationId: publication.id } })
+
+    try {
+        if (rating) {
+            await rating.destroy();
+            return res.status(200).json({ message: 'Rating eliminado' })
+        } else {
+            return res.status(404).json({ message: 'Usted todavia no ha calificado la publicación' })
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: 'Hubo un error al querer eliminar su calificación, intentalo más tarde' })
     }
 }
 
@@ -109,5 +140,6 @@ const getOverallRating = async (req, res) => {
 export {
     getRating,
     saveRating,
-    getOverallRating
+    getOverallRating,
+    deleteRating
 }

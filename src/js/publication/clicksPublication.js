@@ -9,7 +9,10 @@ $btnInfo.addEventListener('click', () => {
     $divInfoRightOfUse.classList.toggle('hidden')
 })
 
-$btnOptions.addEventListener('click', () => {
-    $optionsPublication.classList.toggle('hidden')
-})
+if ($btnOptions) {
+    $btnOptions.addEventListener('click', () => {
+        $optionsPublication.classList.toggle('hidden')
+    })
+
+}
 

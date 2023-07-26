@@ -16,7 +16,7 @@
   \*************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\nconst $btnInfo = document.getElementById('btnInfoRightOfUse')\r\nconst $divInfoRightOfUse = document.getElementById('infoRightOfUse')\r\n\r\nconst $btnOptions = document.getElementById('btnOptions')\r\nconst $optionsPublication = document.getElementById('optionsPublication')\r\n\r\n\r\n$btnInfo.addEventListener('click', () => {\r\n    $divInfoRightOfUse.classList.toggle('hidden')\r\n})\r\n\r\n$btnOptions.addEventListener('click', () => {\r\n    $optionsPublication.classList.toggle('hidden')\r\n})\r\n\r\n\n\n//# sourceURL=webpack://fotazaproject/./src/js/publication/clicksPublication.js?");
+eval("__webpack_require__.r(__webpack_exports__);\nconst $btnInfo = document.getElementById('btnInfoRightOfUse')\r\nconst $divInfoRightOfUse = document.getElementById('infoRightOfUse')\r\n\r\nconst $btnOptions = document.getElementById('btnOptions')\r\nconst $optionsPublication = document.getElementById('optionsPublication')\r\n\r\n\r\n$btnInfo.addEventListener('click', () => {\r\n    $divInfoRightOfUse.classList.toggle('hidden')\r\n})\r\n\r\nif ($btnOptions) {\r\n    $btnOptions.addEventListener('click', () => {\r\n        $optionsPublication.classList.toggle('hidden')\r\n    })\r\n\r\n}\r\n\r\n\n\n//# sourceURL=webpack://fotazaproject/./src/js/publication/clicksPublication.js?");
 
 /***/ })
 

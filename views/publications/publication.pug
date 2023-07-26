@@ -238,11 +238,13 @@ block contenido
     
                         
 block scripts
-    if user
-        script(src="/js/getComments.js")
-        script(src="/js/addComment.js")
+    if user.id === userPost.id
         script(src="/js/editPublication.js")
         script(src="/js/deletePublication.js")
+    
+    if user 
+        script(src="/js/getComments.js")
+        script(src="/js/addComment.js")
 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     script(src="/js/clicksPublication.js")
