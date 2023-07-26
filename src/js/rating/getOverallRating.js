@@ -8,17 +8,31 @@ const url = window.location.href;
 const parts = url.split("/");
 const idPublication = parts[parts.length - 1];
 
-axios.get(`/rating/overall/${idPublication}`)
-    .then(response => {
-        const count = response.data.count
-        const average = response.data.average
+getOverallRating()
 
-        $totalOpinions.textContent = `${response.data.count} ${count == 1 ? 'valoración' : 'valoraciones'}`
-        $average.textContent = average
+function getOverallRating() {
+    axios.get(`/rating/overall/${idPublication}`)
+        .then(response => {
+            const count = response.data.count
+            const average = response.data.average
+
+            $totalOpinions.textContent = `${response.data.count} ${count == 1 ? 'valoración' : 'valoraciones'}`
+            $average.textContent = average
 
 
-        for (let i = 0; i < Math.floor(average); i++) {
-            $stars[i].classList.add('checked');
-        }
-    })
-    .catch(err => { })
+            for (let i = 0; i < $stars.length; i++) {
+                $stars[i].classList.add('checked');
+                if (i < Math.floor(average)) {
+                    $stars[i].classList.add('checked');
+                } else {
+                    $stars[i].classList.remove('checked');
+                }
+            }
+        })
+        .catch(err => { })
+}
+
+
+export {
+    getOverallRating
+}

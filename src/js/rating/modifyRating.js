@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getOverallRating } from './getOverallRating.js'
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 
@@ -29,6 +30,7 @@ stars.forEach((star, index) => {
                     console.log(response)
                     deleteChecked(stars, -1)
                     ultimaEstrella = null
+                    getOverallRating()
                 })
                 .catch(function (error) {
                     const errKey = error.response.data.key
@@ -47,6 +49,7 @@ stars.forEach((star, index) => {
                 addChecked(stars, index)
                 deleteChecked(stars, index)
                 ultimaEstrella = stars[index];
+                getOverallRating()
             })
             .catch(function (error) {
                 const errKey = error.response.data.key
