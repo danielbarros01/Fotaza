@@ -21,10 +21,10 @@ function getOverallRating() {
 
 
             for (let i = 0; i < $stars.length; i++) {
-                $stars[i].classList.add('checked');
+                // Agrega la clase "checked" a las estrellas con índice menor que el valor promedio
                 if (i < Math.floor(average)) {
                     $stars[i].classList.add('checked');
-                } else {
+                } else { // Elimina la clase "checked" de las estrellas con índice mayor o igual al valor promedio
                     $stars[i].classList.remove('checked');
                 }
             }

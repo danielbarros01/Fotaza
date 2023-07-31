@@ -4,6 +4,7 @@ import sharp from 'sharp'
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
 import fs from 'fs'
 import path from 'path'
+import { routeImages } from '../config/generalConfig.js'
 
 // GET /publications
 const viewPublications = (req, res) => {
@@ -390,6 +391,11 @@ const deletePublication = async (req, res) => {
     }
 
     try {
+        const rutePublication = publication.image
+        const imagePath = path.join(routeImages.uploadsFolder, rutePublication) //rutaServidor/public/uploads/imagenNombre
+
+
+        deleteImage(null, imagePath)
         await publication.destroy()
 
         return res.status(200).json({ message: 'Publicación eliminada' })
@@ -400,11 +406,24 @@ const deletePublication = async (req, res) => {
 }
 
 //function helper
-const deleteImage = (req) => {
-    if (req.file) {
-        const filePath = req.file.path;
+const deleteImage = (req, route) => {
+    if (req) {
+        if (req.file) {
+            const filePath = req.file.path;
 
-        fs.unlink(filePath, (err) => {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error al eliminar el archivo:', err);
+                } else {
+                    console.log('Archivo eliminado exitosamente');
+                }
+            });
+        }
+    }
+
+
+    if (route) {
+        fs.unlink(route, (err) => {
             if (err) {
                 console.error('Error al eliminar el archivo:', err);
             } else {

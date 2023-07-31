@@ -2,11 +2,12 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import csurf from 'csurf'
 import homeRoutes from './routes/homeRoutes.js'
-import usersRoutes from './routes/usersRoutes.js'
+import authRoutes from './routes/authRoutes.js'
 import publicationsRoutes from './routes/publicationsRoutes.js'
 import interestsRoutes from './routes/interestsRoutes.js'
 import ratingsRoutes from './routes/ratingsRoutes.js'
 import commentsRoutes from './routes/commentsRoutes.js'
+import usersRoutes from './routes/usersRoutes.js'
 import db from './config/db.js'
 
 const app = express()
@@ -34,10 +35,11 @@ app.use(express.json());
 //Routing
 app.use('/', homeRoutes)
 app.use('/publications', publicationsRoutes)
-app.use('/auth', usersRoutes)
+app.use('/auth', authRoutes)
 app.use('/categories', interestsRoutes)
 app.use('/rating', ratingsRoutes)
 app.use('/comments', commentsRoutes)
+app.use('/users', usersRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))

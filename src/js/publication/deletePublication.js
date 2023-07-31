@@ -53,7 +53,7 @@ const deletePublication = async (id, loader) => {
         const response = await axios.delete(`/publications/${id}`, { headers: { 'CSRF-Token': token } });
         console.log(response)
         // Realizar cualquier acción adicional en el cliente después de la eliminación exitosa
-        window.location.href = `/my-publications`
+        window.location.href = `/users/my-publications`
     } catch (error) {
         console.error('Error al eliminar el registro:', error);
         // Realizar cualquier acción adicional en el cliente después de un error

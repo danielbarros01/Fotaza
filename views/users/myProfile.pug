@@ -1,0 +1,56 @@
+extends ../layout/index
+
+block styles 
+    meta(name="csrf-token" content= csrfToken)
+    link(rel="stylesheet", href="/css/navOptionsPhotos.css")
+
+block contenido
+    include ../layout/header
+
+    main 
+        section#infoProfile
+            div#profilePhotos(class="mb-[60px] relative")
+                div#coverPhoto(class="h-64")
+                    img(src=userProfile.cover_url ? `/img/covers/${userProfile.cover_url}` : '/img/covers/greenViolet.png' alt="Imagen de portada" class="h-full w-full") 
+                div#profilePicture(class="absolute top-2/3 left-[3%] w-36 h-36 border-4 border-polished-white")
+                    img(src=userProfile.image_url ? `${userProfile.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil")
+
+                if user && user.id == userProfile.id
+                    button(class="flex gap-2 items-center bg-gray-300 text-principal-gray px-4 py-2 rounded-lg float-right mr-[3%] mt-3 border-2 border-transparent hover:border-principal-gray transition")
+                        i(class="fa-solid fa-pen")
+                        span Editar perfil
+            #infoUser(class="right-2 px-[3%]") 
+                p(class="text-3xl font-bold text-principal-gray")= userProfile.name + " " + userProfile.lastname 
+                p(class="text-lg text-secondary-gray")= userProfile.username
+        
+        #options(class="mt-16 mx-[3%]")  
+            button(class="border border-transparent bg-gray-300 text-principal-gray w-40 py-2 px-3 flex justify-between items-center rounded-xl")            
+                i(class="fa-solid fa-image text-3xl font-bold")
+                span(class="text-2xl font-bold") Fotos
+                span#textCountPhotos(class="text-lg text-secondary-gray") 4
+        
+        section#photos(class="mt-6 mx-[3%]")  
+            #navOptionsPhotos 
+                //OPCION 1 - Fotos publicas
+                input(type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked)
+                label(for="slide-item-1")
+                    p.icon Públicas
+                        span 4
+                //OPCION 2 - Fotos de venta general
+                input(type="radio" name="slideItem" id="slide-item-2" class="slide-toggle")
+                label(for="slide-item-2")
+                    p.icon Venta General
+                        span 0
+                //OPCION 1 - Fotos de venta unica
+                input(type="radio" name="slideItem" id="slide-item-3" class="slide-toggle")
+                label(for="slide-item-3")
+                    p.icon Unicas
+                        span 0
+
+                .clear 
+                .slider
+                    .bar    
+            #images 
+                
+block scripts
+    script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

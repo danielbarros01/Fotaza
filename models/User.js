@@ -28,6 +28,10 @@ const User = db.define('users', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    cover_url: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     token: DataTypes.STRING,
     confirmed: DataTypes.BOOLEAN
 }, {

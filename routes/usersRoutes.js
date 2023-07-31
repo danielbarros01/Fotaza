@@ -1,21 +1,16 @@
-import express from "express";
-import { formLogin, formRegister, register, confirmAccount, recoverPassword,
-     resetPassword, comprobarToken, newPassword, authenticate } from '../controllers/usersContoller.js'
+import express from "express"
+import authenticateUser from '../Middlewares/authenticateUser.js'
+import protectRoute from "../Middlewares/protectRoute.js";
+import { getUser } from "../controllers/usersController.js";
+
 const router = express.Router();
 
-router.get('/login', formLogin)
-router.post('/login', authenticate)
+router.get('/my-publications', protectRoute, (req, res) => {
+    res.redirect(`/users/${req.user.id}`);
+})
 
-router.get('/signup', formRegister)
-router.post('/signup', register)
-
-router.get('/recover-password', recoverPassword)
-router.post('/recover-password', resetPassword)
-
-router.get('/recover-password/:token', comprobarToken)
-router.post('/recover-password/:token', newPassword)
-
-router.get('/confirm/:token', confirmAccount)
+//GET /users/:username
+router.get('/:username', authenticateUser, getUser)
 
 
 export default router
