@@ -10,12 +10,24 @@ block contenido
         div(class="md:w-4/6 xl:w-3/6 rounded-md shadow-md m-auto p-4 bg-white md:px-16")
             h1(class="text-center text-2xl mt-4 mb-8 font-bold") Crear una nueva publicación 
             form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data") 
-                
-                div(class="border-dashed border-2 w-full h-40 rounded flex items-center pl-4 bg-polished-white")
-                    input(type="file" name="image" id="file")
-                    div(class="preview w-1/2 h-full p-3 flex justify-center")
-                        img(id="image" class="h-full float-right border-2 border-principal-gray rounded-md")
+
+                div(class="border-dashed border border-principal-gray w-full h-40 rounded flex items-center bg-polished-white")
+
+                    div(class="preview flex-1 h-full py-3 flex space-x-2")
+                        img(id="image" class="h-full ml-6")
+
+                        div(class="infoImg hidden w-2/5 h-full py-3 space-y-2")
+                            p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-[50%] w-fit rounded text-center") 1200 x 720
+                            p#sizeImg(class="font-bold text-sm bg-red-100 text-red-800 p-1 w-1/2 rounded text-center") 3.7 MB
+
+                    div(class="btnsImg w-1/5 h-full flex flex-col justify-center items-center space-y-4 mx-4")
+                        label(for="file" class="bg-principal-gray text-white p-2 cursor-pointer text-center w-[90%] font-bold hover:opacity-80")
+                            span Seleccionar 
+                        input(type="file" name="image" id="file" class="hidden")
+                        button#deleteImg(class="hidden bg-white text-principal-gray border-2 border-principal-gray p-1 cursor-pointer w-2/3 font-bold hover:opacity-80") Eliminar
+
                 span(id="errImage").text-red-500.text-xs.hidden
+
 
                 div.px-6.flex.flex-col.gap-4.mt-8
                     input(id="title" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full")
