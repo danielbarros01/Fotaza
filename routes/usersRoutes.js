@@ -6,7 +6,7 @@ import { getUser } from "../controllers/usersController.js";
 const router = express.Router();
 
 router.get('/my-publications', protectRoute, (req, res) => {
-    res.redirect(`/users/${req.user.id}`);
+    res.redirect(`/users/${req.user.username}`);
 })
 
 //GET /users/:username

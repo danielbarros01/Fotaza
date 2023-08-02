@@ -34,6 +34,14 @@ const savePublication = async (req, res) => {
         return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
     }
 
+    //Campos obligatorios
+    const camposObligatorios = ['title', 'category', 'rightsOfUse', 'privacyItem']
+    const camposPresentes = camposObligatorios.every(campo => campo in req.body);
+    if (!camposPresentes) {
+        res.clearCookie('_token')
+        return res.status(400).json([{ path: 'critical', error: 'Faltan campos obligatorios en el formulario' }]);
+    }
+
     //Que los campos tambien vengan
     const errors = []
     for (let campo in req.body) {
@@ -44,6 +52,14 @@ const savePublication = async (req, res) => {
         if (campo == 'category' || campo == 'rightsOfUse') {
             if (!(!!Number(req.body[campo]))) { //Si no es numero
                 errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
+            }
+        }
+
+        if (campo == 'privacyItem') {
+            switch (req.body[campo]) {
+                case 'public': break;
+                case 'protected': break;
+                default: errors.push({ path: campo, msg: `${campo} debe ser public o protected` })
             }
         }
     }
@@ -59,7 +75,7 @@ const savePublication = async (req, res) => {
     /* - - - - */
 
     const { filename, mimetype, path: imagePath } = req.file
-    const { title, category: category_id, rightsOfUse: rightId } = req.body
+    const { title, category: category_id, rightsOfUse: rightId, privacyItem: privacy } = req.body
     const { id } = req.user
     const tags = JSON.parse(req.body.tags)
 
@@ -74,16 +90,6 @@ const savePublication = async (req, res) => {
 
         if (!rightOfUse) {
             return res.status(400).json({ path: 'rightOfUse', msg: 'No existe este Derecho de uso' })
-        }
-
-        let privacy
-        switch (rightOfUse.name) {
-            case 'Dominio Público':
-                privacy = 'public'
-                break;
-            case 'Copyright':
-                privacy = 'private'
-                break;
         }
 
         //Obtener resolucion

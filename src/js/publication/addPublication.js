@@ -33,13 +33,14 @@ $form.addEventListener("submit", function (e) {
     //currentTarget es $form
     const formData = new FormData(e.currentTarget)
 
+    console.log(formData)
     const errors = checkFields();
 
     //valido que haya una imagen, si no agrego el nombre del campo a los errores
     validationImage(errors)
 
     if (errors.length > 0) {
-        viewErrors(errors)
+        return viewErrors(errors)
     }
 
     //agrego el array de tags
@@ -84,7 +85,7 @@ $categories.addEventListener('change', function (e) {
     }
 });
 
-$btnCancelImg.addEventListener('click', function(e){
+$btnCancelImg.addEventListener('click', function (e) {
     e.preventDefault()
     $file.value = ''
     $image.setAttribute('src', null)
@@ -177,6 +178,10 @@ function viewErrors(errors, clientOrServer) {
             case 'rightsOfUse':
                 $spanErrRightOfUse.textContent = 'Debe seleccionar un derecho de uso disponible'
                 $spanErrRightOfUse.classList.remove('hidden')
+                break;
+            case 'critical':
+                alert('Atención: Algunos de los datos del formulario han sido modificados. Por favor, inicia sesión nuevamente')
+                window.location.href = `/auth/login`
                 break;
         }
     })

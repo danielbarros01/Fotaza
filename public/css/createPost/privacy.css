@@ -1,0 +1,17 @@
+#privacyOptionsContent {
+ position: relative;
+ display: inline-block;
+}
+
+#privacyOptions {
+ position: absolute;
+ top: 0;
+ left: 0;
+ background-color: white;
+ z-index: 1;
+}
+
+
+#privacyOptions .privacy-input:checked + label {
+ background-color: rgba(238, 238, 238, 0.7);
+} 

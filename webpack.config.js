@@ -14,6 +14,7 @@ export default {
         editPublication: './src/js/publication/editPublication.js',
         deletePublication: './src/js/publication/deletePublication.js',
         tags: './src/js/publication/tags.js',
+        privacyOptions: './src/js/publication/create/privacyOptions.js',
     },
     output:{
         filename: '[name].js',
