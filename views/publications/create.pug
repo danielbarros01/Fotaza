@@ -4,12 +4,14 @@ block styles
     meta(name="csrf-token" content= csrfToken)
     link(rel="stylesheet", href="/css/tags.css")
     link(rel="stylesheet", href="/css/createPost/privacy.css")
+    link(rel="stylesheet", href="/css/createPost/allCategories.css")
+    
 block contenido
     include ../layout/header
 
-    main.bg-polished-white.h-screen.pt-10.h-full
-        div(class="md:w-4/6 xl:w-3/6 rounded-md shadow-md m-auto bg-white")
-            form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data" class="relative") 
+    main(class="md:pt-10")
+        div(class="min-h-screen h-fit md:min-h-fit md:h-fit md:w-4/6 rounded-md shadow-md m-auto bg-white md:max-w-5xl relative md:mb-8")
+            form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data" class="relative bg-white min-h-screen md:min-h-fit h-fit") 
                 
                 div#privacyOptionsContent(class="absolute left-4 top-4 bg-white flex flex-col justify-center rounded-md w-36")
                     
@@ -30,24 +32,24 @@ block contenido
                             i(class="fa-solid fa-shield text-2xl")
                             p Protegida
 
-                h1(class="text-center text-2xl font-semibold absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2") Nueva publicación
+                h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-8 right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
 
                 div(class="md:px-16 p-4 mt-8") 
                       
-                    div(class="border-dashed border border-principal-gray w-full h-40 rounded flex items-center bg-polished-white")
+                    div(class="lg:border border-dashed border-principal-gray w-full h-fit lg:h-40 rounded lg:flex lg:items-center lg:bg-polished-white")
 
-                        div(class="preview flex-1 h-full py-3 flex space-x-2")
-                            img(id="image" class="h-full ml-6")
+                        div(class="preview lg:flex-1 lg:h-full py-3 lg:flex space-x-2")
+                            img(id="image" class="h-full lg:ml-6")
 
-                            div(class="infoImg hidden w-2/5 h-full py-3 space-y-2")
-                                p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-[50%] w-fit rounded text-center") 1200 x 720
-                                p#sizeImg(class="font-bold text-sm bg-red-100 text-red-800 p-1 w-1/2 rounded text-center") 3.7 MB
+                            div(class="infoImg hidden lg:w-2/5 h-full py-3 space-x-1 lg:space-y-2 flex lg:flex-col")
+                                p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-1/2 w-fit rounded text-center")
+                                p#sizeImg(class="font-bold text-sm lg:text-xs bg-red-100 text-red-800 p-1 w-fit rounded text-center")
 
-                        div(class="btnsImg w-1/5 h-full flex flex-col justify-center items-center space-y-4 mx-4")
-                            label(for="file" class="bg-principal-gray text-white p-2 cursor-pointer text-center w-[90%] font-bold hover:opacity-80")
-                                span Seleccionar 
+                        div(class="btnsImg lg:w-1/5 lg:h-full flex justify-around lg:flex-col lg:justify-center lg:items-center lg:space-y-4 lg:mx-4")
+                            label(for="file" class="max-w-xs bg-principal-gray text-white p-2 mr-1 cursor-pointer text-center w-9/12 lg:w-[90%] font-bold hover:opacity-80")
+                                span Seleccionar Imagen 
                             input(type="file" name="image" id="file" class="hidden")
-                            button#deleteImg(class="hidden bg-white text-principal-gray border-2 border-principal-gray p-1 cursor-pointer w-2/3 font-bold hover:opacity-80") Eliminar
+                            button#deleteImg(class="hidden max-w-[200px] bg-white text-principal-gray border-2 border-principal-gray p-2 md:p-1 cursor-pointer w-3/12 md:w-2/3 font-bold hover:opacity-80") Eliminar
 
                     span(id="errImage").text-red-500.text-xs.hidden
 
@@ -56,12 +58,23 @@ block contenido
                         input(id="title" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full")
                         span(id="errTitle").text-red-500.text-xs.hidden
 
-                        div 
-                            label(for="category") Categoría
-                            select(id="categories" name="category" class="block w-64 h-10 rounded-md pl-4 border-2 border-principal-gray")
-                                option(value="") - Seleccionar - 
-                                each category in categories 
-                                    option(value= category.id)= category.name
+                        
+                        .section-categories
+                            .categories-info(class="flex justify-between") 
+                                p(class="text-lg") Categorías 
+                                button#btnViewAllCategories(type="button" class="text-sm text-blue-400") Ver todo 
+                            .categories-content(class="w-full h-[120px] flex items-center")
+                                button#btnLeft(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white")
+                                    i(class="fa-solid fa-circle-chevron-left text-3xl text-principal-gray")
+                                .categories(class="w-10/12 h-full flex items-center overflow-hidden")
+                                    .calle(class="flex transition-transform duration-300 ease")
+                                        each category in categories 
+                                            input(type="radio" name="category" id=`category-${category.id}` value=`${category.id}` class="hidden")
+                                            label.category-content(for=`category-${category.id}` class="w-fit h-full mx-2")
+                                                .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease" style=`background-image: url(${category.image})`)
+                                                p(class="text-principal-gray text-sm text-center mt-1")= category.name
+                                button#btnRight(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white")
+                                    i(class="fa-solid fa-circle-chevron-right text-3xl text-principal-gray")
                             span(id="errCategory").text-red-500.text-xs.hidden
 
                         div 
@@ -83,8 +96,28 @@ block contenido
                                 span.w-full.text-white.font-bold Subir
                                 img(src="/img/project/upload.svg", alt="").w-6.ml-4
 
+                div#modalAllCategories(class="absolute z-30 top-0 left-0 h-full w-full bg-white overflow-auto transition-all duration-200 ease-in-out ocultar")
+                    .topDialog(class="flex justify-between px-4 py-2 bg-gradient-to-r from-gray-input to-transparent mt-4 md:mt-0") 
+                        .title(class="flex items-center text-2xl text-principal-gray space-x-2") 
+                            i(class="fa-solid fa-icons")
+                            h6 Todas las categorias
+                        button#btnCloseAllCategories(type="button" class="w-8 h-8 rounded-full shadow-xl border-t border-gray-input hover:border-b") X
+                    .search-section
+                        .search-content(class="relative text-principal-gray m-4") 
+                            input#search(type="search", name="" placeholder="Buscar" class="w-40 p-2 pl-9 rounded-full outline-none opacity-80 bg-gray-input focus:w-64 focus:opacity-100 transition-all duration-200 ease-in-out") 
+                            i(class="fa-solid fa-magnifying-glass absolute top-1/2 left-2 transform translate-y-[-50%]")
+                    .allCategories
+
+
+    template#categoryOfAll 
+        //-input(type="radio" class="hidden" name="category")
+        label.category-content(class="w-fit h-full")
+            .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease")
+            p#name(class="text-principal-gray text-sm text-center mt-1 w-fit")              
 
 block scripts
     script(src="/js/addPublication.js")
     script(src="/js/privacyOptions.js")
+    script(src="/js/categoriesOptions.js")
+    script(src="/js/allCategories.js") 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

@@ -9,7 +9,6 @@ const $sizeImg = $infoImg.querySelector("#sizeImg")
 const $btnCancelImg = document.querySelector("#deleteImg")
 const $file = document.querySelector("#file")
 const $title = document.querySelector("#title")
-const $categories = document.querySelector("#categories")
 const $tag = document.querySelector("#tag")
 const $tags = document.querySelector("#tags")
 
@@ -70,19 +69,6 @@ $form.addEventListener("submit", function (e) {
 $title.addEventListener('keyup', function (event) {
     $spanErrTitle.textContent = null
     $spanErrTitle.classList.add('hidden')
-});
-
-$categories.addEventListener('change', function (e) {
-    const selectedOption = e.target.value;
-
-    //si el valor es un numero
-    if (!!Number(selectedOption)) {
-        $spanErrCategory.textContent = null
-        $spanErrCategory.classList.add('hidden')
-    } else {
-        $spanErrCategory.textContent = 'Debe seleccionar una categoria'
-        $spanErrCategory.classList.remove('hidden')
-    }
 });
 
 $btnCancelImg.addEventListener('click', function (e) {

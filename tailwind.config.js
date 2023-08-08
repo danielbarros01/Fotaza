@@ -11,6 +11,9 @@ export default {
         'polished-white': '#F7F7F7',
         'neon-green': '#16FF00'
       },
+      fontFamily:{
+        "cabin": ['"Cabin"',' sans-serif']
+      }
     },
   },
   plugins: [],

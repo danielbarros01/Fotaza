@@ -8,6 +8,7 @@ import interestsRoutes from './routes/interestsRoutes.js'
 import ratingsRoutes from './routes/ratingsRoutes.js'
 import commentsRoutes from './routes/commentsRoutes.js'
 import usersRoutes from './routes/usersRoutes.js'
+import categoriesRoutes from './routes/categoriesRoutes.js'
 import db from './config/db.js'
 
 const app = express()
@@ -37,6 +38,7 @@ app.use('/', homeRoutes)
 app.use('/publications', publicationsRoutes)
 app.use('/auth', authRoutes)
 app.use('/categories', interestsRoutes)
+app.use('/categories', categoriesRoutes)
 app.use('/rating', ratingsRoutes)
 app.use('/comments', commentsRoutes)
 app.use('/users', usersRoutes)

@@ -86,10 +86,16 @@ const savePublication = async (req, res) => {
 
 
     try {
+        //Validar que exista esta licencia
         const rightOfUse = await RightOfUse.findByPk(rightId)
-
         if (!rightOfUse) {
             return res.status(400).json({ path: 'rightOfUse', msg: 'No existe este Derecho de uso' })
+        }
+
+        //Validar que exista la categoria
+        const category = await Category.findByPk(category_id)
+        if (!category) {
+            return res.status(400).json({ path: 'category', msg: 'No existe la categoria'})
         }
 
         //Obtener resolucion

@@ -1,0 +1,60 @@
+.container-categories {
+ width: 100%;
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+ gap: 8px;
+}
+
+.sectionLetra {
+ display: flex;
+ flex-direction: column;
+ margin-bottom: 20px;
+ padding-bottom: 20px;
+ padding-left: 20px;
+ padding-right: 20px;
+ border-bottom: 1px solid rgb(93, 93, 93);
+}
+
+/* Estilo para todos los elementos .sectionLetra excepto el último */
+.sectionLetra:last-child {
+ border-bottom: none; /* Elimina el borde inferior en todos los elementos excepto el último */
+}
+
+.allCategories {
+ padding-left: 20px;
+ padding-right: 20px;
+}
+
+.letra {
+ font-size: 30px;
+ font-weight: 400;
+ margin-bottom: 10px;
+}
+
+.category-content {
+ display: flex;
+ align-items: center;
+ flex-direction: column;
+}
+
+.ocultar {
+ visibility: hidden;
+ opacity: 0;
+}
+
+.mostrar {
+ visibility: visible;
+ opacity: 1;
+}
+
+/* input[type="radio"][name="category"]:checked
+ + label.category-content
+ > :first-child {
+ border: 2px solid #1b9c85;
+ transform: scale(1.2);
+} */
+
+.labelSelected {
+ border: 2px solid #1b9c85;
+ transform: scale(1.2);
+}
