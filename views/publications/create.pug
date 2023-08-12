@@ -11,92 +11,89 @@ block contenido
 
     main(class="md:pt-10")
         div(class="min-h-screen h-fit md:min-h-fit md:h-fit md:w-4/6 rounded-md shadow-md m-auto bg-white md:max-w-5xl relative md:mb-8")
-            form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data" class="relative bg-white min-h-screen md:min-h-fit h-fit") 
-                
-                div#privacyOptionsContent(class="absolute left-4 top-4 bg-white flex flex-col justify-center rounded-md w-36")
-                    
-                    div#optionPrivacySelected
-                        span(class="privacy flex items-center p-2 pl-3 text-principal-gray space-x-2 cursor-pointer")
-                            i#iconPrivacy(class="fa-solid fa-globe text-2xl")
-                            p#textPrivacy Publica
-                            i#btnViewOptions(class="fa-solid fa-caret-down")
-
-                    div#privacyOptions(class="hidden border border-principal-gray rounded shadow-md w-full divide-y")
-                        input(type="radio" name="privacyItem" id="privacy-public" class="privacy-input hidden" value='public' checked)
-                        label(for="privacy-public" class="privacy flex items-center p-2 pl-3 hover:bg-gray-input text-principal-gray space-x-2 cursor-pointer")
-                            i(class="fa-solid fa-globe text-2xl")
-                            p Publica
-
-                        input(type="radio" name="privacyItem" id="privacy-protected" class="privacy-input hidden" value='protected')
-                        label(for="privacy-protected" class="privacy flex items-center p-2 pl-3 hover:bg-gray-input text-principal-gray space-x-2 cursor-pointer")
-                            i(class="fa-solid fa-shield text-2xl")
-                            p Protegida
-
-                h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-8 right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
-
-                div(class="md:px-16 p-4 mt-8") 
-                      
-                    div(class="lg:border border-dashed border-principal-gray w-full h-fit lg:h-40 rounded lg:flex lg:items-center lg:bg-polished-white")
-
-                        div(class="preview lg:flex-1 lg:h-full py-3 lg:flex space-x-2")
-                            img(id="image" class="h-full lg:ml-6")
-
-                            div(class="infoImg hidden lg:w-2/5 h-full py-3 space-x-1 lg:space-y-2 flex lg:flex-col")
-                                p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-1/2 w-fit rounded text-center")
-                                p#sizeImg(class="font-bold text-sm lg:text-xs bg-red-100 text-red-800 p-1 w-fit rounded text-center")
-
-                        div(class="btnsImg lg:w-1/5 lg:h-full flex justify-around lg:flex-col lg:justify-center lg:items-center lg:space-y-4 lg:mx-4")
-                            label(for="file" class="max-w-xs bg-principal-gray text-white p-2 mr-1 cursor-pointer text-center w-9/12 lg:w-[90%] font-bold hover:opacity-80")
-                                span Seleccionar Imagen 
-                            input(type="file" name="image" id="file" class="hidden")
-                            button#deleteImg(class="hidden max-w-[200px] bg-white text-principal-gray border-2 border-principal-gray p-2 md:p-1 cursor-pointer w-3/12 md:w-2/3 font-bold hover:opacity-80") Eliminar
-
-                    span(id="errImage").text-red-500.text-xs.hidden
-
-
-                    div.px-6.flex.flex-col.gap-4.mt-8
-                        input(id="title" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full")
-                        span(id="errTitle").text-red-500.text-xs.hidden
-
+            form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data" class="relative h-fit") 
+                #privacyOptionsAndPhoto(class="p-4 h-fit") 
+                    div#privacyOptionsContent(class=" bg-white flex flex-col justify-center rounded-md w-36 z-50")
                         
-                        .section-categories
-                            .categories-info(class="flex justify-between") 
-                                p(class="text-lg") Categorías 
-                                button#btnViewAllCategories(type="button" class="text-sm text-blue-400") Ver todo 
-                            .categories-content(class="w-full h-[120px] flex items-center")
-                                button#btnLeft(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white")
-                                    i(class="fa-solid fa-circle-chevron-left text-3xl text-principal-gray")
-                                .categories(class="w-10/12 h-full flex items-center overflow-hidden")
-                                    .calle(class="flex transition-transform duration-300 ease")
-                                        each category in categories 
-                                            input(type="radio" name="category" id=`category-${category.id}` value=`${category.id}` class="hidden")
-                                            label.category-content(for=`category-${category.id}` class="w-fit h-full mx-2")
-                                                .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease" style=`background-image: url(${category.image})`)
-                                                p(class="text-principal-gray text-sm text-center mt-1")= category.name
-                                button#btnRight(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white")
-                                    i(class="fa-solid fa-circle-chevron-right text-3xl text-principal-gray")
-                            span(id="errCategory").text-red-500.text-xs.hidden
+                        div#optionPrivacySelected
+                            span(class="privacy flex items-center p-2 pl-3 text-principal-gray space-x-2 cursor-pointer")
+                                i#iconPrivacy(class="fa-solid fa-globe text-2xl")
+                                p#textPrivacy Publica
+                                i#btnViewOptions(class="fa-solid fa-caret-down")
 
-                        div 
-                            .flex.justify-between.items-center
-                                label(for="tag") Etiquetas 
-                                span(id="errTag").text-red-500.text-xs.hidden
-                            input(id="tag" type="text" placeholder="Ingrese sus etiquetas ( presione enter para agregar )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
-                            ul(id="tags").w-full.flex.gap-2
+                        div#privacyOptions(class="hidden border border-principal-gray rounded shadow-md w-full divide-y")
+                            input(type="radio" name="privacyItem" id="privacy-public" class="privacy-input hidden" value='public' checked)
+                            label(for="privacy-public" class="privacy flex items-center p-2 pl-3 hover:bg-gray-input text-principal-gray space-x-2 cursor-pointer")
+                                i(class="fa-solid fa-globe text-2xl")
+                                p Publica
 
-                    div.flex.justify-between.items-center.mt-10.relative
-                        div 
-                            select#rightsOfUse(name="rightsOfUse" class="bg-principal-gray text-white py-2 px-4  font-normal text-sm").w-full
-                                each right in rightsOfUse 
-                                    option(value= right.id)= right.name
-                        span(id="errRightOfUse").text-red-500.text-xs.hidden.absolute.top-7.mt-3
+                            input(type="radio" name="privacyItem" id="privacy-protected" class="privacy-input hidden" value='protected')
+                            label(for="privacy-protected" class="privacy flex items-center p-2 pl-3 hover:bg-gray-input text-principal-gray space-x-2 cursor-pointer")
+                                i(class="fa-solid fa-shield text-2xl")
+                                p Protegida
+                    div(class="w-24 float-right mr-4")
+                        img#photoPostSecondary(src="/uploads/2a5fee4e-233b-497d-b0e9-e0b05ba120dd.jpeg" class="hidden")
 
-                        button#btnSave(type="submit" class="bg-principal-gray text-white font-normal mr-2")
-                            .my-3.mx-4.flex.justify-between
-                                span.w-full.text-white.font-bold Subir
-                                img(src="/img/project/upload.svg", alt="").w-6.ml-4
+                div#photoData(class="relative md:min-h-fit")
+                    h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-[-26px] right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
 
-                div#modalAllCategories(class="absolute z-30 top-0 left-0 h-full w-full bg-white overflow-auto transition-all duration-200 ease-in-out ocultar")
+                    div(class="md:px-16 p-4 mt-8") 
+                        
+                        div(class="lg:border border-dashed border-principal-gray w-full h-fit lg:h-40 rounded lg:flex lg:items-center lg:bg-polished-white")
+
+                            div(class="preview lg:flex-1 lg:h-full py-3 lg:flex space-x-2")
+                                img(id="image" class="h-full lg:ml-6")
+
+                                div(class="infoImg hidden lg:w-2/5 h-full py-3 space-x-1 lg:space-y-2 flex lg:flex-col")
+                                    p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-1/2 w-fit rounded text-center")
+                                    p#sizeImg(class="font-bold text-sm lg:text-xs bg-red-100 text-red-800 p-1 w-fit rounded text-center")
+
+                            div(class="btnsImg lg:w-1/5 lg:h-full flex justify-around lg:flex-col lg:justify-center lg:items-center lg:space-y-4 lg:mx-4")
+                                label(for="file" class="max-w-xs bg-principal-gray text-white p-2 mr-1 cursor-pointer text-center w-9/12 lg:w-[90%] font-bold hover:opacity-80")
+                                    span Seleccionar Imagen 
+                                input(type="file" name="image" id="file" class="hidden")
+                                button#deleteImg(class="hidden max-w-[200px] bg-white text-principal-gray border-2 border-principal-gray p-2 md:p-1 cursor-pointer w-3/12 md:w-2/3 font-bold hover:opacity-80") Eliminar
+
+                        span(id="errImage").text-red-500.text-xs.hidden
+
+
+                        div.px-6.flex.flex-col.gap-4.mt-8
+                            input(id="title" type="text" name="title" placeholder="Agrega un titulo" class="border-b-2 border-secondary-gray text-xl focus:outline-none pb-1 pl-3 m-auto w-full")
+                            span(id="errTitle").text-red-500.text-xs.hidden
+
+                            
+                            .section-categories
+                                .categories-info(class="flex justify-between") 
+                                    p(class="text-lg") Categorías 
+                                    button#btnViewAllCategories(type="button" class="text-sm text-blue-400 hover:text") Ver todo 
+                                .categories-content(class="w-full h-[120px] flex items-center")
+                                    button#btnLeft(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white hover:opacity-90")
+                                        i(class="fa-solid fa-circle-chevron-left text-3xl text-principal-gray")
+                                    .categories(class="w-10/12 h-full flex items-center overflow-hidden")
+                                        .calle(class="flex transition-transform duration-300 ease")
+                                            each category in categories 
+                                                input(type="radio" name="category" id=`category-${category.id}` value=`${category.id}` class="hidden")
+                                                label.category-content(for=`category-${category.id}` class="w-fit h-full mx-2")
+                                                    .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease" style=`background-image: url(${category.image})`)
+                                                    p(class="text-principal-gray text-sm text-center mt-1")= category.name
+                                    button#btnRight(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white hover:opacity-90")
+                                        i(class="fa-solid fa-circle-chevron-right text-3xl text-principal-gray")
+                                span(id="errCategory").text-red-500.text-xs.hidden
+
+                            div 
+                                .flex.justify-between.items-center
+                                    label(for="tag") Etiquetas 
+                                    span(id="errTag").text-red-500.text-xs.hidden
+                                input(id="tag" type="text" placeholder="Ingrese sus etiquetas ( presione enter para agregar )" class="block w-full border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none")
+                                ul(id="tags").w-full.flex.gap-2
+
+                        div(class="mt-10 flex justify-center sm:justify-end")
+                            button#btnContinue(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
+                                .my-3.mx-4.flex.justify-between
+                                    span.w-full.text-white.font-bold Continuar
+                                    img(src="/img/project/arrow-right.svg", alt="").w-6.ml-4
+
+                div#modalAllCategories(class="absolute z-50 top-0 left-0 h-full w-full bg-white overflow-auto transition-all duration-200 ease-in-out ocultar")
                     .topDialog(class="flex justify-between px-4 py-2 bg-gradient-to-r from-gray-input to-transparent mt-4 md:mt-0") 
                         .title(class="flex items-center text-2xl text-principal-gray space-x-2") 
                             i(class="fa-solid fa-icons")
@@ -108,6 +105,59 @@ block contenido
                             i(class="fa-solid fa-magnifying-glass absolute top-1/2 left-2 transform translate-y-[-50%]")
                     .allCategories
 
+                div#policyData(class="z-40 w-full h-full px-4 hidden")
+                    div(class="mt-8")
+                        .postType(class="flex justify-between relative")
+                            span(id="errTypes" class="absolute top-[-26px]").text-red-500.text-xs.hidden
+                            .types(class="flex gap-4")
+                                div
+                                    input(type="radio" name="typePost" id="input-free" value="free" class="hidden peer")
+                                    label#typeLibre(for="input-free" class="w-36 h-24 bg-gray-input rounded-2xl flex flex-col justify-center items-center cursor-pointer peer-checked:border peer-checked:border-principal-gray transition-all duration-300 ease-in-out")
+                                        p(class="text-xl text-center pt-4 text-principal-gray my-2") Libre
+                                        i(class="fa-solid fa-dove text-6xl text-principal-gray")
+
+                                div
+                                    input(type="radio" name="typePost" id="input-sale" value="sale" class="hidden peer")
+                                    label#venta(for="input-sale" class="flex flex-col lg:flex-row items-center bg-gray-input lg:bg-transparent rounded-2xl cursor-pointer peer-checked:border peer-checked:border-principal-gray lg:peer-checked:border-r-0 lg:peer-checked:border-b-0 lg:rounded-e-md transition-all duration-300 ease-in-out")
+                                        #typeVenta(class="w-36 h-24 sm:bg-gray-input rounded-2xl flex flex-col justify-center items-center")
+                                            p(class="text-xl text-center pt-4 text-principal-gray my-2") Venta
+                                            i(class="fa-solid fa-sack-dollar text-6xl text-principal-gray")
+
+                                        .typesVenta(class="flex flex-col h-0 justify-center gap-3 max-w-28 transition-all duration-300 ease-in-out overflow-hidden")
+                                            div(class="flex items-center ml-3 gap-1")
+                                                input(type="radio" name="typeSale" value="general" id="venta-general" class="appearance-none w-5 h-5 border-2 border-principal-gray rounded-full outline-none checked:bg-principal-gray checked:border-black cursor-pointer" checked)
+                                                label(for="venta-general" class="cursor-pointer") Venta General
+                                            div(class="flex items-center ml-3 gap-1")
+                                                input(type="radio" name="typeSale" id="venta-unica" value="unique" class="appearance-none w-5 h-5 border-2 border-principal-gray rounded-full outline-none checked:bg-principal-gray checked:border-black cursor-pointer")
+                                                label(for="venta-unica" class="cursor-pointer") Venta Unica
+                                            span(id="errTypeSale" class="absolute bottom-[-20px]").text-red-500.text-xs.hidden
+                            .moreInfoPostType(class="h-fit px-2") 
+                                a(href="/publications/types" class="text-blue-700" target="_blank") 
+                                    span(class="hidden sm:contents") Mas información 
+                                    i(class="fa-solid fa-circle-info text-2xl sm:text-base")
+                        
+                        .container-input-price(class="mt-8 opacity-0 h-0 transition-all duration-300 ease") 
+                            p(class="text-2xl") Precio
+                            div
+                                input#input-price(type="text" name="price" placeholder="AR$0.00" class="appearance-none w-48 h-10 text-xl text-right border-2 border-secondary-gray p-1 pr-2 focus:outline-none")
+                                select(name="currency" class="text-xl h-10 bg-gray-input border-0 p-1")
+                                    option(value="ars" selected) ARS 
+                                    option(value="us") US
+                        span(id="errPrice").text-red-500.text-xs.hidden
+                        span(id="errCurrency").text-red-500.text-xs.hidden.block
+                        div(class="btns2 mt-10 flex justify-between")
+                                button#btnBack(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
+                                    .my-3.mx-4.flex.justify-between
+                                        img(src="/img/project/arrow-left.svg", alt="").w-6.ml-4
+                                        span.w-full.text-white.font-bold Atras
+                                button#btnSave(type="submit" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
+                                    .my-3.mx-4.flex.justify-between
+                                        span.w-full.text-white.font-bold Subir
+                                        img(src="/img/project/upload.svg", alt="").w-6.ml-4
+
+            div(class="circlesForm text-center space-x-2 pb-3 sm:mt-[-20px] text-principal-gray z-50")
+                i(class="fa-solid fa-circle")
+                i(class="fa-regular fa-circle")
 
     template#categoryOfAll 
         //-input(type="radio" class="hidden" name="category")
@@ -120,4 +170,6 @@ block scripts
     script(src="/js/privacyOptions.js")
     script(src="/js/categoriesOptions.js")
     script(src="/js/allCategories.js") 
+    script(src="/js/multiStageForm.js") 
+    script(src="/js/salePublication.js") 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

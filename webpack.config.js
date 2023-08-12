@@ -16,7 +16,10 @@ export default {
         tags: './src/js/publication/tags.js',
         privacyOptions: './src/js/publication/create/privacyOptions.js',
         categoriesOptions: './src/js/publication/create/categoriesOptions.js',
-        allCategories: './src/js/publication/create/allCategories.js'
+        allCategories: './src/js/publication/create/allCategories.js',
+        validationsCreate: './src/js/publication/create/validations.js',
+        multiStageForm: './src/js/publication/create/multiStageForm.js',
+        salePublication: './src/js/publication/create/salePublication.js',
     },
     output:{
         filename: '[name].js',

@@ -34,18 +34,31 @@ const savePublication = async (req, res) => {
         return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
     }
 
-    //Campos obligatorios
-    const camposObligatorios = ['title', 'category', 'rightsOfUse', 'privacyItem']
-    const camposPresentes = camposObligatorios.every(campo => campo in req.body);
+    /* Campos obligatorios */
+    let camposObligatorios = ['title', 'category', /* 'rightsOfUse', */ 'privacyItem', 'typePost']
+
+    //verifico si es de tipo venta
+    if (req.body['typePost'] == 'sale') {
+        camposObligatorios = [...camposObligatorios, 'typeSale', 'price', 'currency'] //agrego valores obligatorios si es de tipo venta
+    }
+    /* const camposPresentes = camposObligatorios.every(campo => campo in req.body);
     if (!camposPresentes) {
         res.clearCookie('_token')
         return res.status(400).json([{ path: 'critical', error: 'Faltan campos obligatorios en el formulario' }]);
+    } */
+    /*  */
+
+    //Que los campos que vengan no esten vacios
+    const errors = []
+
+    //Para validar que si es de tipo free no me importen estos campos a la hora de agregar los errores si vienen vacios
+    let camposExcluidos = []
+    if (req.body['typePost'] != 'sale') {
+        camposExcluidos = ['price', 'typeSale'];
     }
 
-    //Que los campos tambien vengan
-    const errors = []
     for (let campo in req.body) {
-        if (!req.body[campo]) {
+        if (!req.body[campo] && !camposExcluidos.includes(campo)) {
             errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
         }
 
@@ -62,7 +75,36 @@ const savePublication = async (req, res) => {
                 default: errors.push({ path: campo, msg: `${campo} debe ser public o protected` })
             }
         }
+
+        //type debe ser free o sale
+        if (campo == 'typePost' && (req.body[campo] != 'free' && req.body[campo] != 'sale')) {
+            errors.push({ path: campo, msg: `${campo} debe ser libre o de venta` })
+        }
     }
+
+    //si es de tipo sale
+    if (req.body['typePost'] == 'sale') {
+        //typeVenta puede ser general o unique
+        const typeSale = req.body['typeSale']
+        if (typeSale != 'general' && typeSale != 'unique') {
+            errors.push({ path: 'typeSale', msg: `El tipo de venta solamente puede ser general o unico` })
+        }
+
+        //price de tipo numero
+        const price = req.body['price']
+
+        if (isNaN(price) || price <= 0) {
+            errors.push({ path: 'price', msg: `Debe ingresar un numero valido mayor a 0 y menor a 100 millones` })
+        }
+
+
+        //currency ars o us
+        const currency = req.body['currency']
+        if (currency != 'ars' && currency != 'us') {
+            errors.push({ path: 'currency', msg: `El tipo de moneda puede ser ars o us` })
+        }
+    }
+
 
     //Si hay campos vacios:
     if (errors.length > 0) {
@@ -75,7 +117,8 @@ const savePublication = async (req, res) => {
     /* - - - - */
 
     const { filename, mimetype, path: imagePath } = req.file
-    const { title, category: category_id, rightsOfUse: rightId, privacyItem: privacy } = req.body
+
+    const { title, category: category_id, rightsOfUse: rightId, privacyItem: privacy, typePost: type } = req.body
     const { id } = req.user
     const tags = JSON.parse(req.body.tags)
 
@@ -87,7 +130,7 @@ const savePublication = async (req, res) => {
 
     try {
         //Validar que exista esta licencia
-        const rightOfUse = await RightOfUse.findByPk(rightId)
+        const rightOfUse = await RightOfUse.findByPk(1)
         if (!rightOfUse) {
             return res.status(400).json({ path: 'rightOfUse', msg: 'No existe este Derecho de uso' })
         }
@@ -95,15 +138,14 @@ const savePublication = async (req, res) => {
         //Validar que exista la categoria
         const category = await Category.findByPk(category_id)
         if (!category) {
-            return res.status(400).json({ path: 'category', msg: 'No existe la categoria'})
+            return res.status(400).json({ path: 'category', msg: 'No existe la categoria' })
         }
 
         //Obtener resolucion
         const imageInfo = await sharp(imagePath).metadata();
         const resolution = `${imageInfo.width}x${imageInfo.height}`;
 
-        //Guardar publicacion
-        const publication = await Publication.create({
+        let camposPublication = {
             image: filename,
             title,
             date: new Date(),
@@ -111,9 +153,24 @@ const savePublication = async (req, res) => {
             resolution,
             privacy, //que el usuario elija si quiere ocultar una foto
             category_id,
-            rights_of_use_id: rightId,
-            user_id: id
-        })
+            rights_of_use_id: rightOfUse.id,
+            user_id: id,
+            type
+        }
+
+        let publication
+        if (type == 'sale') {
+            camposPublication.typeSale = req.body['typeSale']
+            camposPublication.price = req.body['price']
+            camposPublication.currency = req.body['currency']
+
+            publication = await Publication.create(camposPublication)
+        } else if (type == 'free') {
+            //Guardar publicacion
+            publication = await Publication.create(camposPublication)
+        }
+
+
 
 
         //find or create para obtener el id del tag o crearlo y tambien obtener el id

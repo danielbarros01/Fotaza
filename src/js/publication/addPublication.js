@@ -1,8 +1,12 @@
 import axios from 'axios'
-import { maxTags, deleteTag, createTagElement, addTags } from './tags.js'
+import { addTags } from './tags.js'
+import { checkFields, validationImage, viewErrors } from './create/validations.js'
 
 const $form = document.querySelector("#form")
+
 const $image = document.querySelector("#image")
+const $secondImage = document.querySelector("#photoPostSecondary")
+
 const $infoImg = document.querySelector(".infoImg")
 const $resolutionImg = $infoImg.querySelector("#resolutionImg")
 const $sizeImg = $infoImg.querySelector("#sizeImg")
@@ -11,12 +15,17 @@ const $file = document.querySelector("#file")
 const $title = document.querySelector("#title")
 const $tag = document.querySelector("#tag")
 const $tags = document.querySelector("#tags")
+const categoryInputs = document.querySelectorAll('input[type="radio"][name="category"]');
 
 const $spanErrImg = document.getElementById('errImage')
 const $spanErrTitle = document.getElementById('errTitle')
 const $spanErrCategory = document.getElementById('errCategory')
 const $spanErrRightOfUse = document.getElementById('errRightOfUse')
 const $spanErrTag = document.getElementById('errTag')
+const $spanErrTypes = document.getElementById('errTypes')
+const $spanErrTypeSale = document.getElementById('errTypeSale')
+const $spanErrPrice = document.getElementById('errPrice')
+const $spanErrCurrency = document.getElementById('errCurrency')
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 const tags = []
@@ -32,14 +41,15 @@ $form.addEventListener("submit", function (e) {
     //currentTarget es $form
     const formData = new FormData(e.currentTarget)
 
-    console.log(formData)
-    const errors = checkFields();
+    const errors = checkFields($form);
 
     //valido que haya una imagen, si no agrego el nombre del campo a los errores
-    validationImage(errors)
+    validationImage($form, errors)
 
+    console.log(formData)
     if (errors.length > 0) {
-        return viewErrors(errors)
+        console.log(errors)
+        return viewErrors(errors, null, $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
     }
 
     //agrego el array de tags
@@ -58,19 +68,20 @@ $form.addEventListener("submit", function (e) {
             if (error.response && error.response.status === 400) {
                 console.log('Errores de validación:', error.response.data);
                 // Muestra los errores de validación en la interfaz de usuario
-                viewErrors(error.response.data, 'server')
+                viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
             } else {
                 console.error('Error al enviar la solicitud:', error);
             }
         });
 })
 
-
+//Cuando empiezo a escribir un titulo
 $title.addEventListener('keyup', function (event) {
     $spanErrTitle.textContent = null
     $spanErrTitle.classList.add('hidden')
 });
 
+//Cancelar la imagen que seleccione
 $btnCancelImg.addEventListener('click', function (e) {
     e.preventDefault()
     $file.value = ''
@@ -82,6 +93,18 @@ $btnCancelImg.addEventListener('click', function (e) {
     $sizeImg.textContent = null
     $resolutionImg.textContent = null
 })
+
+
+/* Si selecciono alguna categoria */
+categoryInputs.forEach(input => {
+    input.addEventListener('change', () => {
+        if (input.checked) {
+            $spanErrCategory.textContent = null
+            $spanErrCategory.classList.add('hidden')
+        }
+    });
+});
+
 
 addTags(tags, $tag, $tags, $spanErrTag);
 
@@ -96,6 +119,7 @@ async function renderImage(formData, cb) {
         $spanErrImg.classList.remove('hidden')
         $file.value = ''; // Limpiar el input de archivo
         $image.setAttribute('src', ''); // Limpiar la imagen previa
+        $secondImage.setAttribute('src', '')// Limpiar la segunda imagen previa
 
         $infoImg.classList.add('hidden')
         $btnCancelImg.classList.add('hidden')
@@ -109,6 +133,10 @@ async function renderImage(formData, cb) {
         $spanErrImg.textContent = ''
         $spanErrImg.classList.add('hidden')
 
+        //la imagen de la segunda parte del modal
+        $secondImage.setAttribute('src', image)
+        //$secondImage.classList.remove('hidden')
+
         $infoImg.classList.remove('hidden')
         $btnCancelImg.classList.remove('hidden')
 
@@ -117,63 +145,8 @@ async function renderImage(formData, cb) {
     }
 }
 
-function validationImage(arrayErrors) {
-    /* Imagen */
-    const formData = new FormData($form)
-    const file = formData.get('image')
 
-    if (file.size === 0) {
-        arrayErrors.push('image')
-    }
-}
-
-//Validar campos
-function checkFields() {
-    const formData = new FormData($form)
-    const emptyFields = [];
-
-    for (let [name, value] of formData.entries()) {
-        if (!value) {
-            emptyFields.push(name);
-        }
-    }
-
-    return emptyFields;
-}
-
-function viewErrors(errors, clientOrServer) {
-
-    if (clientOrServer == 'server') {
-        errors = errors.map(err => err.path)
-    }
-
-    errors.forEach(fieldName => {
-        switch (fieldName) {
-            case 'title':
-                $spanErrTitle.textContent = 'El titulo no debe ir vacio'
-                $spanErrTitle.classList.remove('hidden')
-                break;
-            case 'category':
-                $spanErrCategory.textContent = 'Debe seleccionar una categoria'
-                $spanErrCategory.classList.remove('hidden')
-                break;
-            case 'image':
-                $spanErrImg.textContent = 'Debe seleccionar una imagen'
-                $spanErrImg.classList.remove('hidden')
-                break;
-            case 'rightsOfUse':
-                $spanErrRightOfUse.textContent = 'Debe seleccionar un derecho de uso disponible'
-                $spanErrRightOfUse.classList.remove('hidden')
-                break;
-            case 'critical':
-                alert('Atención: Algunos de los datos del formulario han sido modificados. Por favor, inicia sesión nuevamente')
-                window.location.href = `/auth/login`
-                break;
-        }
-    })
-}
-
-
+//Obtener el tamaño de la imagen en mb
 function sizeImg(size) {
     let sizeImg = size
 

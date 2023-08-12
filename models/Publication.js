@@ -27,6 +27,23 @@ const Publication = db.define('publications', {
     privacy: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    typeSale: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'type_sale'
+    },
+    price: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 })
 

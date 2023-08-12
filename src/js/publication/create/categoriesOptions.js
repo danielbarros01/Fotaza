@@ -12,6 +12,7 @@ let maxMove = calleAncho - containerAncho
 let moveCount = 0
 
 $btnLeft.addEventListener('click', (e) => {
+    console.log('aqui')
     moveCount += move;
 
     if (moveCount >= 0) moveCount = 0
@@ -20,6 +21,7 @@ $btnLeft.addEventListener('click', (e) => {
 })
 
 $btnRight.addEventListener('click', (e) => {
+    console.log('aqui')
     moveCount -= move;
 
     if (moveCount <= -maxMove) moveCount = -maxMove;
