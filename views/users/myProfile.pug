@@ -15,10 +15,12 @@ block contenido
                 div#profilePicture(class="absolute top-2/3 left-[3%] w-36 h-36 border-4 border-polished-white")
                     img(src=userProfile.image_url ? `${userProfile.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil")
 
+                //- Mostrar editar perfil si soy yo mismo
                 if user && user.id == userProfile.id
                     button(class="flex gap-2 items-center bg-gray-300 text-principal-gray px-4 py-2 rounded-lg float-right mr-[3%] mt-3 border-2 border-transparent hover:border-principal-gray transition")
                         i(class="fa-solid fa-pen")
                         span Editar perfil
+
             #infoUser(class="right-2 px-[3%]") 
                 p(class="text-3xl font-bold text-principal-gray")= userProfile.name + " " + userProfile.lastname 
                 p(class="text-lg text-secondary-gray")= userProfile.username
@@ -35,7 +37,7 @@ block contenido
                 input(type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked)
                 label(for="slide-item-1")
                     p.icon Públicas
-                        span 4
+                        span= publications.length
                 //OPCION 2 - Fotos de venta general
                 input(type="radio" name="slideItem" id="slide-item-2" class="slide-toggle")
                 label(for="slide-item-2")
@@ -50,7 +52,30 @@ block contenido
                 .clear 
                 .slider
                     .bar    
-            #images 
+
+            //- pre= JSON.stringify(publications,undefinde,2)
+
+            #images(class="lg:columns-3 columns-2xs gap-4 my-4 space-y-4") 
+                //- Importar imagesProfile y mostrar las imagenes
+                //- Vamos a traer 20 imagenes ejemplo
+                each publication in publications
+                    div(class="relative group")
+                        a(href=`/publications/${publication.id}` target="_blank" class="relative block overflow-hidden") 
+
+                            img(src=`/uploads/${publication.image}` alt=`Imagen ${publication.title}` class="rounded-md w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
+
+                            div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full p-2 flex justify-between transform transition-all duration-500 group-hover:translate-y-[100%]") 
+                                span(class="text-white")= publication.title
+
+                                div(class="flex flex-col items-center") 
+                                    img(src=`${publication.category.image}` alt=`Imagen de categoria ${publication.category.name}` class="w-9 h-8 rounded-full")
+                                    span(class="text-white text-xs")= publication.category.name 
+
+            
+
+
+
+
                 
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

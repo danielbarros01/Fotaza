@@ -24,7 +24,7 @@ const protectRoute = async (req, res, next) => {
 
     } catch (error) {
         //Cualquier error o si ya expiro el token
-        return res.clearCookie('_token').redirect('auth/login')
+        return res.clearCookie('_token').redirect('/auth/login')
     }
 }
 

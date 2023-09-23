@@ -20,6 +20,7 @@ export default {
         validationsCreate: './src/js/publication/create/validations.js',
         multiStageForm: './src/js/publication/create/multiStageForm.js',
         salePublication: './src/js/publication/create/salePublication.js',
+        userMenu: './src/js/header/userMenu.js',
     },
     output:{
         filename: '[name].js',

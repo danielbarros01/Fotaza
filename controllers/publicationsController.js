@@ -171,8 +171,6 @@ const savePublication = async (req, res) => {
         }
 
 
-
-
         //find or create para obtener el id del tag o crearlo y tambien obtener el id
         const tagsBD = [] //instancias de tag
         for (const tag of tags) {
@@ -198,6 +196,9 @@ const savePublication = async (req, res) => {
 
 // GET /publications/my-posts
 const viewMyPublications = async (req, res) => {
+    res.render('publications/myPublications', {
+        pagina: 'Mis publicaciones'
+    })
 }
 
 // GET /publications/:id

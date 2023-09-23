@@ -16,19 +16,21 @@ User.belongsToMany(Category, { through: Interest });
 //Definir relacion muchos a 1
 User.hasMany(Publication, { foreignKey: 'user_id' })
 Category.hasMany(Publication, { foreignKey: 'category_id' })
-RightOfUse.hasMany(Publication, { foreignKey: 'rights_of_use_id'})
+RightOfUse.hasMany(Publication, { foreignKey: 'rights_of_use_id' })
 
 // Definir la relación muchos a muchos entre Publicacion y Tag
-Publication.belongsToMany(Tag, { through: PublicationHasTag});
+Publication.belongsToMany(Tag, { through: PublicationHasTag });
+
+Publication.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
 
 // Definir la relación de rating
-Publication.belongsToMany(User, { through: Rating})
+Publication.belongsToMany(User, { through: Rating })
 
 // Definir las relaciones de comment
-User.hasMany(Comment, {foreignKey:'user_id'})
+User.hasMany(Comment, { foreignKey: 'user_id' })
 //Para poder utilizar usuario en comentario
-Comment.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
-Publication.hasMany(Comment, {foreignKey:'publication_id'})
+Comment.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
+Publication.hasMany(Comment, { foreignKey: 'publication_id' })
 
 
 /* Publication.belongsToMany(User, { through: Comment})

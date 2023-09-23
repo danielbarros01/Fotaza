@@ -13,5 +13,17 @@ header(class="px-3.5 bg-white")
             if user 
                 a(href="/publications/create") 
                     button(class="bg-principal-gray text-white py-2 px-8 border-2 border-principal-gray font-normal mr-2 hover:opacity-80") Crear
-                div.w-14.h-14.border-2.border-principal-gray.cursor-pointer.shadow
+                div#profileImage.w-14.h-14.border-2.border-principal-gray.cursor-pointer.shadow.relative
                     img(src=user.image_url , alt="Imagen de perfil" class="w-full h-full")
+                
+                    div#menu(class="bg-principal-gray shadow-xl absolute top-14 right-0 min-h-[100px] min-w-[250px] z-50 hidden")
+                        ul(class="text-white") 
+                            li(class="text-lg hover:bg-hard-gray py-4") 
+                                a(href=`/users/${user.username}` class="flex justify-evenly items-center")
+                                    img(src=user.image_url , alt="Imagen de perfil" class="w-16 rounded") 
+                                    div(class="flex flex-col") 
+                                        span(class="text-sm")= user.name + " " + user.lastname
+                                        span(class="text-xs font-light")= user.username
+
+if user 
+    script(src="/js/userMenu.js") 
