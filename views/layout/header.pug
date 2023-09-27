@@ -23,7 +23,13 @@ header(class="px-3.5 bg-white")
                                     img(src=user.image_url , alt="Imagen de perfil" class="w-16 rounded") 
                                     div(class="flex flex-col") 
                                         span(class="text-sm")= user.name + " " + user.lastname
-                                        span(class="text-xs font-light")= user.username
+                                        span(class="text-xs font-light")= user.username     
+                            hr(class="w-4/5 m-auto")
+                            li(class="text-lg hover:bg-hard-gray py-3 pl-6 cursor-pointer")
+                                form(action="/auth/sign-off" method="POST")
+                                    input(type="hidden" name="_csrf" value=csrfToken)
+                                    input(type="submit" value="Cerrar Sesión" class="cursor-pointer")
+
 
 if user 
     script(src="/js/userMenu.js") 

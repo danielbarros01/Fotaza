@@ -298,6 +298,11 @@ const newPassword = async (req, res) => {
     })
 }
 
+//POST /sign-off
+const signOff = async (req, res) => {
+    res.clearCookie('_token').status(200).redirect('/auth/login')
+}
+
 export {
     formLogin,
     authenticate,
@@ -307,5 +312,6 @@ export {
     recoverPassword,
     resetPassword,
     comprobarToken,
-    newPassword
+    newPassword,
+    signOff
 }
