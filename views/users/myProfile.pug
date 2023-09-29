@@ -17,9 +17,10 @@ block contenido
 
                 //- Mostrar editar perfil si soy yo mismo
                 if user && user.id == userProfile.id
-                    button(class="flex gap-2 items-center bg-gray-300 text-principal-gray px-4 py-2 rounded-lg float-right mr-[3%] mt-3 border-2 border-transparent hover:border-principal-gray transition")
-                        i(class="fa-solid fa-pen")
-                        span Editar perfil
+                    a(href="/users/account") 
+                        div(class="flex gap-2 items-center bg-gray-300 text-principal-gray px-4 py-2 rounded-lg float-right mr-[3%] mt-3 border-2 border-transparent hover:border-principal-gray transition")
+                            i(class="fa-solid fa-pen")
+                            span Editar perfil
 
             #infoUser(class="right-2 px-[3%]") 
                 p(class="text-3xl font-bold text-principal-gray")= userProfile.name + " " + userProfile.lastname 

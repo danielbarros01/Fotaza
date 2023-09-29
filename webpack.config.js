@@ -21,6 +21,9 @@ export default {
         multiStageForm: './src/js/publication/create/multiStageForm.js',
         salePublication: './src/js/publication/create/salePublication.js',
         userMenu: './src/js/header/userMenu.js',
+        alertAccount: './src/js/user/alertAccount.js',
+        picturesAccount: './src/js/user/picturesAccount.js',
+        getResolution: './src/js/helpers/getResolution.js',
     },
     output:{
         filename: '[name].js',
