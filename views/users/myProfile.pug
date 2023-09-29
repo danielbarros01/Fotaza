@@ -13,7 +13,7 @@ block contenido
                 div#coverPhoto(class="h-64")
                     img(src=userProfile.cover_url ? `/img/covers/${userProfile.cover_url}` : '/img/covers/greenViolet.png' alt="Imagen de portada" class="h-full w-full") 
                 div#profilePicture(class="absolute top-2/3 left-[3%] w-36 h-36 border-4 border-polished-white")
-                    img(src=userProfile.image_url ? `${userProfile.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil")
+                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil")
 
                 //- Mostrar editar perfil si soy yo mismo
                 if user && user.id == userProfile.id

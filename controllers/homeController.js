@@ -17,7 +17,8 @@ const home = async (req, res) => {
         viewBtnsAuth: false,
         user: user,
         imageUrl: "/img/backgrounds/fondo6.jpg",
-        nameUserPhoto: "Khaled Ali"
+        nameUserPhoto: "Khaled Ali",
+        csrfToken: req.csrfToken() 
     })
 
 }

@@ -20,15 +20,16 @@ header(class="px-3.5 bg-white")
                         ul(class="text-white") 
                             li(class="text-lg hover:bg-hard-gray py-4") 
                                 a(href=`/users/${user.username}` class="flex justify-evenly items-center")
-                                    img(src=user.image_url , alt="Imagen de perfil" class="w-16 rounded") 
+                                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' , alt="Imagen de perfil" class="w-16 rounded") 
                                     div(class="flex flex-col") 
                                         span(class="text-sm")= user.name + " " + user.lastname
                                         span(class="text-xs font-light")= user.username     
                             hr(class="w-4/5 m-auto")
-                            li(class="text-lg hover:bg-hard-gray py-3 pl-6 cursor-pointer")
+                            
+                            li(class="text-lg hover:bg-hard-gray cursor-pointer")
                                 form(action="/auth/sign-off" method="POST")
                                     input(type="hidden" name="_csrf" value=csrfToken)
-                                    input(type="submit" value="Cerrar Sesión" class="cursor-pointer")
+                                    input(type="submit" value="Cerrar Sesión" class="cursor-pointer w-full text-left py-3 pl-6")
 
 
 if user 
