@@ -86,6 +86,9 @@ const editAccount = async (req, res) => {
     user.lastname = lastname
     user.username = username
 
+    //VERIFICAR IMAGEN, actualizar ruta
+    if(req.file) user.image_url = req.file.filename
+
     await user.save()
 
     return res.render('users/account', {

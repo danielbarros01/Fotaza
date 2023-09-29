@@ -1,4 +1,6 @@
 import express from "express"
+import upload from "../Middlewares/uploadImage.js"
+
 import authenticateUser from '../Middlewares/authenticateUser.js'
 import protectRoute from "../Middlewares/protectRoute.js";
 import { getUser, userAccount, editAccount } from "../controllers/usersController.js";
@@ -14,7 +16,7 @@ router.get('/account', protectRoute, userAccount)
 
 
 //POST /users/account
-router.post('/account', protectRoute, editAccount)
+router.post('/account', protectRoute, upload.single('avatar'), editAccount)
 
 
 //Pongo al ultimo para que encuentre /account

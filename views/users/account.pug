@@ -1,6 +1,7 @@
 extends ../layout/index
 
 block styles 
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" integrity="sha512-hvNR0F/e2J7zPPfLC9auFe3/SE0yG4aJCOd/qxew74NN7eyiSKjr7xJJMu1Jy2wf7FXITpWS1E/RY8yzuXN7VA==" crossorigin="anonymous" referrerpolicy="no-referrer")
 
 block contenido
     include ../layout/header
@@ -18,8 +19,9 @@ block contenido
         
         section(class="bg-white shadow-2xl lg:w-3/4 lg:ml-6")
             
-            form(method="POST" enctype="multipart/form-data") 
-                input(type="hidden" name="_csrf" value= csrfToken)
+            form(method="POST" enctype="multipart/form-data" action=`?_csrf=${csrfToken}`) 
+                //- input(type="hidden" name="_csrf" value=csrfToken)
+                
                 div#profilePhotos(class="relative h-52")
                     
                     div#coverPhoto(class="h-52 w-full")
@@ -27,16 +29,16 @@ block contenido
                     
                     div(class="absolute top-[20%] left-7 flex")
                         div#profilePicture(class="md:border-4 border-polished-white w-32")
-                            img#avatarImage(src=user.image_url ? `${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="")
+                            img#avatarImage(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="")
                         
                         div(class="grid place-content-center p-5")
                             span(class="text-center text-2xl text-white mb-4")= user.name + " " + user.lastname
                             
                             //- ------------------------------------------------------------
-                            button#avatarButton(type="button" class="w-fit flex gap-2 items-center bg-white text-sm text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition m-auto sm:m-0")
+                            label(for="avatarInput" class="cursor-pointer w-fit flex gap-2 items-center bg-white text-sm text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition m-auto sm:m-0")
                                 i(class="fa-solid fa-pen")
                                 span Cambiar avatar
-                            input#avatarInput(type="file" name="avatar" class="hidden")
+                            input#avatarInput(type="file" name="avatar" class="hidden" accept=".png,.jpg,.jpeg")
                         
                     button(type="button" class="absolute right-0 sm:bottom-0 mb-4 mr-6 w-fit flex gap-2 items-center mt-2 sm:mt-0 bg-blue-800 text-white sm:bg-white text-sm sm:text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition")
                         i(class="fa-solid fa-pen")
@@ -81,6 +83,24 @@ block contenido
                     i(class="fa-solid fa-circle-xmark text-lg")
         //- pre= JSON.stringify(errores, undefined, 2)
 
+        .modal(class="hidden opacity-0 bg-black bg-opacity-25 backdrop-blur-sm fixed bottom-0 left-0 right-0 top-0 w-full h-full overflow-auto justify-center items-center  p-5 transition-all duration-150 ease-in-out") 
+            
+            .modal-content(class="hidden opacity-0 w-11/12 m-auto bg-white rounded-lg overflow-hidden transform scale-90 transition-all duration-400 delay-300 ease-linear") 
+                
+                .modal-header(class="w-full py-5 px-2 text-center bg-slate-50 shadow-md text-lg") 
+                    p Recorta tu foto 
+                
+                .modal-body(class="flex content-between items-start gap-2 py-4 px-2") 
+                    
+                    .content-image-cropper(class="w-4/5 h-96 p-1 outline outline-1") 
+                        img(src="", alt="" class="img-cropper" id="img-cropper" class="w-full")
+                    
+                    .content-image-sample(class="h-52 w-52 outline outline-1 rounded-full overflow-hidden") 
+                        .img-sample#img-croppered(class="h-full w-full") 
+                
+                .modal-footer(class="w-full p-2 text-center bg-slate-50 shadow-md text-lg flex items-center content-end gap-4") 
+                    button(class="btn primary" id="btn-cut" class="border-none py-3 px-16 rounded-md cursor-pointer text-white bg-principal-gray hover:opacity-90") Recortar 
+                    button(class="btn secundary" id="btn-close" class="border-none py-3 px-16 rounded-md cursor-pointer text-white bg-secondary-gray hover:opacity-90") Cancelar 
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     if save

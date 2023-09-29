@@ -26,6 +26,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "cropperjs": "^1.6.1",
     "csurf": "^1.11.0",
     "dotenv": "^16.3.1",
     "dropzone": "^5.9.3",
