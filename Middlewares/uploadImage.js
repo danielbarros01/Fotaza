@@ -1,11 +1,23 @@
 import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (file.fieldname === 'avatar') {
-            cb(null, './public/img/profiles/'); //cuando se llama al callback es porque se esta guardando correctamente
+            // Ruta donde se guardarán las imágenes de perfil
+            const profileImagePath = './public/img/profiles/'
+
+            // Ruta completa del archivo existente (sin importar la extensión)
+            const existingFilePath = path.join(profileImagePath, req.user.username);
+
+            // Eliminar el archivo existente si existe
+            if (fs.existsSync(existingFilePath)) {
+                fs.unlinkSync(existingFilePath);
+            }
+
+            cb(null, profileImagePath);
         } else {
             cb(null, './public/uploads/');
         }

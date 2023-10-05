@@ -1,10 +1,7 @@
-import { Model } from 'sequelize'
 import fs from 'fs'
 import path, { dirname } from 'path'
-import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 import { check, validationResult } from 'express-validator'
-import db from '../config/db.js'
 import { User, Publication, Category } from '../models/Index.js'
 
 // Obtener la ruta del directorio actual del módulo
@@ -84,6 +81,9 @@ const userAccount = async (req, res) => {
 
 //POST /users/account  --> Editar
 const editAccount = async (req, res) => {
+    const { name, lastname, username, 'cover-radio': cover } = req.body
+    const user = await User.findByPk(req.user.id)
+
     // Validar el campo 'name' 'lastname' 'username'
     await Promise.all(validateNameAndLastName('name', 'nombre').map(validation => validation.run(req)));
     await Promise.all(validateNameAndLastName('lastname', 'apellido').map(validation => validation.run(req)));
@@ -103,9 +103,41 @@ const editAccount = async (req, res) => {
 
             resultadoValidaciones.errors.push(error)
         }
-    }
-    //Falta verificar foto de perfil, dimensiones, tiene que ser 1:1
 
+        user.image_url = req.file.filename
+    }
+
+    //si username se cambio se cambia el nombre del avatar
+    if (user.username != username) {
+        let verifyAvatar = true
+        //Verificar que no exista el username que el usuario quiere
+        const usernameExist = await User.findOne({ where: { username: username } })
+
+        if (usernameExist) {
+            const error = {
+                msg: `El nombre de usuario "${username} ya existe, intenta con otro`,
+                path: 'username'
+            }
+
+            resultadoValidaciones.errors.push(error)
+            verifyAvatar = false
+        }
+
+        //Si se puede cambiar el username, cambiar el avatar de nombre
+        if (verifyAvatar) {
+            const isChange = changeAvatarName(user, username) //true or false
+            if (!isChange) {
+                const error = {
+                    msg: `Hubo un error "${username} al querer cambiar el nombre de usuario"`,
+                    path: 'username'
+                }
+
+                resultadoValidaciones.errors.push(error)
+            }
+        }
+    }
+
+    //----VALIDAR ERRORES----
     if (!resultadoValidaciones.isEmpty()) {
         return res.render('users/account', {
             errores: resultadoValidaciones.array(),
@@ -115,13 +147,9 @@ const editAccount = async (req, res) => {
         })
     }
 
-    const { name, lastname, username, 'cover-radio': cover } = req.body
-    const user = await User.findByPk(req.user.id)
-
     user.name = name
     user.lastname = lastname
     user.username = username
-    user.image_url = req.file.filename
 
     //Cover_url
     if (imageNames.includes(cover)) user.cover_url = cover
@@ -160,6 +188,39 @@ const editAccount = async (req, res) => {
                 .custom((value) => !/\s/.test(value)).withMessage('El nombre de usuario no debe contener espacios')
                 .isLength({ max: 145 }).withMessage('El nombre de usuario debe tener un máximo de 145 caracteres')
         ]
+    }
+
+    //cambiar nombre de imagen
+    function changeAvatarName(user, newUsername) {
+        try {
+            const imgDirectory = path.join(__dirname, '..', 'public', 'img', 'profiles');
+            // Lee los nombres de los archivos en el directorio de imágenes
+            const imageNames = fs.readdirSync(imgDirectory);
+            const matchImage = imageNames.find(imageName => imageName.startsWith(user.username)) //busco la imagen
+
+            if (matchImage) {
+                const imageExtension = path.extname(matchImage) //obtengo la extension ex. .png
+
+                const newName = newUsername + imageExtension //nuevo nombre con extension
+
+                //rutas completas de la imagen original y nueva con nombre cambiado
+                const oldImgPath = path.join(imgDirectory, matchImage);
+                const newImgPath = path.join(imgDirectory, newName);
+
+                //cambiar el nombre
+                fs.renameSync(oldImgPath, newImgPath)
+
+                //cambiar de la bd
+                user.image_url = newName
+                return true
+            } else {
+                return false
+            }
+        } catch (error) {
+            console.error(`Error al cambiar el nombre de la imagen del usuario ${oldUsername}: ${error} `);
+            return false; // Devuelve false en caso de error
+        }
+
     }
 }
 
