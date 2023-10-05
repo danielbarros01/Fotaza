@@ -1,7 +1,8 @@
 import { Model } from 'sequelize'
 import fs from 'fs'
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import path, { dirname } from 'path'
+import sharp from 'sharp'
+import { fileURLToPath } from 'url'
 import { check, validationResult } from 'express-validator'
 import db from '../config/db.js'
 import { User, Publication, Category } from '../models/Index.js'
@@ -90,11 +91,27 @@ const editAccount = async (req, res) => {
 
     let resultadoValidaciones = validationResult(req)
 
+    //VERIFICAR IMAGEN, actualizar ruta
+    if (req.file) {
+
+        if (!req.file.mimetype.match(/^image\/(png|jpg|jpeg)$/)) {
+            //Agregar a los errores resultadoValidaciones
+            const error = {
+                msg: 'Debe ingresar una imagen de tipo "png" o "jpg/jpeg"',
+                path: 'avatar'
+            }
+
+            resultadoValidaciones.errors.push(error)
+        }
+    }
+    //Falta verificar foto de perfil, dimensiones, tiene que ser 1:1
+
     if (!resultadoValidaciones.isEmpty()) {
         return res.render('users/account', {
             errores: resultadoValidaciones.array(),
             user: req.user,
-            csrfToken: req.csrfToken()
+            csrfToken: req.csrfToken(),
+            covers: imageNames
         })
     }
 
@@ -104,11 +121,7 @@ const editAccount = async (req, res) => {
     user.name = name
     user.lastname = lastname
     user.username = username
-
-    //VERIFICAR IMAGEN, actualizar ruta
-    if (req.file) user.image_url = req.file.filename
-    //Falta verificar foto de perfil, dimensiones, tiene que ser 1:1
-
+    user.image_url = req.file.filename
 
     //Cover_url
     if (imageNames.includes(cover)) user.cover_url = cover

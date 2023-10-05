@@ -43,11 +43,12 @@ block contenido
                                 i(class="fa-solid fa-pen")
                                 span Cambiar avatar
                             input#avatarInput(type="file" name="avatar" class="hidden" accept=".png,.jpg,.jpeg")
+                            //- input#avatarInput2(type="file" name="avatar" class="")
                         
                     button#coverBtn(type="button" class="absolute right-0 sm:bottom-0 mb-4 mr-6 w-fit flex gap-2 items-center mt-2 sm:mt-0 bg-blue-800 text-white sm:bg-white text-sm sm:text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition")
                         i(class="fa-solid fa-pen")
                         span Cambiar portada
-
+                +getErrorMsg('avatar')
 
                 div#fields(class="mt-8 md:space-y-6 p-4")
                     div(class="md:flex space-y-4 md:space-y-0")
