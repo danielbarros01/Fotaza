@@ -26,7 +26,11 @@ block contenido
                     
                     div#coverPhoto(class="h-52 w-full")
                         img(src=user.cover_url ? `/img/covers/${user.cover_url}` : '/img/covers/greenViolet.png' alt="Imagen de portada" class="h-full w-full") 
-                    
+                        
+                        //- Covers
+                        each cover in covers
+                            input(type="radio" name="cover-radio" value=cover id= cover checked=cover == user.cover_url class="hidden")
+
                     div(class="absolute top-[20%] left-7 flex")
                         div#profilePicture(class="md:border-4 border-polished-white w-32")
                             img#avatarImage(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="")
@@ -40,7 +44,7 @@ block contenido
                                 span Cambiar avatar
                             input#avatarInput(type="file" name="avatar" class="hidden" accept=".png,.jpg,.jpeg")
                         
-                    button(type="button" class="absolute right-0 sm:bottom-0 mb-4 mr-6 w-fit flex gap-2 items-center mt-2 sm:mt-0 bg-blue-800 text-white sm:bg-white text-sm sm:text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition")
+                    button#coverBtn(type="button" class="absolute right-0 sm:bottom-0 mb-4 mr-6 w-fit flex gap-2 items-center mt-2 sm:mt-0 bg-blue-800 text-white sm:bg-white text-sm sm:text-blue-800 px-2 py-1 rounded-full border-2 border-transparent hover:border-blue-400 transition")
                         i(class="fa-solid fa-pen")
                         span Cambiar portada
 
@@ -101,9 +105,26 @@ block contenido
                 .modal-footer(class="w-full p-2 text-center bg-slate-50 shadow-md text-lg flex items-center content-end gap-4") 
                     button(class="btn primary" id="btn-cut" class="border-none py-3 px-16 rounded-md cursor-pointer text-white bg-principal-gray hover:opacity-90") Recortar 
                     button(class="btn secundary" id="btn-close" class="border-none py-3 px-16 rounded-md cursor-pointer text-white bg-secondary-gray hover:opacity-90") Cancelar 
+
+        .modalCover(class="hidden bg-black bg-opacity-25 backdrop-blur-sm fixed bottom-0 left-0 right-0 top-0 w-full h-full overflow-auto flex justify-center items-center p-5")
+            
+            .modalCover-content(class="w-11/12 xl:h-80 m-auto bg-white rounded-lg overflow-y-auto") 
+                
+                .modal-header(class="w-full py-5 px-8 text-center bg-slate-50 shadow-md text-lg flex justify-between") 
+                    p Elige un color
+                    button(class="fa-solid fa-xmark hover:text-red-600 btnClose")
+                
+                .modal-body(class="flex justify-around gap-2 flex-wrap py-4 px-2") 
+                    each cover in covers
+                        label(class="group cursor-pointer w-96" for= cover class="label-cover")
+                            img(src=`/img/covers/${cover}` class=`group-hover:opacity-80 group-hover:border-gray-400 border-2 ${user.cover_url == cover ? "border-4 border-indigo-500 shadow-lg label-checked" : ""}`)
+
+
+        pre= JSON.stringify(images, undefined, 2)
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     if save
         script(src="/js/alertAccount.js") 
 
     script(src="/js/picturesAccount.js") 
+    script(src="/js/coverAccount.js") 

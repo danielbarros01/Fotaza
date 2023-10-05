@@ -23,6 +23,7 @@ export default {
         userMenu: './src/js/header/userMenu.js',
         alertAccount: './src/js/user/alertAccount.js',
         picturesAccount: './src/js/user/picturesAccount.js',
+        coverAccount: './src/js/user/coverAccount.js',
         getResolution: './src/js/helpers/getResolution.js',
     },
     output:{

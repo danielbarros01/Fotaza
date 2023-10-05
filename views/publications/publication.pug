@@ -14,7 +14,7 @@ block contenido
     main
         div(class="flex justify-between mx-10 mt-10")
             div.flex
-                div(class="w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat border-2 border-principal-gray cursor-pointer shadow" style=`background-image: url(${userPost.image_url})`) 
+                div(class="w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat border-2 border-principal-gray cursor-pointer shadow" style=`background-image: url(${userPost.image_url ? `/img/profiles/${userPost.image_url}` : '/img/profiles/profilePredeterminated.png'})`) 
                 div(class="ml-3") 
                     p.font-bold= `${userPost.name } ${userPost.lastname }`
                     p.text-secondary-gray= userPost.username
@@ -198,7 +198,7 @@ block contenido
         template#templateComment
             div(class="comment mb-8")
                 div.flex                
-                    div(class="commentUserImage w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat" style=`background-image: url(${user.image_url})`) 
+                    div(class="commentUserImage w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat" style=`background-image: url(${user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png'})`) 
                     
                     div(class="flex flex-col w-full")
                         div(class="flex justify-between w-full mt-[-10px]")

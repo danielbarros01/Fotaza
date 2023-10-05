@@ -1,7 +1,19 @@
 import { Model } from 'sequelize'
+import fs from 'fs'
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { check, validationResult } from 'express-validator'
 import db from '../config/db.js'
 import { User, Publication, Category } from '../models/Index.js'
+
+// Obtener la ruta del directorio actual del módulo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+// Directorio de las imágenes
+const imgDirectory = path.join(__dirname, '..', 'public', 'img', 'covers');
+// Lee los nombres de los archivos en el directorio de imágenes
+const imageNames = fs.readdirSync(imgDirectory);
+
 
 //GET /users/:username
 const getUser = async (req, res) => {
@@ -56,10 +68,17 @@ const getUser = async (req, res) => {
 const userAccount = async (req, res) => {
     const { user } = req
 
-    return res.render('users/account', {
-        csrfToken: req.csrfToken(),
-        user
-    })
+    try {
+        return res.render('users/account', {
+            csrfToken: req.csrfToken(),
+            user,
+            covers: imageNames
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error interno del servidor');
+    }
 }
 
 //POST /users/account  --> Editar
@@ -79,7 +98,7 @@ const editAccount = async (req, res) => {
         })
     }
 
-    const { name, lastname, username } = req.body
+    const { name, lastname, username, 'cover-radio': cover } = req.body
     const user = await User.findByPk(req.user.id)
 
     user.name = name
@@ -87,14 +106,21 @@ const editAccount = async (req, res) => {
     user.username = username
 
     //VERIFICAR IMAGEN, actualizar ruta
-    if(req.file) user.image_url = req.file.filename
+    if (req.file) user.image_url = req.file.filename
+    //Falta verificar foto de perfil, dimensiones, tiene que ser 1:1
+
+
+    //Cover_url
+    if (imageNames.includes(cover)) user.cover_url = cover
 
     await user.save()
+
 
     return res.render('users/account', {
         user,
         csrfToken: req.csrfToken(),
-        save: true
+        save: true,
+        covers: imageNames
     })
 
     //validar nombre y apellido
