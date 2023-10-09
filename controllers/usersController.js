@@ -1,9 +1,10 @@
 import fs from 'fs'
+import { v4 as uuidv4 } from 'uuid'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { check, validationResult } from 'express-validator'
 import { User, Publication, Category } from '../models/Index.js'
-
+import { changePasswordEmail } from '../helpers/sendEmail.js'
 // Obtener la ruta del directorio actual del módulo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -67,7 +68,7 @@ const userAccount = async (req, res) => {
     const { user } = req
 
     try {
-        return res.render('users/account', {
+        return res.render('users/account/account', {
             csrfToken: req.csrfToken(),
             user,
             covers: imageNames
@@ -139,7 +140,7 @@ const editAccount = async (req, res) => {
 
     //----VALIDAR ERRORES----
     if (!resultadoValidaciones.isEmpty()) {
-        return res.render('users/account', {
+        return res.render('users/account/account', {
             errores: resultadoValidaciones.array(),
             user: req.user,
             csrfToken: req.csrfToken(),
@@ -157,7 +158,7 @@ const editAccount = async (req, res) => {
     await user.save()
 
 
-    return res.render('users/account', {
+    return res.render('users/account/account', {
         user,
         csrfToken: req.csrfToken(),
         save: true,
@@ -217,15 +218,77 @@ const editAccount = async (req, res) => {
                 return false
             }
         } catch (error) {
-            console.error(`Error al cambiar el nombre de la imagen del usuario ${oldUsername}: ${error} `);
+            console.error(`Error al cambiar el nombre de la imagen del usuario ${user.username}: ${error} `);
             return false; // Devuelve false en caso de error
         }
 
     }
 }
 
+//GET /users/account/password
+const password = async (req, res) => {
+    return res.render('users/account/changePassword', {
+        csrfToken: req.csrfToken(),
+        user: req.user
+    })
+}
+
+//POST /users/account/password
+const changePassword = async (req, res) => {
+    await check('password').notEmpty().withMessage('Ingresa la contraseña').run(req)
+    let resultadoValidaciones = validationResult(req)
+
+    if (!resultadoValidaciones.isEmpty()) {
+        return res.render('users/account/changePassword', {
+            error: { msg: 'El campo no debe estar vacio' },
+            user: req.user,
+            csrfToken: req.csrfToken()
+        })
+    }
+
+
+    try {
+        const { password } = req.body
+        const user = await User.findByPk(req.user.id)
+
+        //Validar la contraseña
+        if (!user.verificarPassword(password)) {
+            return res.render('users/account/changePassword', {
+                error: { msg: "La contraseña es incorrecta" },
+                user: req.user,
+                csrfToken: req.csrfToken()
+            })
+        }
+
+        //Si es correcta enviar email con codigo
+
+        //1. Generar token
+        user.token = uuidv4()
+        //2. guardarlo en bd
+        await user.save()
+        //3. enviarlo al email
+        changePasswordEmail({
+            name: user.name, lastname: user.lastname, email: user.email, token: user.token
+        })
+        
+        //limpiar cookie de sesion
+        res.clearCookie('_token')
+
+        //Renderizar mensaje
+        res.render('templates/sendEmail', {
+            pagina: "Cambio de contraseña",
+            mensajePagina: "Cambia tu contraseña de"
+        })
+    } catch (error) {
+        console.log(`Hubo un error al querer cambiar la contraseña del usuario ${req.username}`, error)
+        return res.status(500).send('Error interno del servidor');
+    }
+}
+
 export {
     getUser,
     userAccount,
-    editAccount
+    editAccount,
+    password,
+    changePassword
 }

@@ -1,10 +1,10 @@
-extends ../layout/index
+extends ../../layout/index
 
 block styles 
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" integrity="sha512-hvNR0F/e2J7zPPfLC9auFe3/SE0yG4aJCOd/qxew74NN7eyiSKjr7xJJMu1Jy2wf7FXITpWS1E/RY8yzuXN7VA==" crossorigin="anonymous" referrerpolicy="no-referrer")
 
 block contenido
-    include ../layout/header
+    include ../../layout/header
 
     main(class="px-6 py-10 lg:flex") 
         //- Este aside debo pasarlo a otro archivo ya que lo usare en otra parte tambien
@@ -121,7 +121,6 @@ block contenido
                             img(src=`/img/covers/${cover}` class=`group-hover:opacity-80 group-hover:border-gray-400 border-2 ${user.cover_url == cover ? "border-4 border-indigo-500 shadow-lg label-checked" : ""}`)
 
 
-        pre= JSON.stringify(images, undefined, 2)
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     if save
