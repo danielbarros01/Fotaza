@@ -83,7 +83,16 @@ const authenticate = async (req, res) => {
     }).redirect('/')
 }
 
+// auth/google
+const authGoogle = async (req, res) => {
+    //Autenticar con jwt
+    const token = generateJWT(req.user.id)
 
+    //Almacenar en cookie
+    return res.cookie('_token', token, {
+        httpOnly: true
+    }).redirect('/')
+}
 
 // auth/signup
 const formRegister = (req, res) => {
@@ -187,7 +196,7 @@ const recoverPassword = (req, res) => {
         pagina: 'Recovery Password',
         imageUrl: "/img/backgrounds/fondo5.jpg",
         nameUserPhoto: "masbebet christianto",
-        csrfToken: req.csrfToken() 
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -202,7 +211,7 @@ const resetPassword = async (req, res) => {
             imageUrl: "/img/backgrounds/fondo5.jpg",
             nameUserPhoto: "masbebet christianto",
             errores: resultadoValidaciones.array(),
-            csrfToken: req.csrfToken() 
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -216,7 +225,7 @@ const resetPassword = async (req, res) => {
             nameUserPhoto: "masbebet christianto",
             user: { email },
             errores: [{ msg: 'El email no pertenece a ningun usuario' }],
-            csrfToken: req.csrfToken() 
+            csrfToken: req.csrfToken()
         })
     }
 
@@ -257,7 +266,7 @@ const comprobarToken = async (req, res) => {
         pagina: "Reestablece tu contraseña",
         imageUrl: "/img/backgrounds/fondo4.jpg",
         nameUserPhoto: "Luise and Nic",
-        csrfToken: req.csrfToken() 
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -306,6 +315,7 @@ const signOff = async (req, res) => {
 export {
     formLogin,
     authenticate,
+    authGoogle,
     formRegister,
     register,
     confirmAccount,

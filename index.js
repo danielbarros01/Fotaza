@@ -1,6 +1,11 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import csurf from 'csurf'
+
+import passport from 'passport'
+import "./Middlewares/google.js"
+
+
 import homeRoutes from './routes/homeRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import publicationsRoutes from './routes/publicationsRoutes.js'
@@ -32,7 +37,11 @@ app.use(cookieParser())
 app.use(csurf({ cookie: true }))
 
 // Configurar el middleware para analizar el cuerpo de la solicitud JSON
-app.use(express.json());
+app.use(express.json())
+
+// Inicializa Passport
+app.use(passport.initialize());
+
 
 //Routing
 app.use('/', homeRoutes)

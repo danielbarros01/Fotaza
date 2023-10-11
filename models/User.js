@@ -22,7 +22,11 @@ const User = db.define('users', {
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true //Por si la autenticacion es con google 
+    },
+    google_id: {
+        type: DataTypes.STRING,
+        allowNull: true // Puede ser nulo si no se autenticaron con Google
     },
     image_url: {
         type: DataTypes.STRING,
@@ -40,11 +44,13 @@ const User = db.define('users', {
         //usuario es en realidad req.body
         //se ejecuta antes de crear el usuario, despues ya no, a la hora de actualizar la contraseña hay que usar otra forma
         beforeCreate: async function (user) {
-            const salt = await bcrypt.genSalt(10) //generar salt con 10 rondas
-            user.password = await bcrypt.hash(user.password, salt)
+            if (user.password) { //verifico porque si inicio con google no hace falta
+                const salt = await bcrypt.genSalt(10) //generar salt con 10 rondas
+                user.password = await bcrypt.hash(user.password, salt)
+            }
         }
     },
-    scopes:{
+    scopes: {
         withoutPassword: {
             attributes: {
                 exclude: ['password', 'token', 'confirmed']
