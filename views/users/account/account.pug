@@ -32,8 +32,8 @@ block contenido
                             input(type="radio" name="cover-radio" value=cover id= cover checked=cover == user.cover_url class="hidden")
 
                     div(class="absolute top-[20%] left-7 flex")
-                        div#profilePicture(class="md:border-4 border-polished-white w-32")
-                            img#avatarImage(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="")
+                        div#profilePicture(class="md:border-4 border-polished-white w-32 h-32")
+                            img#avatarImage(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="w-full h-full")
                         
                         div(class="grid place-content-center p-5")
                             span(class="text-center text-2xl text-white mb-4")= user.name + " " + user.lastname

@@ -39,6 +39,7 @@ router.get("/google", passport.authenticate("auth-google", {
           "https://www.googleapis.com/auth/userinfo.profile",
           "https://www.googleapis.com/auth/userinfo.email",
      ],
+     prompt: 'select_account', // Agrega esto para forzar la selección de la cuenta
      session: false,
 }), authGoogle);
 

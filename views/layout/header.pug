@@ -21,7 +21,7 @@ header(class="px-3.5 bg-white")
 
                             a(href=`/users/${user.username}`)
                                 li(class="text-lg hover:bg-hard-gray py-4 flex justify-evenly items-center") 
-                                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' , alt="Imagen de perfil" class="w-16 rounded") 
+                                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' , alt="Imagen de perfil" class="w-16 h-16 rounded") 
                                     div(class="flex flex-col") 
                                         span(class="text-sm")= user.name + " " + user.lastname
                                         span(class="text-xs font-light")= user.username     

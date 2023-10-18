@@ -36,6 +36,12 @@ Publication.hasMany(Comment, { foreignKey: 'publication_id' })
 /* Publication.belongsToMany(User, { through: Comment})
 Comment.belongsTo(User, {foreignKey: 'user_id'}) */
 
+/* Interes tiene una categoria */
+Interest.belongsTo(Category, { foreignKey: 'category_id', as: 'category' })
+
+/* Publicacion tiene un usuario */
+Publication.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
+
 export {
     Interest,
     Category,
