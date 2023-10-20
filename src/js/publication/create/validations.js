@@ -1,7 +1,7 @@
 //Validar campos
 function checkFields($form) {
     const formData = new FormData($form)
-    debugger
+    //debugger
     if (!formData.get('category')) {
         formData.set('category', '')
     }
@@ -47,10 +47,10 @@ function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, sp
         errors = errors.map(err => err.path) //path nombre de campo del eror ej price, currency
     } */
 
-/* Y LOS MENSAJES DEL SERVIDOR??? HAY QUE PONERLOS */
+    /* Y LOS MENSAJES DEL SERVIDOR??? HAY QUE PONERLOS */
 
     errors.forEach(error => {
-        switch (error.path) {
+        switch (error) {
             case 'title':
                 spanTitle.textContent = error.msg || 'El titulo no debe ir vacio'
                 spanTitle.classList.remove('hidden')
@@ -75,10 +75,12 @@ function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, sp
                 spanErrTypeSale.textContent = error.msg || 'Seleccione un tipo de venta'
                 spanErrTypeSale.classList.remove('hidden')
                 break;
+
             case 'price':
                 spanErrPrice.textContent = error.msg || 'Ingrese el monto'
                 spanErrPrice.classList.remove('hidden')
                 break;
+
             case 'currency':
                 spanErrCurrency.textContent = error.msg || 'Ingrese un tipo de moneda valido'
                 spanErrCurrency.classList.remove('hidden')

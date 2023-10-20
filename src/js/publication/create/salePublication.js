@@ -110,10 +110,18 @@ function mostrarTypesVenta() {
 function ocultarPrice() {
     $containerInputPrice.classList.remove('h-fit', 'opacity-100')
     $containerInputPrice.classList.add('h-0', 'opacity-0')
+
+    setTimeout(() => {
+        $containerInputPrice.classList.add('hidden')
+    }, 500);
 }
 
 function mostrarPrice() {
-    $containerInputPrice.classList.remove('h-0', 'opacity-0')
-    $containerInputPrice.classList.add('h-fit', 'opacity-100')
+    setTimeout(() => {
+        $containerInputPrice.classList.remove('h-0', 'opacity-0')
+        $containerInputPrice.classList.add('h-fit', 'opacity-100')
+    }, 200);
+
+    $containerInputPrice.classList.remove('hidden')
 }
 /*  */

@@ -31,8 +31,13 @@ block contenido
                             label(for="privacy-protected" class="privacy flex items-center p-2 pl-3 hover:bg-gray-input text-principal-gray space-x-2 cursor-pointer")
                                 i(class="fa-solid fa-shield text-2xl")
                                 p Protegida
-                    div(class="w-24 float-right mr-4")
-                        img#photoPostSecondary(src="/uploads/2a5fee4e-233b-497d-b0e9-e0b05ba120dd.jpeg" class="hidden")
+                    div(class="w-44 float-right mr-4 hidden sm:block")
+                        .moreInfoPostType(class="h-fit hidden") 
+                            a(href="/publications/types" class="text-blue-700 w-full flex justify-evenly hover:underline" target="_blank") 
+                                span Tipos de publicación
+                                i(class="fa-solid fa-circle-info text-2xl md:text-xl")
+
+                        img#photoPostSecondary(src="/uploads/2a5fee4e-233b-497d-b0e9-e0b05ba120dd.jpeg" class="hidden w-28 float-right p-1 mt-3")
 
                 div#photoData(class="relative md:min-h-fit")
                     h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-[-26px] right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
@@ -42,7 +47,7 @@ block contenido
                         div(class="lg:border border-dashed border-principal-gray w-full h-fit lg:h-40 rounded lg:flex lg:items-center lg:bg-polished-white")
 
                             div(class="preview lg:flex-1 lg:h-full py-3 lg:flex space-x-2")
-                                img(id="image" class="h-full lg:ml-6")
+                                img(id="image" class="h-full lg:ml-6 m-auto lg:m-0")
 
                                 div(class="infoImg hidden lg:w-2/5 h-full py-3 space-x-1 lg:space-y-2 flex lg:flex-col")
                                     p#resolutionImg(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-1/2 w-fit rounded text-center")
@@ -74,7 +79,7 @@ block contenido
                                             each category in categories 
                                                 input(type="radio" name="category" id=`category-${category.id}` value=`${category.id}` class="hidden")
                                                 label.category-content(for=`category-${category.id}` class="w-fit h-full mx-2")
-                                                    .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease" style=`background-image: url(${category.image})`)
+                                                    .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease" style=`background-image: url(/img/backgroundsCategories/${category.image})`)
                                                     p(class="text-principal-gray text-sm text-center mt-1")= category.name
                                     button#btnRight(type="button" class="w-1/12 h-full cursor-pointer z-20 bg-white hover:opacity-90")
                                         i(class="fa-solid fa-circle-chevron-right text-3xl text-principal-gray")
@@ -131,21 +136,16 @@ block contenido
                                                 input(type="radio" name="typeSale" id="venta-unica" value="unique" class="appearance-none w-5 h-5 border-2 border-principal-gray rounded-full outline-none checked:bg-principal-gray checked:border-black cursor-pointer")
                                                 label(for="venta-unica" class="cursor-pointer") Venta Unica
                                             span(id="errTypeSale" class="absolute bottom-[-20px]").text-red-500.text-xs.hidden
-                            .moreInfoPostType(class="h-fit px-2") 
-                                a(href="/publications/types" class="text-blue-700" target="_blank") 
-                                    span(class="hidden sm:contents") Mas información 
-                                    i(class="fa-solid fa-circle-info text-2xl sm:text-base")
                         
-                        .container-input-price(class="mt-8 opacity-0 h-0 transition-all duration-300 ease") 
+                        .container-input-price(class="mt-8 opacity-0 h-0 hidden transition-all duration-300 ease") 
                             p(class="text-2xl") Precio
                             div
                                 input#input-price(type="text" name="price" placeholder="AR$0.00" class="appearance-none w-48 h-10 text-xl text-right border-2 border-secondary-gray p-1 pr-2 focus:outline-none")
                                 select(name="currency" class="text-xl h-10 bg-gray-input border-0 p-1")
                                     option(value="ars" selected) ARS 
-                                    option(value="us") US
                         span(id="errPrice").text-red-500.text-xs.hidden
                         span(id="errCurrency").text-red-500.text-xs.hidden.block
-                        div(class="btns2 mt-10 flex justify-between")
+                        div(class="btns2 mt-10 pt-5 flex justify-between gap-1 w-full")
                                 button#btnBack(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
                                     .my-3.mx-4.flex.justify-between
                                         img(src="/img/project/arrow-left.svg", alt="").w-6.ml-4
@@ -155,7 +155,7 @@ block contenido
                                         span.w-full.text-white.font-bold Subir
                                         img(src="/img/project/upload.svg", alt="").w-6.ml-4
 
-            div(class="circlesForm text-center space-x-2 pb-3 sm:mt-[-20px] text-principal-gray z-50")
+            div(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
                 i(class="fa-solid fa-circle")
                 i(class="fa-regular fa-circle")
 

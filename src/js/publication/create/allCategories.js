@@ -46,7 +46,7 @@ function addCategory(category, $fragment) {
 
   $template.querySelector("label").setAttribute('for', `category-${category.id}`)
 
-  $template.querySelector(".category").style.backgroundImage = `url(${category.image})`;
+  $template.querySelector(".category").style.backgroundImage = `url(/img/backgroundsCategories/${category.image})`;
   $template.querySelector("#name").textContent = category.name
 
 
