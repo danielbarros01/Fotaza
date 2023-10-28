@@ -20,6 +20,7 @@ export default {
         validationsCreate: './src/js/publication/create/validations.js',
         multiStageForm: './src/js/publication/create/multiStageForm.js',
         salePublication: './src/js/publication/create/salePublication.js',
+        licenses: './src/js/publication/create/licenses.js',
         userMenu: './src/js/header/userMenu.js',
         alertAccount: './src/js/user/alertAccount.js',
         picturesAccount: './src/js/user/picturesAccount.js',

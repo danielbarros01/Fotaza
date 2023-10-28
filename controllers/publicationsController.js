@@ -16,7 +16,10 @@ const viewPublications = (req, res) => {
 // GET /publications/create
 const createPublication = async (req, res) => {
     const categories = await Category.findAll()
-    const rightsOfUse = await RightOfUse.findAll()
+    const rightsOfUse = await RightOfUse.findAll({ where: { free: true } })
+
+    //Buscar las licencias que sean compatibles con Publicacion de tipo libre
+
     res.render('publications/create', {
         pagina: 'Create Publication',
         csrfToken: req.csrfToken(),

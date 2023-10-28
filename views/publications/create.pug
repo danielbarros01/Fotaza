@@ -33,13 +33,13 @@ block contenido
                                 p Protegida
                     div(class="w-44 float-right mr-4 hidden sm:block")
                         .moreInfoPostType(class="h-fit hidden") 
-                            a(href="/publications/types" class="text-blue-700 w-full flex justify-evenly hover:underline" target="_blank") 
-                                span Tipos de publicación
+                            a(href="/publications/types" class="text-blue-700 w-full flex justify-evenly group" target="_blank") 
+                                span(class="group-hover:underline") Tipos de publicación
                                 i(class="fa-solid fa-circle-info text-2xl md:text-xl")
 
                         img#photoPostSecondary(src="/uploads/2a5fee4e-233b-497d-b0e9-e0b05ba120dd.jpeg" class="hidden w-28 float-right p-1 mt-3")
 
-                div#photoData(class="relative md:min-h-fit")
+                #photoData(class="relative md:min-h-fit")
                     h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-[-26px] right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
 
                     div(class="md:px-16 p-4 mt-8") 
@@ -98,7 +98,7 @@ block contenido
                                     span.w-full.text-white.font-bold Continuar
                                     img(src="/img/project/arrow-right.svg", alt="").w-6.ml-4
 
-                div#modalAllCategories(class="absolute z-50 top-0 left-0 h-full w-full bg-white overflow-auto transition-all duration-200 ease-in-out ocultar")
+                #modalAllCategories(class="absolute z-50 top-0 left-0 h-full w-full bg-white overflow-auto transition-all duration-200 ease-in-out ocultar")
                     .topDialog(class="flex justify-between px-4 py-2 bg-gradient-to-r from-gray-input to-transparent mt-4 md:mt-0") 
                         .title(class="flex items-center text-2xl text-principal-gray space-x-2") 
                             i(class="fa-solid fa-icons")
@@ -110,7 +110,7 @@ block contenido
                             i(class="fa-solid fa-magnifying-glass absolute top-1/2 left-2 transform translate-y-[-50%]")
                     .allCategories
 
-                div#policyData(class="z-40 w-full h-full px-4 hidden")
+                #policyData(class="z-40 w-full h-full px-4 hidden")
                     div(class="mt-8")
                         .postType(class="flex justify-between relative")
                             span(id="errTypes" class="absolute top-[-26px]").text-red-500.text-xs.hidden
@@ -145,15 +145,43 @@ block contenido
                                     option(value="ars" selected) ARS 
                         span(id="errPrice").text-red-500.text-xs.hidden
                         span(id="errCurrency").text-red-500.text-xs.hidden.block
-                        div(class="btns2 mt-10 pt-5 flex justify-between gap-1 w-full")
-                                button#btnBack(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
-                                    .my-3.mx-4.flex.justify-between
-                                        img(src="/img/project/arrow-left.svg", alt="").w-6.ml-4
-                                        span.w-full.text-white.font-bold Atras
-                                button#btnSave(type="submit" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
-                                    .my-3.mx-4.flex.justify-between
-                                        span.w-full.text-white.font-bold Subir
-                                        img(src="/img/project/upload.svg", alt="").w-6.ml-4
+
+
+                        section#sectionLicenses(class="mt-10")   
+                            h7(class="text-2xl my-2") Licencias 
+                            #licenses(class="space-y-4")
+                                //- Cargar licencias segun opcion libre o venta
+                                //- Primero cargaremos las opciones de licencias Libre ya que esta seleccionado por defecto
+                                each license in rightsOfUse
+                                    .license(class="h-fit bg-gray-input flex rounded-lg px-3 py-5") 
+                                        .main-license(class="w-11/12")
+                                            .header-license(class="flex items-center gap-4 pb-3") 
+                                                p.name-license(class="text-2xl font-extrabold")= license.name 
+                                                //- Valida que no sea ni public domain, copyright o copyleft porque son imgs mas grandes
+                                                img.img-license(src=`/img/licenses/${license.image_url}` class=`${license.id != 1 && license.id != 2 && license.id != 6 ? 'w-20' : 'w-8'} min-h-8`)
+                                            div
+                                                p.description-license(class="text-lg font-semibold")= license.description
+                                        
+                                        .radio-license(class="w-1/12 grid place-content-center")
+                                            input(type="radio" name="license" id=`license-${license.id}` class="hidden" checked=(license.id == 1))
+                                            label.modified-radio(for=`license-${license.id}` class=`${license.id == 1 ? 'bg-black' : ''} w-5 h-5 border-4 border-principal-gray rounded-full cursor-pointer hover:bg-gray-300 inline-block relative`)
+                                                span.radio-select(class="absolute top-0 left-0 w-full h-full rounded-full border-2 border-white")
+                                    
+
+                                            
+
+
+                    div(class="btns2 mt-10 pt-5 flex justify-between gap-1 w-full")
+                            button#btnBack(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
+                                .my-3.mx-4.flex.justify-between
+                                    img(src="/img/project/arrow-left.svg", alt="").w-6.ml-4
+                                    span.w-full.text-white.font-bold Atras
+                            button#btnSave(type="submit" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
+                                .my-3.mx-4.flex.justify-between
+                                    span.w-full.text-white.font-bold Subir
+                                    img(src="/img/project/upload.svg", alt="").w-6.ml-4
+
+
 
             div(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
                 i(class="fa-solid fa-circle")
@@ -165,6 +193,20 @@ block contenido
             .category(class="rounded-full w-20 h-20 bg-cover bg-center bg-no-repeat cursor-pointer shadow-lg transition-all duration-300 ease")
             p#name(class="text-principal-gray text-sm text-center mt-1 w-fit")              
 
+    template#templateLicense 
+        .license(class="h-fit bg-gray-input flex rounded-lg px-3 py-5")  
+            .main-license(class="w-11/12")
+                .header-license(class="flex items-center gap-4 pb-3")  
+                    p.name-license(class="text-2xl font-extrabold") 
+                    img.img-license(class="min-h-8")
+                div
+                    p.description-license(class="text-lg font-semibold")
+            .radio-license(class="w-1/12 grid place-content-center") 
+                input(type="radio" name="license" class="hidden")
+                label.modified-radio(class="w-5 h-5 border-4 border-principal-gray rounded-full cursor-pointer hover:bg-gray-300 inline-block relative")
+                    span.radio-select(class="absolute top-0 left-0 w-full h-full rounded-full border-2 border-white")
+
+
 block scripts
     script(src="/js/addPublication.js")
     script(src="/js/privacyOptions.js")
@@ -172,4 +214,5 @@ block scripts
     script(src="/js/allCategories.js") 
     script(src="/js/multiStageForm.js") 
     script(src="/js/salePublication.js") 
+    script(src="/js/licenses.js") 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
