@@ -26,7 +26,7 @@ $options.forEach(option => {
         optionSelected = option
         if (option.id == 'privacy-protected') {
             $optionText.textContent = 'Protegida'
-            $iconPrivacy.classList.remove('fa-globe')
+            $iconPrivacy.classList.remove('fa-globe', 'fa-lock')
             $iconPrivacy.classList.add('fa-shield')
 
             //cambiar orden del menu
@@ -35,8 +35,16 @@ $options.forEach(option => {
 
         } else if (option.id == 'privacy-public') {
             $optionText.textContent = 'Publica'
-            $iconPrivacy.classList.remove('fa-shield')
+            $iconPrivacy.classList.remove('fa-shield', 'fa-lock')
             $iconPrivacy.classList.add('fa-globe')
+
+            //cambiar orden del menu
+            const label = option.nextElementSibling //obtengo el label del elemento
+            insertPreppendOption(label, option)
+        } else if (option.id == 'privacy-private') {
+            $optionText.textContent = 'Privada'
+            $iconPrivacy.classList.remove('fa-shield', 'fa-globe')
+            $iconPrivacy.classList.add('fa-lock')
 
             //cambiar orden del menu
             const label = option.nextElementSibling //obtengo el label del elemento

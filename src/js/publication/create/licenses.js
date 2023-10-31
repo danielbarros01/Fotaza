@@ -7,6 +7,13 @@ const $sectionLicenses = document.getElementById('licenses')
 const $inputsRadioTypes = document.querySelectorAll('input[type=radio][name="typePost"]')
 const $inputsRadioTypesSale = document.querySelectorAll('input[type=radio][name="typeSale"]')
 
+const $noLicenses = document.getElementById('unique-licences')
+
+const $alert = document.getElementById('alert')
+
+const $optionPublic = document.getElementById('privacy-public').nextElementSibling
+const $optionProtected = document.getElementById('privacy-protected').nextElementSibling
+
 //guardo el valor seleccionado de tipo de publicacion //free o sale
 $inputsRadioTypes.forEach(type => {
     type.addEventListener('change', (e) => {
@@ -61,6 +68,10 @@ document.addEventListener('click', function (event) {
         });
         const r = event.target.parentElement.querySelector('.radio-select')
         r.classList.add('bg-black');
+
+
+        //Validar si elijo copyright la publicacion debe ser privada
+        isCopyright(event.target)
     }
 });
 
@@ -71,6 +82,15 @@ async function consultaLicencias(typeSelected, typeSaleSelected) {
     if (typeSelected == 'sale') {
         ruta = `/licenses/${typeSelected}?typeSale=${typeSaleSelected}`
     }
+
+    //Unique no tiene licencias que poner
+    if (typeSelected == 'sale' && typeSaleSelected == 'unique') {
+        $sectionLicenses.innerHTML = ''
+        $noLicenses.classList.remove('hidden')
+
+        return
+    }
+
 
     try {
         const response = await axios.get(ruta)
@@ -105,6 +125,9 @@ function mostrarLicencias(data) {
         $fragment.appendChild($clone)
     })
 
+    //Si hay licencias, oculto mensaje de que no hay licencias para unique
+    $noLicenses.classList.add('hidden')
+
     //Borro el contenido e incerto el nuevo
     $sectionLicenses.innerHTML = ''
     $sectionLicenses.appendChild($fragment)
@@ -112,7 +135,41 @@ function mostrarLicencias(data) {
     //Selecciono el primer input
     const $primerInput = $sectionLicenses.querySelector('input[type=radio][name="license"]')
     $primerInput.checked = true
+
+    //Validar si primer input es copyright
+    isCopyright($primerInput)
+
     //Pinto el label que simula ser radio
     const r = $primerInput.parentElement.querySelector('.radio-select')
     r.classList.add('bg-black');
+}
+
+
+
+function isCopyright(input) {
+    //Si elijo copyright la publicacion debe ser privada
+    const isCopyright = input.parentElement.parentElement.querySelector('.name-license').textContent == 'Copyright'
+
+    if (isCopyright) {
+        const privacyOption = document.getElementById('privacy-private')
+        privacyOption.checked = true
+
+        const event = new Event('change')
+        privacyOption.dispatchEvent(event)
+
+        //Mostrar alert informando sobre esto
+        $alert.classList.remove('hidden')
+        $alert.querySelector('#infoMessage').textContent = 'La publicación será privada si eliges Copyright como licencia'
+        setTimeout(() => {
+            $alert.classList.add('hidden')
+        }, 4000);
+
+        //Anular posibilidad de elegir otro que no sea privado
+        $optionPublic.classList.add('hidden')
+        $optionProtected.classList.add('hidden')
+    } else {
+        //Mostrar de nuevo las otras opciones si no elijo copyright
+        $optionPublic.classList.remove('hidden')
+        $optionProtected.classList.remove('hidden')
+    }
 }
