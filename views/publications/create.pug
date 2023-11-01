@@ -62,7 +62,7 @@ block contenido
                             div(class="btnsImg lg:w-1/5 lg:h-full flex justify-around lg:flex-col lg:justify-center lg:items-center lg:space-y-4 lg:mx-4")
                                 label(for="file" class="max-w-xs bg-principal-gray text-white p-2 mr-1 cursor-pointer text-center w-9/12 lg:w-[90%] font-bold hover:opacity-80")
                                     span Seleccionar Imagen 
-                                input(type="file" name="image" id="file" class="hidden")
+                                input(type="file" name="image" id="file" class="hidden" accept="image/png,image/jpeg,image/jpg")
                                 button#deleteImg(class="hidden max-w-[200px] bg-white text-principal-gray border-2 border-principal-gray p-2 md:p-1 cursor-pointer w-3/12 md:w-2/3 font-bold hover:opacity-80") Eliminar
 
                         span(id="errImage").text-red-500.text-xs.hidden
@@ -148,7 +148,7 @@ block contenido
                             div
                                 input#input-price(type="text" name="price" placeholder="AR$0.00" class="appearance-none w-48 h-10 text-xl text-right border-2 border-secondary-gray p-1 pr-2 focus:outline-none")
                                 select(name="currency" class="text-xl h-10 bg-gray-input border-0 p-1")
-                                    option(value="ars" selected) ARS 🇦🇷
+                                    option(value="ars" selected class="cursor-pointer") ARS 🇦🇷
                         span(id="errPrice").text-red-500.text-xs.hidden
                         span(id="errCurrency").text-red-500.text-xs.hidden.block
 
@@ -174,7 +174,7 @@ block contenido
                                                 p.description-license(class="text-lg font-semibold")= license.description
                                         
                                         .radio-license(class="w-1/12 grid place-content-center")
-                                            input(type="radio" name="license" id=`license-${license.id}` class="hidden" checked=(license.id == 1))
+                                            input(type="radio" name="license" id=`license-${license.id}` value=license.id class="hidden" checked=(license.id == 1))
                                             label.modified-radio(for=`license-${license.id}` class="w-5 h-5 border-4 border-principal-gray rounded-full cursor-pointer hover:bg-gray-300 inline-block relative")
                                                 span.radio-select(class=`absolute top-0 left-0 w-full h-full rounded-full border-2 border-white ${license.id == 1 ? 'bg-black' : ''}`)
                                     

@@ -9,6 +9,16 @@ import protectRoute from '../Middlewares/protectRoute.js'
 import authenticateUser from "../Middlewares/authenticateUser.js"
 import upload from "../Middlewares/uploadImage.js"
 
+//----------------------
+
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+//----------------------
+
 const router = express.Router()
 
 // GET /publications
@@ -36,6 +46,14 @@ router.patch('/:id', authenticateUser, editPublication)
 
 //DELETE /publications/:id
 router.delete('/:id', authenticateUser, deletePublication)
+
+
+
+//Devolver imagenes
+router.get('/image/watermarked/:id', (req, res) => {
+    const baseDir = path.resolve(__dirname, '..');
+    res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);
+});
 
 
 export default router

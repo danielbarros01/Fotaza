@@ -24,17 +24,18 @@ block contenido
                     button#btnSendCategories(class="bg-principal-gray flex items-center justify-between hover:bg-secondary-gray h-11 w-40")
                         span.w-full.text-white Descargar
                         img(src="/img/project/download.svg", alt="").w-6.mr-2
-                if user.id === userPost.id
-                    button#btnOptions(class="bg-transparent")
-                        img(src="/img/project/options.svg", alt="").w-8.ml-2
-                    div#optionsPublication(class="hidden absolute bg-secondary-gray top-16 right-4 w-2/3 rounded-[10px] rounded-tr-[0px] p-3 shadow-md")
-                        button#btnEdit(class="w-full flex justify-around items-center hover:transform hover:scale-110")
-                            p.text-white Editar 
-                            i(class="fa-solid fa-pen text-white")
-                        hr.my-2
-                        button#btnDelete(class="w-full flex justify-around items-center hover:transform hover:scale-110")  
-                            p.text-red-700 Eliminar 
-                            i(class="fa-solid fa-trash text-red-700")
+                if user
+                    if user.id === userPost.id
+                        button#btnOptions(class="bg-transparent")
+                            img(src="/img/project/options.svg", alt="").w-8.ml-2
+                        div#optionsPublication(class="hidden absolute bg-secondary-gray top-16 right-4 w-2/3 rounded-[10px] rounded-tr-[0px] p-3 shadow-md")
+                            button#btnEdit(class="w-full flex justify-around items-center hover:transform hover:scale-110")
+                                p.text-white Editar 
+                                i(class="fa-solid fa-pen text-white")
+                            hr.my-2
+                            button#btnDelete(class="w-full flex justify-around items-center hover:transform hover:scale-110")  
+                                p.text-red-700 Eliminar 
+                                i(class="fa-solid fa-trash text-red-700")
 
         div(class="flex flex-col items-center mt-3") 
             div(class="flex justify-between items-center w-2/3 mb-2")
@@ -47,7 +48,7 @@ block contenido
                     i(class="fa-solid fa-star star")
             
             div(class="w-2/3 flex justify-center")
-                img(src=`/uploads/${publication.image}`, alt=`${publication.title}` style="max-height:500px")
+                img(src= imageUrl, alt=`${publication.title}` style="max-height:500px")
 
         div.flex.justify-between.mx-10.my-4
             .category.flex.gap-4.items-center
@@ -238,9 +239,10 @@ block contenido
     
                         
 block scripts
-    if user.id === userPost.id
-        script(src="/js/editPublication.js")
-        script(src="/js/deletePublication.js")
+    if user
+        if user.id === userPost.id
+            script(src="/js/editPublication.js")
+            script(src="/js/deletePublication.js")
     
     if user 
         script(src="/js/getComments.js")

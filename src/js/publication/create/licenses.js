@@ -118,6 +118,7 @@ function mostrarLicencias(data) {
 
         const radioButton = $template.querySelector('input[type="radio"][name="license"]');
         radioButton.setAttribute('id', `license-${l.id}`);
+        radioButton.setAttribute('value', l.id);
 
         $template.querySelector('.modified-radio').setAttribute('for', `license-${l.id}`)
 

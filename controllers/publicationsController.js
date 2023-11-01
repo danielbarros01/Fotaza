@@ -6,6 +6,15 @@ import fs from 'fs'
 import path from 'path'
 import { routeImages } from '../config/generalConfig.js'
 
+//----------------------
+
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+//----------------------
+
+
 // GET /publications
 const viewPublications = (req, res) => {
     res.render('publications/home', {
@@ -75,7 +84,8 @@ const savePublication = async (req, res) => {
             switch (req.body[campo]) {
                 case 'public': break;
                 case 'protected': break;
-                default: errors.push({ path: campo, msg: `${campo} debe ser public o protected` })
+                case 'private': break;
+                default: errors.push({ path: campo, msg: `${campo} debe ser public, protected o private` })
             }
         }
 
@@ -121,7 +131,7 @@ const savePublication = async (req, res) => {
 
     const { filename, mimetype, path: imagePath } = req.file
 
-    const { title, category: category_id, rightsOfUse: rightId, privacyItem: privacy, typePost: type } = req.body
+    const { title, category: category_id, license, privacyItem: privacy, typePost: type } = req.body
     const { id } = req.user
     const tags = JSON.parse(req.body.tags)
 
@@ -133,9 +143,9 @@ const savePublication = async (req, res) => {
 
     try {
         //Validar que exista esta licencia
-        const rightOfUse = await RightOfUse.findByPk(1)
+        const rightOfUse = await RightOfUse.findByPk(license)
         if (!rightOfUse) {
-            return res.status(400).json({ path: 'rightOfUse', msg: 'No existe este Derecho de uso' })
+            return res.status(400).json({ path: 'rightOfUse', msg: 'No existe la licensia que solicito' })
         }
 
         //Validar que exista la categoria
@@ -185,6 +195,23 @@ const savePublication = async (req, res) => {
         for (const tag of tagsBD) {
             await PublicationHasTag.create({ publicationId: publication.id, tagId: tag[0].id })
         }
+
+        //----
+        /* Agregarle marca de agua a la imagen y guardarla en la otra carpeta */
+        const baseDir = path.resolve(__dirname, '..');
+
+        //Busco la imagen
+        const image = sharp(imagePath); // Carga la imagen utilizando sharp
+        const watermarkPath = 'images/watermarks/watermarkDefault.png'; // Ruta de tu marca de agua
+
+        //agrego marca de agua
+        const watermarkImageBuffer = await image.composite([
+            { input: watermarkPath, tile: true }
+        ]).toBuffer()
+
+        // Guardar la imagen con marca de agua en la carpeta deseada
+        const watermarkedImagePath = path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`);
+        await fs.promises.writeFile(watermarkedImagePath, watermarkImageBuffer);
 
         res.status(201).json({ publicationId: publication.id })
     } catch (error) {
@@ -281,6 +308,7 @@ const viewPublication = async (req, res) => {
                 category,
                 recomendations,
                 csrfToken: req.csrfToken(),
+                imageUrl: `/publications/image/watermarked/${publication.image}`,
             })
         }
 
@@ -301,6 +329,7 @@ const viewPublication = async (req, res) => {
             rightsOfUse,
             myId: user.id ?? '',
             csrfToken: req.csrfToken(),
+            imageUrl: `/publications/image/watermarked/${publication.image}`,
         })
     } catch (error) {
         console.error(error)
@@ -505,6 +534,8 @@ const deleteImage = (req, route) => {
         });
     }
 }
+
+
 
 
 

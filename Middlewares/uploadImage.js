@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 
             cb(null, profileImagePath);
         } else {
-            cb(null, './public/uploads/');
+            cb(null, './images/uploads/');
         }
     },
     filename: function (req, file, cb) {
