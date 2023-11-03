@@ -21,6 +21,7 @@ export default {
         multiStageForm: './src/js/publication/create/multiStageForm.js',
         salePublication: './src/js/publication/create/salePublication.js',
         licenses: './src/js/publication/create/licenses.js',
+        watermark: './src/js/publication/create/watermark.js',
         userMenu: './src/js/header/userMenu.js',
         alertAccount: './src/js/user/alertAccount.js',
         picturesAccount: './src/js/user/picturesAccount.js',

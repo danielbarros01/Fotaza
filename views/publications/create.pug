@@ -5,6 +5,7 @@ block styles
     link(rel="stylesheet", href="/css/tags.css")
     link(rel="stylesheet", href="/css/createPost/privacy.css")
     link(rel="stylesheet", href="/css/createPost/allCategories.css")
+    link(rel="stylesheet", href="/css/createPost/watermarkOptions.css")
     
 block contenido
     include ../layout/header
@@ -12,6 +13,7 @@ block contenido
     main(class="md:pt-10 relative")
         div(class="min-h-screen h-fit md:min-h-fit md:h-fit md:w-4/6 rounded-md shadow-md m-auto bg-white md:max-w-5xl relative md:mb-8")
             form(id="form" action="/publications/add-image" method="POST" enctype="multipart/form-data" class="relative h-fit") 
+                //--aa
                 #privacyOptionsAndPhoto(class="p-4 h-fit") 
                     div#privacyOptionsContent(class=" bg-white flex flex-col justify-center rounded-md w-36 z-50")
                         
@@ -43,8 +45,9 @@ block contenido
                                 span(class="group-hover:underline") Tipos de publicación
                                 i(class="fa-solid fa-circle-info text-2xl md:text-xl")
 
-                        img#photoPostSecondary(src="/uploads/2a5fee4e-233b-497d-b0e9-e0b05ba120dd.jpeg" class="hidden w-28 float-right p-1 mt-3")
+                        img#photoPostSecondary(class="hidden w-28 float-right p-1 mt-3")
 
+                //--aa
                 #photoData(class="relative md:min-h-fit")
                     h1(class="text-center text-lg text-secondary-gray md:text-principal-gray md:text-2xl font-semibold absolute top-[-26px] right-2 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2") Nueva publicación
 
@@ -192,9 +195,71 @@ block contenido
                                     span.w-full.text-white.font-bold Subir
                                     img(src="/img/project/upload.svg", alt="").w-6.ml-4
 
+                #modalCopyright(class="hidden z-40 h-full w-full px-6 py-7")
+                    div 
+                        h2(class="text-3xl mt-2") Puedes añadir una marca de agua 
+                        p(class="text-slate-700 text-lg mt-1 w-11/12") Al elegir la licencia Copyright puedes añadir una marca de agua personalizada o dejar la que fotaza tiene por defecto
+                    .watermarkOptions(class="flex justify-evenly mt-12 gap-2") 
+                        
+                        input(type="radio" class="hidden" name="optionWatermark" id="default-watermarker" value="default" checked)
+                        div(class="w-36 h-36 sm:w-56 sm:h-56 bg-gray-200 shadow-2xl rounded-xl transition-all duration-300 ease hover:opacity-80")
+                            label.optionWatermark(for="default-watermarker" class="w-full h-full cursor-pointer") 
+                                img(src="/img/project/exampleWatermarker.jpg", alt="Marca de agua por defecto" class="w-full h-3/4 rounded-t-xl")
+                                div(class="w-full h-1/4 grid place-content-center")
+                                    span(class="text-xl font-semibold italic") Fotaza
 
+                        input(type="radio" class="hidden" name="optionWatermark" id="personalized-watermarker" value="customized")
+                        div(class="w-36 h-36 sm:w-56 sm:h-56 bg-gray-200 shadow-2xl rounded-xl transition-all duration-300 ease hover:opacity-80")
+                            label.optionWatermark(for="personalized-watermarker" class="w-full h-full cursor-pointer") 
+                                img(src="/img/project/exampleWatermarkerPersonalize.jpg", alt="Marca de agua por defecto" class="w-full h-3/4 rounded-t-xl")
+                                div(class="w-full h-1/4 grid place-content-center")
+                                    span(class="text-xl font-semibold italic") Personalizar
+                        
+                    
+                    #watermarkData(class="hidden mt-8")
+                        header 
+                            h3(class="text-2xl") Añadir logo personalizado 
+                            p(class="text-slate-700 ") *Debe ser en formato .png y recuerda que su fondo sea transparente
+                       
+                        main(class="px-14") 
+                            
+                            p(class="text-gray-300 text-xs mr-2 mb-1 mt-4 text-end") (Opcional)
+                            //- Ingreso de imagen
+                            div(class="border border-dashed border-principal-gray w-full h-fit min-h-[160px] rounded  sm:flex sm:items-center bg-polished-white")
 
-            div(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
+                                div(class="preview flex-1 h-full py-3 flex space-x-2 justify-center sm:justify-start")
+                                    img(id="imageWatermark" class="h-full lg:ml-6 sm:m-auto lg:m-0 max-w-[150px]")
+
+                                    #infoImgWater(class="w-0 h-0 sm:w-fit sm_h-fit lg:w-2/5 py-3 space-x-1 lg:space-y-2 sm:flex flex-col")
+                                        p#resolutionImgWater(class="font-bold text-sm bg-green-100 text-green-800 p-1 min-w-1/2 w-fit rounded text-center hidden sm:block")
+                                        p#sizeImgWater(class="font-bold text-sm lg:text-xs bg-red-100 text-red-800 p-1 w-fit rounded text-center hidden sm:block")
+
+                                div(class="btnsImgWater sm:w-1/5 sm:h-full flex sm:flex-col justify-center items-center sm:space-y-4 mx-4 m-auto pb-2")
+                                    label(for="fileWatermark" class="bg-principal-gray border-2 border-principal-gray text-white p-2 mr-1 cursor-pointer text-center font-bold hover:opacity-80")
+                                        span Seleccionar 
+                                    input(type="file" name="imageWatermark" id="fileWatermark" class="hidden" accept="image/png")
+                                    
+                                    button#deleteImgWater(class="hidden max-w-[200px] bg-white text-principal-gray border-2 border-principal-gray p-2 md:p-1 cursor-pointer md:w-2/3 font-bold hover:opacity-80 min-w-fit") Eliminar
+                            
+                            span(id="errImageWater").text-red-500.text-xs.hidden
+
+                            //-Ingreso texto personalizado
+                            div(class="my-4") 
+                                .flex.justify-between.items-center
+                                    div.flex.items-center
+                                        label(for="customTextWater") Texto personalizado  
+                                    span(id="errCustomTextWater").text-red-500.text-xs.hidden
+                                input(id="customTextWater" type="text" placeholder="Ej. Fotaza" class="block w-full border border-secondary-gray rounded-md py-2 px-2 focus:outline-none" maxlength="20")
+
+                    //--Btn guardar cambios
+                    div(class="mt-10 flex justify-center sm:justify-end")
+                        button#btnSavedWatermark(type="button" class="bg-principal-gray text-white font-normal max-w-xs sm:max-w-[200px] hover:opacity-80 w-40")
+                            .my-3.mr-4.flex.justify-between
+                                span.w-full.text-white.font-bold Guardar
+                                i(class="fa-solid fa-check text-2xl")
+    
+            //--aa
+            div#btnsCircle(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
                 i(class="fa-solid fa-circle")
                 i(class="fa-regular fa-circle")
 
@@ -230,4 +295,5 @@ block scripts
     script(src="/js/multiStageForm.js") 
     script(src="/js/salePublication.js") 
     script(src="/js/licenses.js") 
+    script(src="/js/watermark.js") 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

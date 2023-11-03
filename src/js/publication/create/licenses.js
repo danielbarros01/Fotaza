@@ -14,6 +14,7 @@ const $alert = document.getElementById('alert')
 const $optionPublic = document.getElementById('privacy-public').nextElementSibling
 const $optionProtected = document.getElementById('privacy-protected').nextElementSibling
 
+
 //guardo el valor seleccionado de tipo de publicacion //free o sale
 $inputsRadioTypes.forEach(type => {
     type.addEventListener('change', (e) => {
@@ -72,6 +73,12 @@ document.addEventListener('click', function (event) {
 
         //Validar si elijo copyright la publicacion debe ser privada
         isCopyright(event.target)
+    }
+
+
+    //boton muestra para cambiar marca de agua
+    if (event.target.matches('#btnChangeWatermark')) {
+        modalCopyright(true)
     }
 });
 
@@ -138,7 +145,19 @@ function mostrarLicencias(data) {
     $primerInput.checked = true
 
     //Validar si primer input es copyright
-    isCopyright($primerInput)
+    const copyright = isCopyright($primerInput)
+
+    //Mostrar texto para editar marca de agua
+    if (copyright) {
+        const b = document.createElement('button')
+        b.textContent = 'Cambiar marca de agua'
+        b.setAttribute('type', 'button')
+        b.setAttribute('id', 'btnChangeWatermark')
+        b.classList.add('absolute', 'right-0', 'top-0', 'p-5', 'text-xs', 'text-blue-400', 'hover:underline')
+
+        $primerInput.parentElement.parentElement.classList.add('relative')
+        $primerInput.parentElement.parentElement.appendChild(b)
+    }
 
     //Pinto el label que simula ser radio
     const r = $primerInput.parentElement.querySelector('.radio-select')
@@ -146,6 +165,7 @@ function mostrarLicencias(data) {
 }
 
 
+let primeraVez = true
 
 function isCopyright(input) {
     //Si elijo copyright la publicacion debe ser privada
@@ -168,9 +188,48 @@ function isCopyright(input) {
         //Anular posibilidad de elegir otro que no sea privado
         $optionPublic.classList.add('hidden')
         $optionProtected.classList.add('hidden')
+
+        //Mostrar modal para poner marca de agua personalizada solo la primera vez automaticamente
+        if (primeraVez) {
+            modalCopyright(true)
+            primeraVez = !primeraVez
+        }
+
+        return true
     } else {
         //Mostrar de nuevo las otras opciones si no elijo copyright
         $optionPublic.classList.remove('hidden')
         $optionProtected.classList.remove('hidden')
     }
+}
+
+//mostrar modal para poner marca de agua
+const $modalCopyright = document.getElementById('modalCopyright')
+const $privacyOptionsAndPhoto = document.getElementById('privacyOptionsAndPhoto')
+const $photoData = document.getElementById('photoData')
+const $policyData = document.getElementById('policyData')
+const $btnsCircle = document.getElementById('btnsCircle')
+
+//True mostrar modal, false ocultarlo
+function modalCopyright(show) {
+    if (show) {
+        $privacyOptionsAndPhoto.classList.add('hidden')
+
+        $btnsCircle.classList.add('hidden')
+        $policyData.classList.add('hidden')
+
+        $modalCopyright.classList.remove('hidden')
+    } else {
+        $privacyOptionsAndPhoto.classList.remove('hidden')
+
+        $btnsCircle.classList.remove('hidden')
+        $policyData.classList.remove('hidden')
+
+        $modalCopyright.classList.add('hidden')
+    }
+
+}
+
+export {
+    modalCopyright
 }

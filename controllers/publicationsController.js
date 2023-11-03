@@ -198,7 +198,7 @@ const savePublication = async (req, res) => {
 
         //----
         /* Agregarle marca de agua a la imagen y guardarla en la otra carpeta */
-        const baseDir = path.resolve(__dirname, '..');
+        //const baseDir = path.resolve(__dirname, '..');
 
         //Busco la imagen
         const image = sharp(imagePath); // Carga la imagen utilizando sharp

@@ -1,0 +1,7 @@
+input[name="optionWatermark"]:checked + div{
+    box-shadow: 5px 8px 19px 0px #002093;
+    transform: scale(1.1);
+
+    border-right: 2px solid #002093;
+    border-bottom: 2px solid #002093;
+}
