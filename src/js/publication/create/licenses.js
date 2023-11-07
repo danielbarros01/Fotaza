@@ -22,18 +22,26 @@ $inputsRadioTypes.forEach(type => {
         console.log(e.target.value)
         switch (e.target.value) {
             case 'free':
+                debugger
                 //cargar licencias para free
                 consultaLicencias('free')
+                viewOtherOptions()
 
                 break;
             case 'sale':
                 if (document.getElementById('venta-general').checked) {
+                    debugger
                     //cargar licencias para sale verificando que tipo de sale es
                     consultaLicencias('sale', 'general')
+                    viewOtherOptions()
                 }
 
                 if (document.getElementById('venta-unica').checked) {
+                    debugger
                     consultaLicencias('sale', 'unique')
+
+                    //Solo privada
+                    changeOptionPrivate()
                 }
                 break;
         }
@@ -77,7 +85,7 @@ document.addEventListener('click', function (event) {
 
 
     //boton muestra para cambiar marca de agua
-    if (event.target.matches('#btnChangeWatermark')) {
+    if (event.target.matches('#btnChangeWatermark') || event.target.closest('#btnChooseWatermark')) {
         modalCopyright(true)
     }
 });
@@ -94,6 +102,9 @@ async function consultaLicencias(typeSelected, typeSaleSelected) {
     if (typeSelected == 'sale' && typeSaleSelected == 'unique') {
         $sectionLicenses.innerHTML = ''
         $noLicenses.classList.remove('hidden')
+
+        //Solo privada
+        changeOptionPrivate()
 
         return
     }
@@ -165,18 +176,15 @@ function mostrarLicencias(data) {
 }
 
 
-let primeraVez = true
+//let primeraVez = true
 
 function isCopyright(input) {
     //Si elijo copyright la publicacion debe ser privada
     const isCopyright = input.parentElement.parentElement.querySelector('.name-license').textContent == 'Copyright'
 
     if (isCopyright) {
-        const privacyOption = document.getElementById('privacy-private')
-        privacyOption.checked = true
-
-        const event = new Event('change')
-        privacyOption.dispatchEvent(event)
+        //Publicacion sera solo de tipo privada
+        changeOptionPrivate()
 
         //Mostrar alert informando sobre esto
         $alert.classList.remove('hidden')
@@ -185,21 +193,16 @@ function isCopyright(input) {
             $alert.classList.add('hidden')
         }, 4000);
 
-        //Anular posibilidad de elegir otro que no sea privado
-        $optionPublic.classList.add('hidden')
-        $optionProtected.classList.add('hidden')
-
         //Mostrar modal para poner marca de agua personalizada solo la primera vez automaticamente
-        if (primeraVez) {
+        /* if (primeraVez) {
             modalCopyright(true)
             primeraVez = !primeraVez
-        }
+        } */
 
         return true
     } else {
         //Mostrar de nuevo las otras opciones si no elijo copyright
-        $optionPublic.classList.remove('hidden')
-        $optionProtected.classList.remove('hidden')
+        viewOtherOptions()
     }
 }
 
@@ -228,6 +231,25 @@ function modalCopyright(show) {
         $modalCopyright.classList.add('hidden')
     }
 
+}
+
+//Publicacion sera solo de tipo privada
+function changeOptionPrivate() {
+    const privacyOption = document.getElementById('privacy-private')
+    privacyOption.checked = true
+
+    const event = new Event('change')
+    privacyOption.dispatchEvent(event)
+
+    //Anular posibilidad de elegir otro que no sea privado
+    $optionPublic.classList.add('hidden')
+    $optionProtected.classList.add('hidden')
+}
+
+//Mostrar los otros tipos de opciones, publica o protegida
+function viewOtherOptions() {
+    $optionPublic.classList.remove('hidden')
+    $optionProtected.classList.remove('hidden')
 }
 
 export {
