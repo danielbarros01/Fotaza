@@ -246,7 +246,7 @@ const savePublication = async (req, res) => {
                 if (!textWatermark) return res.status(400).json({ path: 'watermarkText', msg: 'Debe ingresar un texto para una marca de agua personalizada' })
 
                 //Obtengo los datos de imagen si la hay
-                imageWatermark = req.files['imageWatermark'][0]
+                imageWatermark = req.files['imageWatermark'] ? req.files['imageWatermark'][0] : null
 
                 if (imageWatermark) {
                     const { filename } = imageWatermark
@@ -255,10 +255,9 @@ const savePublication = async (req, res) => {
                 } else {
                     setWatermark(imagePath, true, textWatermark)
                 }
+            } else {
+                setWatermark(imagePath, false)
             }
-
-        } else {
-            setWatermark(imagePath, false)
         }
 
 
@@ -608,26 +607,34 @@ async function getDimensions(watermarkPath) {
 
 
 // Combinar la imagen de marca de agua y el texto en una nueva imagen
-async function newWatermark(watermarkPath, textColor, watermarkText, imagePath) {
+async function newWatermark(watermarkPath, textColor, watermarkText) {
     try {
-        // Leer la imagen
-        const imageBuffer = await sharp(watermarkPath)
-            .resize({
-                height: 100, // Altura deseada
-                fit: sharp.fit.contain,
-                background: { r: 0, g: 0, b: 0, alpha: 0 } // Fondo transparente
-            })
-            .grayscale()
-            .toBuffer();
+        let imageBuffer
+        let imageMetadata
+        let fontSize
 
-        // Obtén las dimensiones de la imagen base
-        const imageMetadata = await sharp(imageBuffer).metadata();
+        if (watermarkPath) {
+            // Leer la imagen
+            imageBuffer = await sharp(watermarkPath)
+                .resize({
+                    height: 100, // Altura deseada
+                    fit: sharp.fit.contain,
+                    background: { r: 0, g: 0, b: 0, alpha: 0 } // Fondo transparente
+                })
+                .grayscale()
+                .toBuffer();
 
-        const fontSize = Math.floor(imageMetadata.height / 1.5);
+            // Obtén las dimensiones de la imagen base
+            imageMetadata = await sharp(imageBuffer).metadata();
 
-        const textWidth = Math.ceil(fontSize * watermarkText.length * 0.5); // Ajuste según la relación de aspecto típica de las fuentes
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}px" height="${imageMetadata.height}" style="background-color: transparent">
-    <text x="8" y="${(imageMetadata.height / 2) + 8}" font-size="${fontSize}" fill="${textColor}" dominant-baseline="middle" text-anchor="start">${watermarkText}</text>
+            fontSize = Math.floor(imageMetadata.height / 1.5);
+        }
+
+
+        const textWidth = Math.ceil(fontSize ? fontSize * watermarkText.length * 0.5 : watermarkText.length * 30); // Ajuste según la relación de aspecto típica de las fuentes
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}px" height="${imageMetadata ? imageMetadata.height : 200}" style="background-color: transparent">
+    <text x="8" y="${imageMetadata ? ((imageMetadata.height / 2) + 8) : 100}" font-size="${fontSize ? fontSize : 70}" fill="${textColor}" dominant-baseline="middle" text-anchor="start">${watermarkText}</text>
 </svg>`;
 
         // Convertir el SVG en una imagen
@@ -641,8 +648,8 @@ async function newWatermark(watermarkPath, textColor, watermarkText, imagePath) 
         // Crear una nueva imagen que tenga suficiente espacio para la imagen y el SVG
         const newImageBuffer = await sharp({
             create: {
-                width: imageMetadata.width + svgBufferMetadata.width,
-                height: imageMetadata.height + 100,
+                width: imageMetadata ? imageMetadata.width + svgBufferMetadata.width : svgBufferMetadata.width,
+                height: imageMetadata ? imageMetadata.height + 100 : 300,
                 channels: 4,
                 background: { r: 0, g: 0, b: 0, alpha: 0 }
             }
@@ -650,26 +657,48 @@ async function newWatermark(watermarkPath, textColor, watermarkText, imagePath) 
             .png()
             .toBuffer();
 
-        // Superponer la imagen y el SVG en la nueva imagen
-        const watermark = await sharp(newImageBuffer)
-            .composite([
-                { input: imageBuffer, gravity: 'west'},
-                { input: svgBuffer, gravity: 'east' },
-                //Aplicar opacidad
-                {
-                    input: Buffer.from([0,0,0,128]),
-                    raw: {
-                      width: 1,
-                      height: 1,
-                      channels: 4,
-                    },
-                    tile: true,
-                    blend: 'dest-in',
-                  }
-            ])
-            .png()
-            //.toFile(path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`));
-            .toBuffer()
+
+        let watermark
+        if (watermarkPath) {
+            // Superponer la imagen y el SVG en la nueva imagen
+            watermark = await sharp(newImageBuffer)
+                .composite([
+                    { input: imageBuffer, gravity: 'west' },
+                    { input: svgBuffer, gravity: 'east' },
+                    //Aplicar opacidad
+                    {
+                        input: Buffer.from([0, 0, 0, 128]),
+                        raw: {
+                            width: 1,
+                            height: 1,
+                            channels: 4,
+                        },
+                        tile: true,
+                        blend: 'dest-in',
+                    }
+                ])
+                .png()
+                //.toFile(path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`));
+                .toBuffer()
+        } else {
+            watermark = await sharp(newImageBuffer)
+                .composite([
+                    { input: svgBuffer, gravity: 'east' },
+                    //Aplicar opacidad
+                    {
+                        input: Buffer.from([0, 0, 0, 128]),
+                        raw: {
+                            width: 1,
+                            height: 1,
+                            channels: 4,
+                        },
+                        tile: true,
+                        blend: 'dest-in',
+                    }
+                ])
+                .png()
+                .toBuffer()
+        }
 
         return watermark
     } catch (error) {
@@ -689,17 +718,25 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
 
         let watermarkPath;
         let watermarkImageBuffer;
+        let watermarkBuffer
 
         //Marca de agua personalizada
         if (personalized) {
-            // Obtener la imagen de marca de agua
-            watermarkPath = nameImageWatermark
-                ? `images/watermarks/${nameImageWatermark}`
-                : 'images/watermarks/watermarkDefault.png';
 
-            // Combinar la imagen de marca de agua y el texto en una nueva imagen
-            /* const combinedImageBuffer = */
-            const watermarkBuffer = await newWatermark(watermarkPath, '#808080', watermarkText, imagePath);
+            if (nameImageWatermark) { //Si viene el nombre de la imagen de marca de agua
+                // Obtener la imagen de marca de agua
+                watermarkPath = nameImageWatermark
+                    ? `images/watermarks/${nameImageWatermark}`
+                    : 'images/watermarks/watermarkDefault.png';
+
+                // Traer la marca de agua lista con foto
+                watermarkBuffer = await newWatermark(watermarkPath, '#808080', watermarkText);
+            } else {
+                // Traer la marca de agua lista solo con el texto
+                watermarkBuffer = await newWatermark(null, '#808080', watermarkText);
+            }
+
+
             watermarkImageBuffer = await image
                 .composite([{ input: watermarkBuffer, tile: true }])
                 .toBuffer();
