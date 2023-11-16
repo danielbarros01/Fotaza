@@ -22,7 +22,7 @@ $inputsRadioTypes.forEach(type => {
         console.log(e.target.value)
         switch (e.target.value) {
             case 'free':
-                debugger
+                //debugger
                 //cargar licencias para free
                 consultaLicencias('free')
                 viewOtherOptions()
@@ -30,14 +30,14 @@ $inputsRadioTypes.forEach(type => {
                 break;
             case 'sale':
                 if (document.getElementById('venta-general').checked) {
-                    debugger
+                    //debugger
                     //cargar licencias para sale verificando que tipo de sale es
                     consultaLicencias('sale', 'general')
                     viewOtherOptions()
                 }
 
                 if (document.getElementById('venta-unica').checked) {
-                    debugger
+                    //debugger
                     consultaLicencias('sale', 'unique')
 
                     //Solo privada

@@ -1,6 +1,8 @@
 import { Op } from 'sequelize'
 import db from '../config/db.js'
 import sharp from 'sharp'
+import svg2img from 'svg2img'
+
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
 import fs from 'fs'
 import path from 'path'
@@ -40,113 +42,128 @@ const createPublication = async (req, res) => {
 
 // POST /publications/create
 const savePublication = async (req, res) => {
-    /* Validaciones */
-    //Valido que venga la imagen
-    if (!req.file) {
-        return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
-    }
-
-    /* Campos obligatorios */
-    let camposObligatorios = ['title', 'category', /* 'rightsOfUse', */ 'privacyItem', 'typePost']
-
-    //verifico si es de tipo venta
-    if (req.body['typePost'] == 'sale') {
-        camposObligatorios = [...camposObligatorios, 'typeSale', 'price', 'currency'] //agrego valores obligatorios si es de tipo venta
-    }
-    /* const camposPresentes = camposObligatorios.every(campo => campo in req.body);
-    if (!camposPresentes) {
-        res.clearCookie('_token')
-        return res.status(400).json([{ path: 'critical', error: 'Faltan campos obligatorios en el formulario' }]);
-    } */
-    /*  */
-
-    //Que los campos que vengan no esten vacios
-    const errors = []
-
-    //Para validar que si es de tipo free no me importen estos campos a la hora de agregar los errores si vienen vacios
-    let camposExcluidos = []
-    if (req.body['typePost'] != 'sale') {
-        camposExcluidos = ['price', 'typeSale'];
-    }
-
-    for (let campo in req.body) {
-        if (!req.body[campo] && !camposExcluidos.includes(campo)) {
-            errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
-        }
-
-        if (campo == 'category' || campo == 'rightsOfUse') {
-            if (!(!!Number(req.body[campo]))) { //Si no es numero
-                errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
-            }
-        }
-
-        if (campo == 'privacyItem') {
-            switch (req.body[campo]) {
-                case 'public': break;
-                case 'protected': break;
-                case 'private': break;
-                default: errors.push({ path: campo, msg: `${campo} debe ser public, protected o private` })
-            }
-        }
-
-        //type debe ser free o sale
-        if (campo == 'typePost' && (req.body[campo] != 'free' && req.body[campo] != 'sale')) {
-            errors.push({ path: campo, msg: `${campo} debe ser libre o de venta` })
-        }
-    }
-
-    //si es de tipo sale
-    if (req.body['typePost'] == 'sale') {
-        //typeVenta puede ser general o unique
-        const typeSale = req.body['typeSale']
-        if (typeSale != 'general' && typeSale != 'unique') {
-            errors.push({ path: 'typeSale', msg: `El tipo de venta solamente puede ser general o unico` })
-        }
-
-        //price de tipo numero
-        const price = req.body['price']
-
-        if (isNaN(price) || price <= 0) {
-            errors.push({ path: 'price', msg: `Debe ingresar un numero valido mayor a 0 y menor a 100 millones` })
-        }
-
-
-        //currency ars o us
-        const currency = req.body['currency']
-        if (currency != 'ars' && currency != 'us') {
-            errors.push({ path: 'currency', msg: `El tipo de moneda puede ser ars o us` })
-        }
-    }
-
-
-    //Si hay campos vacios:
-    if (errors.length > 0) {
-        // Verificar si existe un archivo adjunto y eliminarlo
-        deleteImage(req)
-
-        //Retornar errores
-        return res.status(400).json(errors)
-    }
-    /* - - - - */
-
-    const { filename, mimetype, path: imagePath } = req.file
-
-    const { title, category: category_id, license, privacyItem: privacy, typePost: type } = req.body
-    const { id } = req.user
-    const tags = JSON.parse(req.body.tags)
-
-    //Checkear que solo sean 3 tags
-    if (tags.length > 3) {
-        return res.status(400).json({ path: 'tags', msg: `Escribe maximo 3 categorias` })
-    }
-
 
     try {
-        //Validar que exista esta licencia
+        /*---Abro Validaciones ----*/
+        {
+            //Valido que venga la imagen
+            if (!req.files['image'][0]) {
+                return res.status(400).json([{ path: 'image', msg: 'Debe seleccionar una imagen' }]);
+            }
+
+            /* Campos obligatorios */
+            let camposObligatorios = ['title', 'category', 'privacyItem', 'typePost']
+
+            //verifico si es de tipo venta para agregar mas campos obligatorios
+            if (req.body['typePost'] == 'sale') {
+                camposObligatorios = [...camposObligatorios, 'typeSale', 'price', 'currency'] //agrego valores obligatorios si es de tipo venta
+            }
+
+            const errors = []
+
+            for (let campo in req.body) {
+                if (!req.body[campo] && camposObligatorios.includes(campo)) {  //si viene vacio el campo y esta entre los obligatorios
+                    errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
+                }
+
+                //Si es categoria entro a validar tambien entra si es distinto a tipo de venta unico ya que si es unico no necesita una licensia
+                if (campo == 'category' || (campo == 'license' && req.body['typeSale'] != 'unique')) {
+                    if (!(!!Number(req.body[campo]))) { //Si no es numero, ya que me tiene que enviar solo el id
+                        errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
+                    }
+
+                }
+
+                if (campo == 'privacyItem') {
+                    switch (req.body[campo]) {
+                        case 'public': break;
+                        case 'protected': break;
+                        case 'private': break;
+                        default: errors.push({ path: campo, msg: `${campo} debe ser public, protected o private` })
+                    }
+                }
+
+                //type debe ser free o sale
+                if (campo == 'typePost' && (req.body[campo] != 'free' && req.body[campo] != 'sale')) {
+                    errors.push({ path: campo, msg: `${campo} debe ser libre o de venta` })
+                }
+            }
+
+            //si es de tipo sale
+            if (req.body['typePost'] == 'sale') {
+                //typeVenta puede ser general o unique
+                const typeSale = req.body['typeSale']
+
+                if (typeSale != 'general' && typeSale != 'unique') {
+                    errors.push({ path: 'typeSale', msg: `El tipo de venta solamente puede ser general o unico` })
+                }
+
+                //price de tipo numero
+                const price = req.body['price']
+
+                if (isNaN(price) || price <= 0 || price > 4000000) {
+                    errors.push({ path: 'price', msg: `Debe ingresar un numero valido mayor a 0 y menor a 4 millones` })
+                }
+
+
+                //currency ars (us no disponible)
+                const currency = req.body['currency']
+                if (currency != 'ars' /* && currency != 'us' */) {
+                    errors.push({ path: 'currency', msg: `El tipo de moneda puede ser ars (Moneda Argentina)` })
+                }
+            }
+
+
+
+            //Si hay campos vacios:
+            if (errors.length > 0) {
+                // Verificar si existe un archivo adjunto y eliminarlo
+                deleteImage(req)
+
+                //Retornar errores
+                return res.status(400).json(errors)
+            }
+        }
+        /*---Cierro Validaciones ----*/
+
+
+        /*---Abro Recibo de datos ----*/
+
+        //Datos de la imagen
+        const { filename, mimetype, path: imagePath } = req.files['image'][0]
+
+        //Datos del body
+        const { title, category: category_id, license, privacyItem: privacy, typePost: type, typeSale, optionWatermark, textWatermark } = req.body
+
+        //Id del usuario autenticado
+        const { id } = req.user
+
+        //Etiquetas
+        const tags = JSON.parse(req.body.tags)
+
+        //Checkear que solo sean 3 tags
+        if (tags.length > 3) {
+            return res.status(400).json({ path: 'tags', msg: `Escribe maximo 3 categorias` })
+        }
+
+        /*---Abro Validar licencia ----*/
         const rightOfUse = await RightOfUse.findByPk(license)
-        if (!rightOfUse) {
+
+        //Validar que exista esta licencia
+        if (!rightOfUse && typeSale != 'unique') {
             return res.status(400).json({ path: 'rightOfUse', msg: 'No existe la licensia que solicito' })
         }
+
+        //Validar que la licensia este disponible para el tipo de publicacion
+        if (type == 'free' && !rightOfUse.free) {
+            return res.status(400).json({ path: 'rightOfUse', msg: 'La licensia no esta disponible para tipos de publicacion gratuita' })
+        }
+        else if ((type == 'sale' && typeSale == 'general') && !rightOfUse.general_sale) {
+            return res.status(400).json({ path: 'rightOfUse', msg: 'La licensia no esta disponible para tipos de publicacion de venta general' })
+        }
+
+        /*---Cierro Validar licencia ----*/
+
 
         //Validar que exista la categoria
         const category = await Category.findByPk(category_id)
@@ -155,63 +172,100 @@ const savePublication = async (req, res) => {
         }
 
         //Obtener resolucion
-        const imageInfo = await sharp(imagePath).metadata();
-        const resolution = `${imageInfo.width}x${imageInfo.height}`;
+        const resolution = await getResolution(imagePath)
 
-        let camposPublication = {
-            image: filename,
-            title,
-            date: new Date(),
-            format: mimetype,
-            resolution,
-            privacy, //que el usuario elija si quiere ocultar una foto
-            category_id,
-            rights_of_use_id: rightOfUse.id,
-            user_id: id,
-            type
-        }
 
+        /*---Abro campos a guardar ----*/
+        //Publicacion a crear
         let publication
-        if (type == 'sale') {
-            camposPublication.typeSale = req.body['typeSale']
-            camposPublication.price = req.body['price']
-            camposPublication.currency = req.body['currency']
+        {
+            //Campos base, los que se guardan si o si
+            let camposPublication = {
+                image: filename,
+                title,
+                date: new Date(),
+                format: mimetype,
+                resolution,
+                privacy, //que el usuario elija si quiere ocultar una foto
+                category_id,
+                user_id: id,
+                type
+            }
 
-            publication = await Publication.create(camposPublication)
-        } else if (type == 'free') {
-            //Guardar publicacion
-            publication = await Publication.create(camposPublication)
+            // Guardar licencia si no es unique
+            if (type == 'free' || (type == 'sale' && typeSale != 'unique')) {
+                camposPublication.rights_of_use_id = rightOfUse.id
+            }
+
+            //si es copyright o tipo de venta unica debe ser privada
+            //si es copyright o unique validar si viene la opcion de marca de agua personalizada
+            if ((type == 'sale' && typeSale == 'unique') || rightOfUse.name == 'Copyright') {
+                camposPublication.privacy = 'private'
+            }
+
+            //Si es de tipo sale hace falta: typeSale, price y currency
+            if (type == 'sale') {
+                camposPublication.typeSale = req.body['typeSale']
+                camposPublication.price = req.body['price']
+                camposPublication.currency = req.body['currency']
+
+                publication = await Publication.create(camposPublication)
+            }
+            else if (type == 'free') {
+                //Guardar publicacion
+                publication = await Publication.create(camposPublication)
+            }
         }
+        /*---Cierro campos a guardar ----*/
 
 
-        //find or create para obtener el id del tag o crearlo y tambien obtener el id
+        /*---Abro etiquetas ----*/
         const tagsBD = [] //instancias de tag
-        for (const tag of tags) {
-            const lowercaseTag = tag.toLowerCase(); //convierto en minuscula la palabra
-            tagsBD.push(await Tag.findOrCreate({ where: { name: lowercaseTag } }))
+        {
+            //find or create para obtener el id del tag o crearlo y tambien obtener el id
+            for (const tag of tags) {
+                const lowercaseTag = tag.toLowerCase(); //convierto en minuscula la palabra
+                tagsBD.push(await Tag.findOrCreate({ where: { name: lowercaseTag } }))
+            }
+
+            //agregar a la tabla intermedia
+            for (const tag of tagsBD) {
+                await PublicationHasTag.create({ publicationId: publication.id, tagId: tag[0].id })
+            }
+        }
+        /*---Cierro etiquetas ----*/
+
+
+        /*---Abro marcas de agua ----*/
+        let imageWatermark
+
+        if ((type == 'sale' && typeSale == 'unique') || rightOfUse.name == 'Copyright') {
+            //Si elegi marca de agua personalizada
+            if (optionWatermark == 'customized') {
+                //El texto es obligatorio, asi que debo validar que exista
+                if (!textWatermark) return res.status(400).json({ path: 'watermarkText', msg: 'Debe ingresar un texto para una marca de agua personalizada' })
+
+                //Obtengo los datos de imagen si la hay
+                imageWatermark = req.files['imageWatermark'][0]
+
+                if (imageWatermark) {
+                    const { filename } = imageWatermark
+                    //y si no viene imagen?
+                    setWatermark(imagePath, true, textWatermark, filename)
+                } else {
+                    setWatermark(imagePath, true, textWatermark)
+                }
+            }
+
+        } else {
+            setWatermark(imagePath, false)
         }
 
-        //agregar a la tabla intermedia
-        for (const tag of tagsBD) {
-            await PublicationHasTag.create({ publicationId: publication.id, tagId: tag[0].id })
-        }
 
-        //----
         /* Agregarle marca de agua a la imagen y guardarla en la otra carpeta */
         //const baseDir = path.resolve(__dirname, '..');
 
-        //Busco la imagen
-        const image = sharp(imagePath); // Carga la imagen utilizando sharp
-        const watermarkPath = 'images/watermarks/watermarkDefault.png'; // Ruta de tu marca de agua
 
-        //agrego marca de agua
-        const watermarkImageBuffer = await image.composite([
-            { input: watermarkPath, tile: true }
-        ]).toBuffer()
-
-        // Guardar la imagen con marca de agua en la carpeta deseada
-        const watermarkedImagePath = path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`);
-        await fs.promises.writeFile(watermarkedImagePath, watermarkImageBuffer);
 
         res.status(201).json({ publicationId: publication.id })
     } catch (error) {
@@ -510,8 +564,8 @@ const deletePublication = async (req, res) => {
 //function helper
 const deleteImage = (req, route) => {
     if (req) {
-        if (req.file) {
-            const filePath = req.file.path;
+        if (req.files['image'][0]) {
+            const filePath = req.files['image'][0].path;
 
             fs.unlink(filePath, (err) => {
                 if (err) {
@@ -535,9 +589,135 @@ const deleteImage = (req, route) => {
     }
 }
 
+//function helper
+const getResolution = async (imagePath) => {
+    const imageInfo = await sharp(imagePath).metadata();
+    const resolution = `${imageInfo.width}x${imageInfo.height}`;
+
+    return resolution
+}
+
+async function getDimensions(watermarkPath) {
+    // Obtener dimensiones de la imagen de marca de agua
+    const watermarkMetadata = await sharp(watermarkPath).metadata();
+    const watermarkWidth = watermarkMetadata.width || 0;
+    const watermarkHeight = watermarkMetadata.height || 0;
+
+    return { width: watermarkWidth, height: watermarkHeight }
+}
+
+
+// Combinar la imagen de marca de agua y el texto en una nueva imagen
+async function newWatermark(watermarkPath, textColor, watermarkText, imagePath) {
+    try {
+        // Leer la imagen
+        const imageBuffer = await sharp(watermarkPath)
+            .resize({
+                height: 100, // Altura deseada
+                fit: sharp.fit.contain,
+                background: { r: 0, g: 0, b: 0, alpha: 0 } // Fondo transparente
+            })
+            .grayscale()
+            .toBuffer();
+
+        // Obtén las dimensiones de la imagen base
+        const imageMetadata = await sharp(imageBuffer).metadata();
+
+        const fontSize = Math.floor(imageMetadata.height / 1.5);
+
+        const textWidth = Math.ceil(fontSize * watermarkText.length * 0.5); // Ajuste según la relación de aspecto típica de las fuentes
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}px" height="${imageMetadata.height}" style="background-color: transparent">
+    <text x="8" y="${(imageMetadata.height / 2) + 8}" font-size="${fontSize}" fill="${textColor}" dominant-baseline="middle" text-anchor="start">${watermarkText}</text>
+</svg>`;
+
+        // Convertir el SVG en una imagen
+        svg2img(svg, function (error, buffer) {
+            fs.writeFileSync('text.png', buffer);
+        });
+
+        const svgBuffer = await sharp('text.png').toBuffer();
+        const svgBufferMetadata = await sharp('text.png').metadata();
+
+        // Crear una nueva imagen que tenga suficiente espacio para la imagen y el SVG
+        const newImageBuffer = await sharp({
+            create: {
+                width: imageMetadata.width + svgBufferMetadata.width,
+                height: imageMetadata.height + 100,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            }
+        })
+            .png()
+            .toBuffer();
+
+        // Superponer la imagen y el SVG en la nueva imagen
+        const watermark = await sharp(newImageBuffer)
+            .composite([
+                { input: imageBuffer, gravity: 'west'},
+                { input: svgBuffer, gravity: 'east' },
+                //Aplicar opacidad
+                {
+                    input: Buffer.from([0,0,0,128]),
+                    raw: {
+                      width: 1,
+                      height: 1,
+                      channels: 4,
+                    },
+                    tile: true,
+                    blend: 'dest-in',
+                  }
+            ])
+            .png()
+            //.toFile(path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`));
+            .toBuffer()
+
+        return watermark
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 
 
+//function helper
+//personalized true or false
+
+const setWatermark = async (imagePath, personalized, watermarkText, nameImageWatermark) => {
+    try {
+        //Busco la imagen
+        const image = sharp(imagePath); // Carga la imagen utilizando sharp
+
+        let watermarkPath;
+        let watermarkImageBuffer;
+
+        //Marca de agua personalizada
+        if (personalized) {
+            // Obtener la imagen de marca de agua
+            watermarkPath = nameImageWatermark
+                ? `images/watermarks/${nameImageWatermark}`
+                : 'images/watermarks/watermarkDefault.png';
+
+            // Combinar la imagen de marca de agua y el texto en una nueva imagen
+            /* const combinedImageBuffer = */
+            const watermarkBuffer = await newWatermark(watermarkPath, '#808080', watermarkText, imagePath);
+            watermarkImageBuffer = await image
+                .composite([{ input: watermarkBuffer, tile: true }])
+                .toBuffer();
+        }
+        //Marca de agua por defecto
+        else {
+            watermarkPath = 'images/watermarks/watermarkDefault.png'; // Ruta de tu marca de agua
+            watermarkImageBuffer = await image.composite([{ input: watermarkPath, tile: true }]).toBuffer()
+        }
+
+        // Guardar la imagen con marca de agua en la carpeta deseada
+        const watermarkedImagePath = path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`);
+        await fs.promises.writeFile(watermarkedImagePath, watermarkImageBuffer);
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export {
     viewPublications,

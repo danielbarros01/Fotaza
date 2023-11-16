@@ -22,9 +22,24 @@ function checkFields($form) {
         formData.delete('price')
     }
 
+    let ignoreWatermark = false
+    //debugger
+    if ((formData.get('typePost') == 'sale' && formData.get('typeSale') != 'unique') || formData.get('license') != 2) { //2 es el id de copyright
+        //Ignorar datos de marca de agua personalizado
+        ignoreWatermark = true
+    }
+
+
     for (let [name, value] of formData.entries()) {
+        //debugger
+
+        //Si el valor del campo esta vacio
         if (!value) {
-            emptyFields.push(name);
+
+            if (ignoreWatermark && (name != 'optionWatermark' && name != 'imageWatermark' && name != 'textWatermark')) {
+                emptyFields.push(name);
+            }
+
         }
     }
     return emptyFields;
@@ -77,8 +92,10 @@ function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, sp
                 break;
 
             case 'price':
-                spanErrPrice.textContent = error.msg || 'Ingrese el monto'
-                spanErrPrice.classList.remove('hidden')
+                if (spanErrPrice) {
+                    spanErrPrice.textContent = error.msg || 'Ingrese el monto'
+                    spanErrPrice.classList.remove('hidden')
+                }
                 break;
 
             case 'currency':

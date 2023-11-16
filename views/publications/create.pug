@@ -186,10 +186,7 @@ block contenido
                                             input(type="radio" name="license" id=`license-${license.id}` value=license.id class="hidden" checked=(license.id == 1))
                                             label.modified-radio(for=`license-${license.id}` class="w-5 h-5 border-4 border-principal-gray rounded-full cursor-pointer hover:bg-gray-300 inline-block relative")
                                                 span.radio-select(class=`absolute top-0 left-0 w-full h-full rounded-full border-2 border-white ${license.id == 1 ? 'bg-black' : ''}`)
-                                    
-
-                                            
-
+                                
 
                     div(class="btns2 mt-10 pt-5 flex justify-between gap-1 w-full")
                             button#btnBack(type="button" class="bg-principal-gray text-white font-normal max-w-xs w-4/5 sm:max-w-[200px] sm:w-2/5 hover:opacity-80")
@@ -255,8 +252,8 @@ block contenido
                                     div.flex.items-center
                                         label(for="customTextWater") Texto personalizado  
                                     span(id="errCustomTextWater").text-red-500.text-xs.hidden
-                                input(id="customTextWater" type="text" placeholder="Ej. Fotaza" class="block w-full border border-secondary-gray rounded-md py-2 px-2 focus:outline-none" maxlength="20")
-
+                                input(id="customTextWater" type="text" name="textWatermark" placeholder="Ej. Fotaza" class="block w-full border border-secondary-gray rounded-md py-2 px-2 focus:outline-none" maxlength="20")
+                                
                     //--Btn guardar cambios
                     div(class="mt-10 flex justify-center sm:justify-end")
                         button#btnSavedWatermark(type="button" class="bg-principal-gray text-white font-normal max-w-xs sm:max-w-[200px] hover:opacity-80 w-40")
@@ -265,7 +262,7 @@ block contenido
                                 i(class="fa-solid fa-check text-2xl")
     
             //--aa
-            div#btnsCircle(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
+            #btnsCircle(class="circlesForm text-center space-x-2 pb-3 mt-3 sm:mt-[-20px] text-principal-gray z-50")
                 i(class="fa-solid fa-circle")
                 i(class="fa-regular fa-circle")
 

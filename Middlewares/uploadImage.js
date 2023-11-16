@@ -18,7 +18,14 @@ const storage = multer.diskStorage({
             }
 
             cb(null, profileImagePath);
-        } else {
+        }
+        else if (file.fieldname === 'image') {
+            cb(null, './images/uploads/');
+        }
+        else if (file.fieldname === 'imageWatermark') {
+            cb(null, './images/watermarks/');
+        }
+        else {
             cb(null, './images/uploads/');
         }
     },
@@ -28,7 +35,6 @@ const storage = multer.diskStorage({
         } else {
             cb(null, uuidv4() + path.extname(file.originalname)) //path.extname trae la extension de un archivo //se llama al callback es porque se subio correctamente la imagen
         }
-
     }
 })
 

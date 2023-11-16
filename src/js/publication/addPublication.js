@@ -42,6 +42,7 @@ $form.addEventListener("submit", function (e) {
     //currentTarget es $form
     const formData = new FormData(e.currentTarget)
 
+
     const errors = checkFields($form);
 
     //valido que haya una imagen, si no agrego el nombre del campo a los errores
@@ -64,7 +65,7 @@ $form.addEventListener("submit", function (e) {
     })
         .then(response => {
             const publicationId = response.data.publicationId;
-            window.location.href = `/publications/${publicationId}`
+            //window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {

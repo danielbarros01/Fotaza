@@ -28,7 +28,7 @@ router.get('/', viewPublications)
 router.get('/create', protectRoute, createPublication)
 
 // POST /publications/create
-router.post('/create', protectRoute, upload.single('image'), savePublication)
+router.post('/create', protectRoute, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'imageWatermark', maxCount: 1 }]), savePublication)
 
 // GET /publications/my-posts
 router.get('/my-posts', protectRoute, viewMyPublications)

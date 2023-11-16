@@ -25,12 +25,14 @@ $btnContinue.addEventListener('click', (e) => {
     const errors = checkFields($form);
     //valido que haya una imagen, si no agrego el nombre del campo a los errores
     validationImage($form, errors)
-    
-    if (errors.length >= 1) {
-        console.log(errors)
+    //debugger
+    //Si esta incluido price y es mayor a 1, si solo es price el error lo dejo pasar porque es valdidacion del segundo paso del formulario
 
-        //Si esta incluido price y es mayor a 1, si solo es price el error lo dejo pasar porque es valdidacion del segundo paso del formulario
-        if((errors.includes('price') && errors.length > 1) ||  errors.length >= 1){
+    if (errors.length >= 1) {
+        //Si esta precio y el error es solo 1 no ejecutes lo siguiente
+        if ((errors.includes('price') || errors.includes('textWatermark')) && errors.length === 1) {
+
+        } else {
             return viewErrors(errors, null, $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse)
         }
     }
