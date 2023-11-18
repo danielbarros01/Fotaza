@@ -229,8 +229,9 @@ const savePublication = async (req, res) => {
             }
 
             //agregar a la tabla intermedia
+            //findOrCreate asi si el usuario mando por ej, A y a, es lo mismo a y a y apuntan al mismo tag, no hace falta crear la relacion por 2da vez
             for (const tag of tagsBD) {
-                await PublicationHasTag.create({ publicationId: publication.id, tagId: tag[0].id })
+                await PublicationHasTag.findOrCreate({ where: { publicationId: publication.id, tagId: tag[0].id } })
             }
         }
         /*---Cierro etiquetas ----*/
@@ -261,20 +262,17 @@ const savePublication = async (req, res) => {
         }
 
 
-        /* Agregarle marca de agua a la imagen y guardarla en la otra carpeta */
-        //const baseDir = path.resolve(__dirname, '..');
-
-
-
         res.status(201).json({ publicationId: publication.id })
     } catch (error) {
         //Si ocurrio un erro tambien eliminar la imagen
         deleteImage(req)
+
+        //Elimino logo para la marca de agua si se cargo
+        let imageWatermark = req.files['imageWatermark'] ? req.files['imageWatermark'][0] : null
+        if (imageWatermark) deleteImage(null, `images/watermarks/${imageWatermark.filename}`)
+
         console.error(error)
     }
-
-
-    res.status(200)
 }
 
 // GET /publications/my-posts
@@ -607,7 +605,7 @@ async function getDimensions(watermarkPath) {
 
 
 // Combinar la imagen de marca de agua y el texto en una nueva imagen
-async function newWatermark(watermarkPath, textColor, watermarkText) {
+async function newWatermark(watermarkPath, textColor, watermarkText, uuidExtraido) {
     try {
         let imageBuffer
         let imageMetadata
@@ -639,11 +637,11 @@ async function newWatermark(watermarkPath, textColor, watermarkText) {
 
         // Convertir el SVG en una imagen
         svg2img(svg, function (error, buffer) {
-            fs.writeFileSync('text.png', buffer);
+            fs.writeFileSync(`images/watermarks/text-${uuidExtraido}.png`, buffer);
         });
 
-        const svgBuffer = await sharp('text.png').toBuffer();
-        const svgBufferMetadata = await sharp('text.png').metadata();
+        const svgBuffer = await sharp(`images/watermarks/text-${uuidExtraido}.png`).toBuffer();
+        const svgBufferMetadata = await sharp(`images/watermarks/text-${uuidExtraido}.png`).metadata();
 
         // Crear una nueva imagen que tenga suficiente espacio para la imagen y el SVG
         const newImageBuffer = await sharp({
@@ -667,7 +665,7 @@ async function newWatermark(watermarkPath, textColor, watermarkText) {
                     { input: svgBuffer, gravity: 'east' },
                     //Aplicar opacidad
                     {
-                        input: Buffer.from([0, 0, 0, 128]),
+                        input: Buffer.from([0, 0, 0, 80]),
                         raw: {
                             width: 1,
                             height: 1,
@@ -686,7 +684,7 @@ async function newWatermark(watermarkPath, textColor, watermarkText) {
                     { input: svgBuffer, gravity: 'east' },
                     //Aplicar opacidad
                     {
-                        input: Buffer.from([0, 0, 0, 128]),
+                        input: Buffer.from([0, 0, 0, 80]),
                         raw: {
                             width: 1,
                             height: 1,
@@ -712,9 +710,17 @@ async function newWatermark(watermarkPath, textColor, watermarkText) {
 //personalized true or false
 
 const setWatermark = async (imagePath, personalized, watermarkText, nameImageWatermark) => {
+    
+    // Utilizando expresión regular para extraer el UUID
+    const nameImage = imagePath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
+    // Verificando si se encontró una coincidencia y obteniendo el primer grupo capturado
+    const uuidExtraido = nameImage ? nameImage[0] : null;
+
     try {
         //Busco la imagen
         const image = sharp(imagePath); // Carga la imagen utilizando sharp
+
+
 
         let watermarkPath;
         let watermarkImageBuffer;
@@ -730,10 +736,10 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
                     : 'images/watermarks/watermarkDefault.png';
 
                 // Traer la marca de agua lista con foto
-                watermarkBuffer = await newWatermark(watermarkPath, '#808080', watermarkText);
+                watermarkBuffer = await newWatermark(watermarkPath, '#808080', watermarkText, uuidExtraido);
             } else {
                 // Traer la marca de agua lista solo con el texto
-                watermarkBuffer = await newWatermark(null, '#808080', watermarkText);
+                watermarkBuffer = await newWatermark(null, '#808080', watermarkText, uuidExtraido);
             }
 
 
@@ -751,8 +757,20 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
         const watermarkedImagePath = path.join('images/uploadsWithWatermark/', `watermark_${path.basename(imagePath)}`);
         await fs.promises.writeFile(watermarkedImagePath, watermarkImageBuffer);
 
+
+        //Eliminar logo para la marca de agua que cargo el usuario
+        if (nameImageWatermark) deleteImage(null, watermarkPath)
+        //Eliminar texto para la marca de agua que cargo el usuario
+        deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
+
     } catch (error) {
         console.log(error)
+
+        //Eliminar logo para la marca de agua que cargo el usuario
+        if (nameImageWatermark) deleteImage(null, `images/watermarks/${nameImageWatermark}`)
+
+        //Eliminar texto para la marca de agua que cargo el usuario
+        deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
     }
 }
 
