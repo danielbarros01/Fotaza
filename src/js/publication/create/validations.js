@@ -58,14 +58,10 @@ function validationImage($form, arrayErrors) {
 
 //Para mostrar los errores en los span
 function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, spanRightOfUse, spanTypePost, spanErrTypeSale, spanErrPrice, spanErrCurrency) {
-    /* if (clientOrServer == 'server') {
-        errors = errors.map(err => err.path) //path nombre de campo del eror ej price, currency
-    } */
-
-    /* Y LOS MENSAJES DEL SERVIDOR??? HAY QUE PONERLOS */
+    debugger
 
     errors.forEach(error => {
-        switch (error) {
+        switch (clientOrServer == 'server' ? error.path : error) {
             case 'title':
                 spanTitle.textContent = error.msg || 'El titulo no debe ir vacio'
                 spanTitle.classList.remove('hidden')

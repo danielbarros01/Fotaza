@@ -61,6 +61,10 @@ const savePublication = async (req, res) => {
 
             const errors = []
 
+            if ((req.files['image'][0].size / (1024 * 1024)) > 15) {
+                errors.push({ path: 'image', msg: 'La imagen no puede pesar mas de 15mb' })
+            }
+
             for (let campo in req.body) {
                 if (!req.body[campo] && camposObligatorios.includes(campo)) {  //si viene vacio el campo y esta entre los obligatorios
                     errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
@@ -119,6 +123,14 @@ const savePublication = async (req, res) => {
             if (errors.length > 0) {
                 // Verificar si existe un archivo adjunto y eliminarlo
                 deleteImage(req)
+
+                if (req.body.optionWatermark == 'customized') {
+                    //Obtengo los datos de imagen de marca de agua si la hay
+                    let imageWatermark = req.files['imageWatermark'] ? req.files['imageWatermark'][0] : null
+                    if (imageWatermark) {
+                        deleteImage(null, `images/watermarks/${imageWatermark.filename}`)
+                    }
+                }
 
                 //Retornar errores
                 return res.status(400).json(errors)
@@ -710,7 +722,7 @@ async function newWatermark(watermarkPath, textColor, watermarkText, uuidExtraid
 //personalized true or false
 
 const setWatermark = async (imagePath, personalized, watermarkText, nameImageWatermark) => {
-    
+
     // Utilizando expresión regular para extraer el UUID
     const nameImage = imagePath.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
     // Verificando si se encontró una coincidencia y obteniendo el primer grupo capturado

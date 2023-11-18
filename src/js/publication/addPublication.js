@@ -64,10 +64,13 @@ $form.addEventListener("submit", function (e) {
         }
     })
         .then(response => {
+            debugger
             const publicationId = response.data.publicationId;
             //window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
+            debugger
+            console.log('catch')
             if (error.response && error.response.status === 400) {
                 console.log('Errores de validación:', error.response.data);
                 // Muestra los errores de validación en la interfaz de usuario
