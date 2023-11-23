@@ -70,7 +70,7 @@ const savePublication = async (req, res) => {
                     errors.push({ path: campo, msg: `${campo} no puede estar vacio` })
                 }
 
-                //Si es categoria entro a validar tambien entra si es distinto a tipo de venta unico ya que si es unico no necesita una licensia
+                //Si es categoria entro a validar tambien entra si es distinto a tipo de venta unico ya que si es unico no necesita una licencia
                 if (campo == 'category' || (campo == 'license' && req.body['typeSale'] != 'unique')) {
                     if (!(!!Number(req.body[campo]))) { //Si no es numero, ya que me tiene que enviar solo el id
                         errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
@@ -163,15 +163,15 @@ const savePublication = async (req, res) => {
 
         //Validar que exista esta licencia
         if (!rightOfUse && typeSale != 'unique') {
-            return res.status(400).json({ path: 'rightOfUse', msg: 'No existe la licensia que solicito' })
+            return res.status(400).json({ path: 'rightOfUse', msg: 'No existe la licencia que solicito' })
         }
 
-        //Validar que la licensia este disponible para el tipo de publicacion
+        //Validar que la licencia este disponible para el tipo de publicacion
         if (type == 'free' && !rightOfUse.free) {
-            return res.status(400).json({ path: 'rightOfUse', msg: 'La licensia no esta disponible para tipos de publicacion gratuita' })
+            return res.status(400).json({ path: 'rightOfUse', msg: 'La licencia no esta disponible para tipos de publicacion gratuita' })
         }
         else if ((type == 'sale' && typeSale == 'general') && !rightOfUse.general_sale) {
-            return res.status(400).json({ path: 'rightOfUse', msg: 'La licensia no esta disponible para tipos de publicacion de venta general' })
+            return res.status(400).json({ path: 'rightOfUse', msg: 'La licencia no esta disponible para tipos de publicacion de venta general' })
         }
 
         /*---Cierro Validar licencia ----*/

@@ -54,6 +54,11 @@ function validationImage($form, arrayErrors) {
     if (file.size === 0) {
         arrayErrors.push('image')
     }
+
+    if (file.size / (1024 * 1024) > 15) {
+        debugger
+        arrayErrors.push('imageMaxSize')
+    }
 }
 
 //Para mostrar los errores en los span
@@ -97,6 +102,10 @@ function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, sp
             case 'currency':
                 spanErrCurrency.textContent = error.msg || 'Ingrese un tipo de moneda valido'
                 spanErrCurrency.classList.remove('hidden')
+                break;
+            case 'imageMaxSize':
+                spanImg.textContent = error.msg || 'La imagen solo puede pesar hasta 15mb'
+                spanImg.classList.remove('hidden')
                 break;
             case 'critical':
                 alert('Atención: Algunos de los datos del formulario han sido modificados. Por favor, inicia sesión nuevamente')

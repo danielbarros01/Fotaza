@@ -2,6 +2,7 @@ import axios from 'axios'
 import { addTags } from './tags.js'
 import { checkFields, validationImage, viewErrors } from './create/validations.js'
 import renderImage from './create/renderImage.js'
+import { viewErrorsInAlert } from './create/errorsBackend.js'
 
 const $form = document.querySelector("#form")
 
@@ -48,7 +49,6 @@ $form.addEventListener("submit", function (e) {
     //valido que haya una imagen, si no agrego el nombre del campo a los errores
     validationImage($form, errors)
 
-    console.log(formData)
     if (errors.length > 0) {
         console.log(errors)
         return viewErrors(errors, null, $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
@@ -57,6 +57,7 @@ $form.addEventListener("submit", function (e) {
     //agrego el array de tags
     formData.append('tags', JSON.stringify(tags))
 
+    document.getElementById('sectionLoader').classList.remove('hidden')
 
     axios.post('/publications/create', formData, {
         headers: {
@@ -64,17 +65,18 @@ $form.addEventListener("submit", function (e) {
         }
     })
         .then(response => {
-            debugger
             const publicationId = response.data.publicationId;
             //window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
-            debugger
-            console.log('catch')
+            
+            document.getElementById('sectionLoader').classList.add('hidden')
+
             if (error.response && error.response.status === 400) {
                 console.log('Errores de validación:', error.response.data);
                 // Muestra los errores de validación en la interfaz de usuario
                 viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
+                viewErrorsInAlert(error.response.data)
             } else {
                 console.error('Error al enviar la solicitud:', error);
             }
