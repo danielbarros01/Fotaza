@@ -66,7 +66,7 @@ $form.addEventListener("submit", function (e) {
     })
         .then(response => {
             const publicationId = response.data.publicationId;
-            //window.location.href = `/publications/${publicationId}`
+            window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
             

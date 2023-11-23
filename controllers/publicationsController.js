@@ -268,9 +268,9 @@ const savePublication = async (req, res) => {
                 } else {
                     setWatermark(imagePath, true, textWatermark)
                 }
-            } else {
-                setWatermark(imagePath, false)
             }
+        } else {
+            setWatermark(imagePath, false)
         }
 
 
@@ -773,7 +773,7 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
         //Eliminar logo para la marca de agua que cargo el usuario
         if (nameImageWatermark) deleteImage(null, watermarkPath)
         //Eliminar texto para la marca de agua que cargo el usuario
-        deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
+        if (personalized) deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
 
     } catch (error) {
         console.log(error)
@@ -782,7 +782,7 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
         if (nameImageWatermark) deleteImage(null, `images/watermarks/${nameImageWatermark}`)
 
         //Eliminar texto para la marca de agua que cargo el usuario
-        deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
+        if (personalized) deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
     }
 }
 
