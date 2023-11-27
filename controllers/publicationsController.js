@@ -3,7 +3,7 @@ import db from '../config/db.js'
 import sharp from 'sharp'
 import svg2img from 'svg2img'
 
-import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment } from '../models/Index.js'
+import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest } from '../models/Index.js'
 import fs from 'fs'
 import path from 'path'
 import { routeImages } from '../config/generalConfig.js'
@@ -18,10 +18,100 @@ const __dirname = path.dirname(__filename);
 
 
 // GET /publications
-const viewPublications = (req, res) => {
-    res.render('publications/home', {
-        pagina: 'Home'
-    })
+const viewPublications = async (req, res) => {
+    //Traer usuario de req
+    const { user } = req
+
+    //Verificar que haya usuario
+    try {
+        let publications
+
+        /* USUARIO NO AUTENTICADO */
+        //Si el usuario no esta autenticado devolver publicaciones publicas
+        if (!user) {
+            publications = await Publication.findAll({
+                where: {
+                    privacy: 'public'
+                },
+                order: [
+                    ['qualification', 'DESC'],
+                    ['date', 'DESC']
+                ],
+                include: [
+                    { model: Category, as: 'category' },
+                    {
+                        model: User, as: 'user', attributes: {
+                            exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                        }
+                    }
+                ],
+                limit: 10
+            })
+
+        }
+        /* -- */
+
+        /* USUARIO AUTENTICADO */
+
+        //Traigo sus intereses
+        const interests = await Interest.findAll({
+            where: { userId: req.user.id },
+            include: [{ model: Category, as: 'category' }],
+            raw: true,
+            attributes: ['category.name']
+        })
+
+        //Solo me interesa el nombre de la categoria
+        const categoryNames = interests.map(interest => interest['category.name'])
+        let ordenConsulta = []
+
+        /* Traigo sus intereses, si no tiene intereses, traigo las publicaciones mejor calificadas mas recientes */
+        if (categoryNames.length > 0) {
+            ordenConsulta =
+                [
+                    [Sequelize.literal(`CASE WHEN category.name IN (${categoryNames.map(name => `'${name}'`).join(',')}) THEN 0 ELSE 1 END`), 'ASC'],
+                    ['date', 'DESC']
+                ]
+
+        } else {
+            ordenConsulta =
+                [
+                    ['qualification', 'DESC'],
+                    ['date', 'DESC']
+                ]
+        }
+
+        //Traigo las publicaciones
+        publications = await Publication.findAll({
+            where: {
+                [Op.or]: [{ privacy: 'public' }, { privacy: 'protected' }, { privacy: 'private' }],
+            },
+            include: [
+                { model: Category, as: 'category' },
+                {
+                    model: User, as: 'user', attributes: {
+                        exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                    }
+                }
+            ],
+            order: ordenConsulta,
+            limit: 10
+        })
+        /* -- */
+    } catch (error) {
+
+    }
+
+
+    //Traer publicaciones publicas o protegidas
+    //Traer segun sus intereses
+    //Si no tiene intereses segun fecha y calificacion de publicacion
+
+    //Traer publicaciones solamente publicas con marca de agua
+
+    /*La ruta de imagen con marca de agua o sin marca de agua se decide en el controlador de devolucion de imagen*/
+
+    //Devolver json
 }
 
 // GET /publications/create
@@ -103,8 +193,9 @@ const savePublication = async (req, res) => {
                 }
 
                 //price de tipo numero
-                const price = req.body['price']
-
+                const priceWithCommas = req.body['price']
+                const price = parseFloat(priceWithCommas.replace(/[,.]/g, ''));
+        
                 if (isNaN(price) || price <= 0 || price > 4000000) {
                     errors.push({ path: 'price', msg: `Debe ingresar un numero valido mayor a 0 y menor a 4 millones` })
                 }
@@ -218,7 +309,7 @@ const savePublication = async (req, res) => {
             //Si es de tipo sale hace falta: typeSale, price y currency
             if (type == 'sale') {
                 camposPublication.typeSale = req.body['typeSale']
-                camposPublication.price = req.body['price']
+                camposPublication.price = parseFloat(req.body['price'].replace(/[,.]/g, ''));
                 camposPublication.currency = req.body['currency']
 
                 publication = await Publication.create(camposPublication)
@@ -252,7 +343,7 @@ const savePublication = async (req, res) => {
         /*---Abro marcas de agua ----*/
         let imageWatermark
 
-        if ((type == 'sale' && typeSale == 'unique') || rightOfUse.name == 'Copyright') {
+        if ((type == 'sale' || typeSale == 'unique') || rightOfUse.name == 'Copyright') {
             //Si elegi marca de agua personalizada
             if (optionWatermark == 'customized') {
                 //El texto es obligatorio, asi que debo validar que exista
@@ -268,6 +359,8 @@ const savePublication = async (req, res) => {
                 } else {
                     setWatermark(imagePath, true, textWatermark)
                 }
+            } else {
+                setWatermark(imagePath, false)
             }
         } else {
             setWatermark(imagePath, false)

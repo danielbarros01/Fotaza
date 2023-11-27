@@ -10,6 +10,9 @@ $btnClose.addEventListener('click', () => {
 })
 
 function viewErrorsInAlert(errors){
+    //limpiar alert
+    $errorsBackend.innerHTML = ""
+
     errors.forEach(error => {
         const li = document.createElement('li')
         li.textContent = error.msg

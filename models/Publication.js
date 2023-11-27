@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize'
-import User from './User.js'
+
 import db from '../config/db.js'
 
 const Publication = db.define('publications', {
@@ -38,12 +38,17 @@ const Publication = db.define('publications', {
         field: 'type_sale'
     },
     price: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: true
     },
     currency: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    qualification: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+        defaultValue: 0
     }
 })
 

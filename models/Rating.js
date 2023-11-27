@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize'
 import db from '../config/db.js'
 import User from './User.js'
 import Publication from './Publication.js'
+import saveQualification from '../helpers/saveQualification.js'
 
 const Rating = db.define('ratings', {
     userId: {
@@ -28,6 +29,18 @@ const Rating = db.define('ratings', {
         validate: {
             min: 1,
             max: 5
+        }
+    }
+}, {
+    hooks: {
+        afterCreate: async function (rating) {
+            saveQualification(rating)
+        },
+        afterUpdate: async function (rating) {
+            saveQualification(rating)
+        },
+        afterDestroy: async function (rating) {
+            saveQualification(rating)
         }
     }
 })

@@ -33,15 +33,6 @@ const home = async (req, res) => {
             })
 
 
-            //Guardar todos los nombres de las imagenes
-            const nameImages = publications.map(publication => publication.image)
-
-            //Traer de la carpeta todas las imagenes
-
-
-            //Aplicarles marca de agua
-            //Guardarlas en un nuevo array
-
 
             return res.render('inicio', {
                 viewBtnsAuth: true,
@@ -62,6 +53,22 @@ const home = async (req, res) => {
 
         const categoryNames = interests.map(interest => interest['category.name'])
 
+        let orden = []
+
+        if (categoryNames.length > 0) {
+            orden =
+                [
+                    [Sequelize.literal(`CASE WHEN category.name IN (${categoryNames.map(name => `'${name}'`).join(',')}) THEN 0 ELSE 1 END`), 'ASC'],
+                    ['date', 'DESC']
+                ]
+
+        } else {
+            orden =
+                [
+                    ['date', 'DESC']
+                ]
+        }
+
         publications = await Publication.findAll({
             where: {
                 [Op.or]: [{ privacy: 'public' }, { privacy: 'protected' }],
@@ -77,12 +84,16 @@ const home = async (req, res) => {
                     }
                 }
             ],
-            order: [
-                [Sequelize.literal(`CASE WHEN category.name IN (${categoryNames.map(name => `'${name}'`).join(',')}) THEN 0 ELSE 1 END`), 'ASC'],
-                ['date', 'DESC']
-            ],
+            order: orden,
             limit: 6
         })
+
+        const publicationsWithQualification =
+            await Promise.all(
+                publications.map(async p => {
+                    const qualification = await p.qualification
+                    return { ...p.get(), qualification }
+                }))
 
 
         res.render('inicio', {
@@ -91,7 +102,7 @@ const home = async (req, res) => {
             imageUrl: "/img/backgrounds/fondo6.jpg",
             nameUserPhoto: "Khaled Ali",
             csrfToken: req.csrfToken(),
-            publications
+            publications: publicationsWithQualification
         })
     } catch (error) {
         console.log(error)
