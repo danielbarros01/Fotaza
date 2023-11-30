@@ -42,6 +42,9 @@ Interest.belongsTo(Category, { foreignKey: 'category_id', as: 'category' })
 /* Publicacion tiene un usuario */
 Publication.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
 
+/* Publicacion tiene una licencia */
+Publication.belongsTo(RightOfUse, { foreignKey: 'rights_of_use_id', as: 'license' })
+
 export {
     Interest,
     Category,

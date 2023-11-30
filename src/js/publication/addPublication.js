@@ -79,6 +79,7 @@ $form.addEventListener("submit", function (e) {
                 viewErrorsInAlert(error.response.data)
             } else {
                 console.error('Error al enviar la solicitud:', error);
+                viewErrorsInAlert(error.response.data)
             }
         });
 })

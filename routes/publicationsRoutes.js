@@ -4,7 +4,7 @@ import {
     viewPublications, createPublication, savePublication, viewMyPublications,
     viewPublication, downloadImage, editPublication, deletePublication
 } from '../controllers/publicationsController.js'
-
+import { Publication, RightOfUse } from '../models/Index.js'
 import protectRoute from '../Middlewares/protectRoute.js'
 import authenticateUser from "../Middlewares/authenticateUser.js"
 import upload from "../Middlewares/uploadImage.js"
@@ -50,9 +50,48 @@ router.delete('/:id', authenticateUser, deletePublication)
 
 
 //Devolver imagenes
-router.get('/image/watermarked/:id', (req, res) => {
+router.get('/image/:id', authenticateUser, async (req, res) => {
+    //Traer usuario
+    const { user } = req
     const baseDir = path.resolve(__dirname, '..');
-    res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);
+
+    try {
+        //Buscar la publicacion
+        const publication = await Publication.findOne({ where: { image: req.params.id }, include: { model: RightOfUse, as: 'license' } })
+
+        //Si no estoy autenticado
+        if (!user) {
+
+            //Verificar que la imagen sea solo publica
+            if (publication.privacy != 'public') {
+                return res.status(403).send({ msg: 'No tienes permiso para visualizar esta imagen' })
+            }
+            //--
+
+            //Devolver con marca de agua
+            res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
+        } else {
+            //Si es copyright o venta unica mostrar con marca de agua
+            if ((publication.license.name.toLowerCase() == 'copyright')
+                || (publication.type == 'sale' && publication.typeSale == 'unique')) {
+                    res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
+            } else {
+                //Mostrar sin marca de agua
+                res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);
+            }
+        }
+    } catch (error) {
+        console.error(error)
+        res.status(500).send({ msg: 'Hubo un error de nuestra parte' })
+    }
+
+
+
+
+    //Si estoy autenticado
+
+
+    //res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);
 });
 
 

@@ -45,9 +45,10 @@ const viewPublications = async (req, res) => {
                         }
                     }
                 ],
-                limit: 10
+                limit: 2
             })
 
+            return res.status(200).json(publications)
         }
         /* -- */
 
@@ -98,6 +99,9 @@ const viewPublications = async (req, res) => {
             limit: 10
         })
         /* -- */
+
+
+        return res.status(200).json(publications)
     } catch (error) {
 
     }
@@ -195,7 +199,7 @@ const savePublication = async (req, res) => {
                 //price de tipo numero
                 const priceWithCommas = req.body['price']
                 const price = parseFloat(priceWithCommas.replace(/[,.]/g, ''));
-        
+
                 if (isNaN(price) || price <= 0 || price > 4000000) {
                     errors.push({ path: 'price', msg: `Debe ingresar un numero valido mayor a 0 y menor a 4 millones` })
                 }
@@ -281,46 +285,78 @@ const savePublication = async (req, res) => {
         /*---Abro campos a guardar ----*/
         //Publicacion a crear
         let publication
-        {
-            //Campos base, los que se guardan si o si
-            let camposPublication = {
-                image: filename,
-                title,
-                date: new Date(),
-                format: mimetype,
-                resolution,
-                privacy, //que el usuario elija si quiere ocultar una foto
-                category_id,
-                user_id: id,
-                type
-            }
 
-            // Guardar licencia si no es unique
-            if (type == 'free' || (type == 'sale' && typeSale != 'unique')) {
-                camposPublication.rights_of_use_id = rightOfUse.id
-            }
-
-            //si es copyright o tipo de venta unica debe ser privada
-            //si es copyright o unique validar si viene la opcion de marca de agua personalizada
-            if ((type == 'sale' && typeSale == 'unique') || rightOfUse.name == 'Copyright') {
-                camposPublication.privacy = 'private'
-            }
-
-            //Si es de tipo sale hace falta: typeSale, price y currency
-            if (type == 'sale') {
-                camposPublication.typeSale = req.body['typeSale']
-                camposPublication.price = parseFloat(req.body['price'].replace(/[,.]/g, ''));
-                camposPublication.currency = req.body['currency']
-
-                publication = await Publication.create(camposPublication)
-            }
-            else if (type == 'free') {
-                //Guardar publicacion
-                publication = await Publication.create(camposPublication)
-            }
+        //Campos base, los que se guardan si o si
+        let camposPublication = {
+            image: filename,
+            title,
+            date: new Date(),
+            format: mimetype,
+            resolution,
+            privacy, //que el usuario elija si quiere ocultar una foto
+            category_id,
+            user_id: id,
+            type
         }
+
+        // Guardar licencia si no es unique
+        if (type == 'free' || (type == 'sale' && typeSale != 'unique')) {
+            camposPublication.rights_of_use_id = rightOfUse.id
+        }
+
+        //si es copyright o tipo de venta unica debe ser privada
+        //si es copyright o unique validar si viene la opcion de marca de agua personalizada
+        if ((type == 'sale' && typeSale == 'unique') || rightOfUse.name == 'Copyright') {
+            camposPublication.privacy = 'private'
+        }
+
+        //Si es de tipo sale hace falta: typeSale, price y currency
+        if (type == 'sale') {
+            camposPublication.typeSale = req.body['typeSale']
+            camposPublication.price = parseFloat(req.body['price'].replace(/[,.]/g, ''));
+            camposPublication.currency = req.body['currency']
+
+        }
+
         /*---Cierro campos a guardar ----*/
 
+
+        /*---Abro marcas de agua ----*/
+        let imageWatermark
+
+        if ((type == 'sale' || typeSale == 'unique') || rightOfUse.name == 'Copyright') {
+            //Si elegi marca de agua personalizada
+            if (optionWatermark == 'customized') {
+                //El texto es obligatorio, asi que debo validar que exista
+                if (!textWatermark) return res.status(400).json({ path: 'watermarkText', msg: 'Debe ingresar un texto para una marca de agua personalizada' })
+
+                //Obtengo los datos de imagen si la hay
+                imageWatermark = req.files['imageWatermark'] ? req.files['imageWatermark'][0] : null
+
+                if (imageWatermark) {
+                    const { filename } = imageWatermark
+                    //y si no viene imagen?
+                    const watermark = await setWatermark(imagePath, true, textWatermark, filename)
+
+                    if (!watermark) throw new Error('Error al generar la imagen con la marca de agua')
+                } else {
+                    const watermark = await setWatermark(imagePath, true, textWatermark)
+
+                    if (!watermark) throw new Error('Error al generar la imagen con la marca de agua')
+                }
+            } else {
+                const watermark = await setWatermark(imagePath, false)
+
+                if (!watermark) throw new Error('Error al generar la imagen con la marca de agua')
+            }
+        } else {
+            const watermark = await setWatermark(imagePath, false)
+
+            if (!watermark) throw new Error('Error al generar la imagen con la marca de agua')
+        }
+
+        /*--- Guardar publicacion ---*/
+        publication = await Publication.create(camposPublication)
 
         /*---Abro etiquetas ----*/
         const tagsBD = [] //instancias de tag
@@ -340,33 +376,6 @@ const savePublication = async (req, res) => {
         /*---Cierro etiquetas ----*/
 
 
-        /*---Abro marcas de agua ----*/
-        let imageWatermark
-
-        if ((type == 'sale' || typeSale == 'unique') || rightOfUse.name == 'Copyright') {
-            //Si elegi marca de agua personalizada
-            if (optionWatermark == 'customized') {
-                //El texto es obligatorio, asi que debo validar que exista
-                if (!textWatermark) return res.status(400).json({ path: 'watermarkText', msg: 'Debe ingresar un texto para una marca de agua personalizada' })
-
-                //Obtengo los datos de imagen si la hay
-                imageWatermark = req.files['imageWatermark'] ? req.files['imageWatermark'][0] : null
-
-                if (imageWatermark) {
-                    const { filename } = imageWatermark
-                    //y si no viene imagen?
-                    setWatermark(imagePath, true, textWatermark, filename)
-                } else {
-                    setWatermark(imagePath, true, textWatermark)
-                }
-            } else {
-                setWatermark(imagePath, false)
-            }
-        } else {
-            setWatermark(imagePath, false)
-        }
-
-
         res.status(201).json({ publicationId: publication.id })
     } catch (error) {
         //Si ocurrio un erro tambien eliminar la imagen
@@ -377,6 +386,12 @@ const savePublication = async (req, res) => {
         if (imageWatermark) deleteImage(null, `images/watermarks/${imageWatermark.filename}`)
 
         console.error(error)
+
+        //Eliminar publicacion y todo lo relacionada a ella
+
+        /*  */
+
+        return res.status(500).json([{ path: '-', msg: 'Hemos tenido un error al procesar tu solicitud, intenta nuevamente más tarde' }]);
     }
 }
 
@@ -464,7 +479,7 @@ const viewPublication = async (req, res) => {
                 category,
                 recomendations,
                 csrfToken: req.csrfToken(),
-                imageUrl: `/publications/image/watermarked/${publication.image}`,
+                imageUrl: `/publications/image/${publication.image}`,
             })
         }
 
@@ -485,7 +500,7 @@ const viewPublication = async (req, res) => {
             rightsOfUse,
             myId: user.id ?? '',
             csrfToken: req.csrfToken(),
-            imageUrl: `/publications/image/watermarked/${publication.image}`,
+            imageUrl: `/publications/image/${publication.image}`,
         })
     } catch (error) {
         console.error(error)
@@ -708,7 +723,6 @@ async function getDimensions(watermarkPath) {
     return { width: watermarkWidth, height: watermarkHeight }
 }
 
-
 // Combinar la imagen de marca de agua y el texto en una nueva imagen
 async function newWatermark(watermarkPath, textColor, watermarkText, uuidExtraido) {
     try {
@@ -809,8 +823,6 @@ async function newWatermark(watermarkPath, textColor, watermarkText, uuidExtraid
     }
 }
 
-
-
 //function helper
 //personalized true or false
 
@@ -855,7 +867,18 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
         //Marca de agua por defecto
         else {
             watermarkPath = 'images/watermarks/watermarkDefault.png'; // Ruta de tu marca de agua
-            watermarkImageBuffer = await image.composite([{ input: watermarkPath, tile: true }]).toBuffer()
+
+            let imgInfo = await image.metadata()
+
+            let imageBuffer = await sharp(watermarkPath)
+                .resize({
+                    height: imgInfo.height / 2, // Altura deseada
+                    fit: sharp.fit.contain,
+                    background: { r: 0, g: 0, b: 0, alpha: 0 } // Fondo transparente
+                })
+                .toBuffer();
+
+            watermarkImageBuffer = await image.composite([{ input: imageBuffer, tile: true }]).toBuffer()
         }
 
         // Guardar la imagen con marca de agua en la carpeta deseada
@@ -868,6 +891,7 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
         //Eliminar texto para la marca de agua que cargo el usuario
         if (personalized) deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
 
+        return true
     } catch (error) {
         console.log(error)
 
@@ -876,6 +900,8 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
 
         //Eliminar texto para la marca de agua que cargo el usuario
         if (personalized) deleteImage(null, `images/watermarks/text-${uuidExtraido}.png`)
+
+        return false
     }
 }
 

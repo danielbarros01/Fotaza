@@ -1,5 +1,5 @@
 import { Op, Sequelize } from 'sequelize'
-import { Publication, Category, Interest, User } from '../models/Index.js'
+import { Publication, Category, Interest, User, RightOfUse } from '../models/Index.js'
 
 import fs from 'fs'
 import path from 'path'
