@@ -28,6 +28,7 @@ export default {
         picturesAccount: './src/js/user/picturesAccount.js',
         coverAccount: './src/js/user/coverAccount.js',
         getResolution: './src/js/helpers/getResolution.js',
+        homePublications: './src/js/publications/homePublications.js',
     },
     output:{
         filename: '[name].js',

@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import db from '../config/db.js'
 import sharp from 'sharp'
 import svg2img from 'svg2img'
@@ -22,14 +22,17 @@ const viewPublications = async (req, res) => {
     //Traer usuario de req
     const { user } = req
 
+    //Valores para la paginacion
+    const { page = 0, size = 5 } = req.query
+
     //Verificar que haya usuario
     try {
-        let publications
+        //let publications
 
         /* USUARIO NO AUTENTICADO */
         //Si el usuario no esta autenticado devolver publicaciones publicas
         if (!user) {
-            publications = await Publication.findAll({
+            const { count, rows: publications } = await Publication.findAndCountAll({
                 where: {
                     privacy: 'public'
                 },
@@ -45,10 +48,11 @@ const viewPublications = async (req, res) => {
                         }
                     }
                 ],
-                limit: 2
+                limit: +size,
+                offset: (+page) * (+size)
             })
 
-            return res.status(200).json(publications)
+            return res.status(200).json({ status: 'success', total: count, publications })
         }
         /* -- */
 
@@ -83,9 +87,19 @@ const viewPublications = async (req, res) => {
         }
 
         //Traigo las publicaciones
-        publications = await Publication.findAll({
+        const { count, rows: publications } = await Publication.findAndCountAll({
             where: {
-                [Op.or]: [{ privacy: 'public' }, { privacy: 'protected' }, { privacy: 'private' }],
+                [Op.or]: [
+                    { privacy: 'public' },
+                    { privacy: 'protected' },
+                    {
+                        /* Si es privado pero no esta a la venta, solo la puede visualizar el usuario */
+                        [Op.and]: [
+                            { privacy: 'private' },
+                            { type: 'sale' }
+                        ]
+                    }
+                ],
             },
             include: [
                 { model: Category, as: 'category' },
@@ -96,14 +110,16 @@ const viewPublications = async (req, res) => {
                 }
             ],
             order: ordenConsulta,
-            limit: 10
+            limit: +size,
+            offset: (+page) * (+size)
         })
         /* -- */
 
 
-        return res.status(200).json(publications)
+        return res.status(200).json({ status: 'success', total: count, publications })
     } catch (error) {
-
+        console.error(error)
+        return res.status(500).json({ status: 'error' })
     }
 
 
@@ -419,11 +435,15 @@ const viewPublication = async (req, res) => {
 
         /* Las imágenes protegidas podrán solo ser accedidas por usuarios autenticados */
         //No esta autenticado
-        if (!user && !publication.privacy == 'public') { //la publicacion es publica?
+        if (!user && publication.privacy != 'public') { //la publicacion es publica?
             return res.status(401).send('Solo usuarios registrados pueden ver esta publicacion')
-        } else if (user && (publication.privacy == 'private' && user.id != userPost.id)) {
-            return res.status(401).send('Esta publicación es privada')
+        } else if (user && (publication.privacy == 'private' && publication.type != 'sale')) {
+            if (user.id != userPost.id) {
+                return res.status(401).send('Esta publicación es privada')
+            }
         }
+
+        // || (publication.privacy == 'private' && publication.type != 'sale')
 
         //Obtenemos los demas datos
         const tags = await publication.getTags()
@@ -479,7 +499,6 @@ const viewPublication = async (req, res) => {
                 category,
                 recomendations,
                 csrfToken: req.csrfToken(),
-                imageUrl: `/publications/image/${publication.image}`,
             })
         }
 
@@ -872,13 +891,13 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
 
             let imageBuffer = await sharp(watermarkPath)
                 .resize({
-                    height: imgInfo.height / 2, // Altura deseada
+                    height: Math.round(imgInfo.height / 2), // Altura deseada
                     fit: sharp.fit.contain,
                     background: { r: 0, g: 0, b: 0, alpha: 0 } // Fondo transparente
                 })
                 .toBuffer();
 
-            watermarkImageBuffer = await image.composite([{ input: imageBuffer, tile: true }]).toBuffer()
+            watermarkImageBuffer = await image.composite([{ input: imageBuffer, tile: true}]).toBuffer()
         }
 
         // Guardar la imagen con marca de agua en la carpeta deseada

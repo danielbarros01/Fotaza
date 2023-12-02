@@ -1,10 +1,12 @@
 extends ./layout/index
 
+block styles 
+
 block contenido
-    div(class="h-screen flex flex-col")
+    main(class="min-h-screen flex flex-col")
         include ./layout/header
 
-        main
+        div
             //- Seccion buscador
             section(class="h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center" style=`background-image: url(${imageUrl})`)
                 div.flex.items-center.flex-col
@@ -22,30 +24,37 @@ block contenido
                     span.font-bold= nameUserPhoto
 
             //- Seccion fotos en general
-            
             section#images(class="lg:columns-3 columns-2xs gap-4 my-8 space-y-4 max-w-7xl m-auto") 
-                each publication in publications
-                    div(class="relative group")
-                        a(href=`/publications/${publication.id}` target="_blank" class="relative block overflow-hidden") 
+            
+            .loader(class="w-full grid place-content-center mb-2 hidden")
+                img(src="/img/project/spinning-circles.svg" class="")
 
-                            img(src=`/uploads/${publication.image}` alt=`Imagen ${publication.title}` class="w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
+            //pre= JSON.stringify(publications,undefined,2)
 
-                            div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full h-full p-2 flex flex-col justify-between transition-all duration-500 opacity-0 group-hover:opacity-100") 
-                                
-                            //- info creador
-                            div(class="absolute top-0 transition-all duration-500 opacity-0 group-hover:opacity-100 p-2")
-                                a(href=`/users/${publication.user.username}` class="hover:underline text-white flex items-center gap-2") 
-                                    img(src=`/img/profiles/${publication.user.image_url}` alt=`Imagen de usuario ${publication.user.username}` class="w-9 h-8 rounded-full")
-                                    span(class="text-white text-xs")= publication.user.name 
+    template#publication
+        div(class="relative group")
+            a.linkPublication(target="_blank" class="relative block overflow-hidden cursor-pointer") 
+
+                img.principalImage(class="w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
+
+                div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full h-full p-2 flex flex-col justify-between transition-all duration-500 opacity-0 group-hover:opacity-100") 
+                    
+                //- info creador
+                div(class="absolute top-0 transition-all duration-500 opacity-0 group-hover:opacity-100 p-2")
+                    a.linkUser(class="hover:underline text-white flex items-center gap-2") 
+                        img.imgProfileUser(class="w-9 h-8 rounded-full")
+                        span.name(class="text-white text-xs")
 
 
-                            //- info nombre de imagen y categoria
-                            div(class="absolute bottom-0 flex justify-between items-center transition-all duration-500 opacity-0 group-hover:opacity-100 w-full p-2")
-                                span(class="text-white")= publication.title
+                //- info nombre de imagen y categoria
+                div(class="absolute bottom-0 flex justify-between items-center transition-all duration-500 opacity-0 group-hover:opacity-100 w-full p-2")
+                    span.title(class="text-white")
 
-                                a(href="#") 
-                                    div(class="flex flex-col items-center") 
-                                        img(src=`/img/backgroundsCategories/${publication.category.image}` alt=`Imagen de categoria ${publication.category.name}` class="w-9 h-8 rounded-full")
-                                        span(class="text-white text-xs")= publication.category.name 
+                    a(href="#") 
+                        div(class="flex flex-col items-center") 
+                            img.categoryImage(class="w-9 h-8 rounded-full")
+                            span.categoryName(class="text-white text-xs")
 
-            pre= JSON.stringify(publications,undefined,2)
+
+block scripts
+    script(src="/js/homePublications.js")

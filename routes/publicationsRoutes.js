@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const router = express.Router()
 
 // GET /publications
-router.get('/', viewPublications)
+router.get('/', authenticateUser, viewPublications)
 
 // GET /publications/create
 router.get('/create', protectRoute, createPublication)
@@ -73,7 +73,7 @@ router.get('/image/:id', authenticateUser, async (req, res) => {
         } else {
             //Si es copyright o venta unica mostrar con marca de agua
             if ((publication.license.name.toLowerCase() == 'copyright')
-                || (publication.type == 'sale' && publication.typeSale == 'unique')) {
+                || (publication.type == 'sale' /* && publication.typeSale == 'unique' */)) {
                     res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
             } else {
                 //Mostrar sin marca de agua
