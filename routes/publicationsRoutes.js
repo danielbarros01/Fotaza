@@ -2,7 +2,7 @@ import express from 'express'
 
 import {
     viewPublications, createPublication, savePublication, viewMyPublications,
-    viewPublication, downloadImage, editPublication, deletePublication
+    viewPublication, downloadImage, editPublication, deletePublication, viewPublicationsOf
 } from '../controllers/publicationsController.js'
 import { Publication, RightOfUse } from '../models/Index.js'
 import protectRoute from '../Middlewares/protectRoute.js'
@@ -34,12 +34,13 @@ router.post('/create', protectRoute, upload.fields([{ name: 'image', maxCount: 1
 router.get('/my-posts', protectRoute, viewMyPublications)
 
 // GET /publications/:id
-//Si el post es publico lo puede ver cualquiera
-//Si el post es mio lo puedo modificar
 router.get('/:id', authenticateUser, viewPublication)
 
+//GET /publications/@dani?type=sale
+router.get('/user/:username', authenticateUser, viewPublicationsOf)
+
 // GET /publications/:id/download 
-router.get('/:id/download', downloadImage)
+router.get('/:id/download', protectRoute, downloadImage)
 
 //PATCH /publications/:id
 router.patch('/:id', authenticateUser, editPublication)

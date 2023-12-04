@@ -134,6 +134,67 @@ const viewPublications = async (req, res) => {
     //Devolver json
 }
 
+//GET /publications/@user?tipo
+const viewPublicationsOf = async (req, res) => {
+    const { user } = req
+    const { username } = req.params
+    const { type = 'all', page = 0 } = req.query
+    const { per_page = 4 } = req.headers;
+
+    try {
+        const userProfile = await User.findOne({ where: { username } })
+
+        if (!userProfile) {
+            return res.status(404).json({ status: '404 Not Found', msg: 'No se encontro al usuario' })
+        }
+
+        let options = {
+            user_id: userProfile.id,
+            //Si es unique o general que busque en typeSale, o si no es all, que no agregue el filtro de busqueda por tipo
+            ...(
+                ((type == 'unique' || type == 'general') && { typeSale: type })
+                ||
+                (type != 'all' && { type: type })
+            )
+        }
+
+        //Si el perfil no es el mio
+        if (user.id !== userProfile.id) {
+            /*El perfil de usuario no es el mio
+                Solo se pueden ver las privadas que no sean de tipo publica
+                Op.ne = no es igual a
+                */
+
+            options = {
+                ...options,
+                [Op.and]: [
+                    {
+                        [Op.or]: [
+                            { privacy: 'private', type: { [Op.ne]: 'free' } },
+                            { privacy: { [Op.in]: ['public', 'protected'] } },
+                        ],
+                    },
+                ],
+            }
+        }
+
+        let { count, rows: publications } = await Publication.findAndCountAll(
+            {
+                where: options,
+                order: [['date_and_time', 'DESC']],
+                include: [{ model: Category, as: 'category' }],
+                limit: +per_page,
+                offset: (+page) * (+per_page)
+            })
+
+        return res.status(200).json({ status: '200 success', count, publications })
+    }
+    catch (error) {
+        console.error(error)
+        return res.status(500).json({ status: '500 error' })
+    }
+}
+
 // GET /publications/create
 const createPublication = async (req, res) => {
     const categories = await Category.findAll()
@@ -536,8 +597,15 @@ const downloadImage = async (req, res) => {
     }
 
     const fileName = publication.image
-    const filePath = path.join(process.cwd(), 'public', 'uploads', fileName)
+    let filePath
 
+    //Si la imagen no es de venta descargar imagen sin marca de agua
+    if (publication.type != 'sale') {
+        filePath = path.join(process.cwd(), 'images', 'uploads', fileName)
+    } else {
+        //Si la imagen es de venta descargar con marca de agua
+        filePath = path.join(process.cwd(), 'images', 'uploadsWithWatermark', `watermark_${fileName}`)
+    }
 
     res.download(filePath, fileName, (err) => {
         if (err) {
@@ -897,7 +965,7 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
                 })
                 .toBuffer();
 
-            watermarkImageBuffer = await image.composite([{ input: imageBuffer, tile: true}]).toBuffer()
+            watermarkImageBuffer = await image.composite([{ input: imageBuffer, tile: true }]).toBuffer()
         }
 
         // Guardar la imagen con marca de agua en la carpeta deseada
@@ -926,6 +994,7 @@ const setWatermark = async (imagePath, personalized, watermarkText, nameImageWat
 
 export {
     viewPublications,
+    viewPublicationsOf,
     createPublication,
     savePublication,
     viewMyPublications,

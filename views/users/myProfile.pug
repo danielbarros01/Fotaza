@@ -2,6 +2,7 @@ extends ../layout/index
 
 block styles 
     meta(name="csrf-token" content= csrfToken)
+    meta(name="username" content= userProfile.username)
     link(rel="stylesheet", href="/css/navOptionsPhotos.css")
 
 block contenido
@@ -13,7 +14,7 @@ block contenido
                 div#coverPhoto(class="h-64")
                     img(src=userProfile.cover_url ? `/img/covers/${userProfile.cover_url}` : '/img/covers/greenViolet.png' alt="Imagen de portada" class="h-full w-full") 
                 div#profilePicture(class="absolute top-2/3 left-[3%] w-36 h-36 border-4 border-polished-white")
-                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="w-full h-full")
+                    img(src=userProfile.image_url ? `/img/profiles/${userProfile.image_url}` : '/img/profiles/profilePredeterminated.png' alt="Imagen de perfil" class="w-full h-full")
 
                 //- Mostrar editar perfil si soy yo mismo
                 if user && user.id == userProfile.id
@@ -30,53 +31,68 @@ block contenido
             button(class="border border-transparent bg-gray-300 text-principal-gray w-40 py-2 px-3 flex justify-between items-center rounded-xl")            
                 i(class="fa-solid fa-image text-3xl font-bold")
                 span(class="text-2xl font-bold") Fotos
-                span#textCountPhotos(class="text-lg text-secondary-gray") 4
+                span#textCountPhotos(class="text-lg text-secondary-gray") .
         
-        section#photos(class="mt-6 mx-[3%]")  
-            #navOptionsPhotos 
+        section#photos(class="mt-6 px-11")  
+            #navOptionsPhotos(class="") 
                 //OPCION 1 - Fotos publicas
-                input(type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked)
+                input(type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" value="all" checked)
                 label(for="slide-item-1")
-                    p.icon Públicas
-                        span= publications.length
-                //OPCION 2 - Fotos de venta general
-                input(type="radio" name="slideItem" id="slide-item-2" class="slide-toggle")
+                    p.icon Todas
+
+                //OPCION 1 - Fotos publicas
+                input(type="radio" name="slideItem" id="slide-item-2" class="slide-toggle" value="free")
                 label(for="slide-item-2")
-                    p.icon Venta General
-                        span 0
-                //OPCION 1 - Fotos de venta unica
-                input(type="radio" name="slideItem" id="slide-item-3" class="slide-toggle")
+                    p.icon Públicas
+
+                //OPCION 2 - Fotos de venta general
+                input(type="radio" name="slideItem" id="slide-item-3" class="slide-toggle" value="general")
                 label(for="slide-item-3")
+                    p.icon Venta General
+
+                //OPCION 3 - Fotos de venta unica
+                input(type="radio" name="slideItem" id="slide-item-4" class="slide-toggle" value="unique")
+                label(for="slide-item-4")
                     p.icon Unicas
-                        span 0
 
                 .clear 
                 .slider
                     .bar    
 
             //- pre= JSON.stringify(publications,undefinde,2)
+            div(class="relative lg:max-w-7xl 2xl:max-w-none m-auto")
+                #images(class="2xl:columns-4 lg:columns-3 columns-2xs gap-4 my-4 space-y-4 min-h-[100px]") 
+                .loader(class="absolute top-10 left-0 w-full grid place-content-center mb-2 transform transition-all duration-1000")
+                    img(src="/img/project/spinning-circles.svg" class="")
+                span(class="absolute top-0 w-full h-full grid place-content-center").messages
 
-            #images(class="lg:columns-3 columns-2xs gap-4 my-4 space-y-4") 
-                //- Importar imagesProfile y mostrar las imagenes
-                //- Vamos a traer 20 imagenes ejemplo
-                each publication in publications
-                    div(class="relative group")
-                        a(href=`/publications/${publication.id}` target="_blank" class="relative block overflow-hidden") 
+            #pagination(class="flex justify-center m-8")  
+                button#previous(class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                    i(class="fa-solid fa-arrow-left")
+                    span Anterior
 
-                            img(src=`/uploads/${publication.image}` alt=`Imagen ${publication.title}` class="rounded-md w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
+                #btnsPagination(class="flex")
 
-                            div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full p-2 flex justify-between transform transition-all duration-500 group-hover:translate-y-[100%]") 
-                                span(class="text-white")= publication.title
+                button#next(class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                    span Siguiente
+                    i(class="fa-solid fa-arrow-right")
 
-                                div(class="flex flex-col items-center") 
-                                    img(src=`${publication.category.image}` alt=`Imagen de categoria ${publication.category.name}` class="w-9 h-8 rounded-full")
-                                    span(class="text-white text-xs")= publication.category.name 
+    template#btnPagination 
+        button(class="pagination-btn relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0")
 
-            
+    template#publication
+        div(class="relative group")
+            a.linkPublication(class="relative block overflow-hidden") 
+                img.principalImage(class="rounded-md w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
 
+                div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full p-2 flex justify-between transform transition-all duration-500 group-hover:translate-y-[100%]") 
+                    span.title(class="text-white")
 
-
+                    div(class="flex flex-col items-center") 
+                        img.categoryImage(class="w-9 h-8 rounded-full")
+                        span.categoryName(class="text-white text-xs")
 
                 
 block scripts
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+    script(src="/js/userProfile.js") 

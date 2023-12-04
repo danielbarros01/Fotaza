@@ -13,7 +13,7 @@ block contenido
     
     main
         div(class="flex justify-between mx-10 mt-10")
-            div.flex
+            a(href=`/users/${userPost.username}` class="flex p-3 rounded-lg hover:bg-gray-400/10")
                 div(class="w-14 h-14 mr-2 bg-cover bg-center bg-no-repeat border-2 border-principal-gray cursor-pointer shadow" style=`background-image: url(${userPost.image_url ? `/img/profiles/${userPost.image_url}` : '/img/profiles/profilePredeterminated.png'})`) 
                 div(class="ml-3") 
                     p.font-bold= `${userPost.name } ${userPost.lastname }`
@@ -21,9 +21,10 @@ block contenido
 
             div.flex.items-center.relative
                 a(href=`/publications/${publication.id}/download`) 
-                    button#btnSendCategories(class="bg-principal-gray flex items-center justify-between hover:bg-secondary-gray h-11 w-40")
-                        span.w-full.text-white Descargar
-                        img(src="/img/project/download.svg", alt="").w-6.mr-2
+                    button#btnSendCategories(class="bg-white flex items-center justify-between h-11 w-36 border border-principal-gray hover:border-black group shadow-sm")
+                        span(class="text-principal-gray w-2/3 group-hover:text-black") Descargar
+                        //img(src="/img/project/download.svg", alt="").w-6.mr-2
+                        i(class="fa-solid fa-download text-xl mr-2 text-principal-gray group-hover:text-black")
                 if user
                     if user.id === userPost.id
                         button#btnOptions(class="bg-transparent")
@@ -38,7 +39,7 @@ block contenido
                                 i(class="fa-solid fa-trash text-red-700")
 
         div(class="flex flex-col items-center mt-3") 
-            div(class="flex justify-between items-center w-2/3 mb-2")
+            div(class="flex justify-between items-center w-2/3 mb-4")
                 h1(class="text-4xl text-secondary-gray font-bold")= publication.title 
                 .rating.flex.gap-2
                     i(class="fa-solid fa-star star")
@@ -68,7 +69,7 @@ block contenido
                 #comments(class="w-2/6") 
                     h2(class="text-3xl my-4") Comentarios 
                     .myComment(class="flex items-start mb-8")
-                        img(src=user.image_url, alt="" class="w-14 mr-2")
+                        img(src=`/img/profiles/${user.image_url}`, alt="" class="w-14 mr-2")
                         div(class="bg-gray-200 rounded-[10px] rounded-tl-[0px] w-full")
                             textarea#commentText(name="commentText" placeholder="Agrega un comentario" class="bg-transparent p-3 pl-6 w-full h-20 outline-none resize-none")
                             div.flex.items-center.justify-between
@@ -108,7 +109,7 @@ block contenido
                                 i(class="fa-solid fa-star starGeneral")
                                 i(class="fa-solid fa-star starGeneral")
                                 i(class="fa-solid fa-star starGeneral")
-                            p(class="text-center text-gray-300") Basado en 
+                            p(class="text-gray-300 mt-1") Basado en 
                                 span#totalOpinions
 
 
@@ -119,7 +120,7 @@ block contenido
                             #slideTrack
                                 each recomendation in recomendations 
                                         a(href=`/publications/${recomendation.id}` class="slide") 
-                                            img(src=`/uploads/${recomendation.image}`, alt=`${recomendation.title}`)
+                                            img(src=`/publications/image/${recomendation.image}`, alt=`${recomendation.title}`)
                 else
                     h3(class="text-3xl my-5 text-principal-gray") Otras imágenes que pueden gustarte 
                     div(class="w-5/6 h-72 bg-gray-300 rounded p-6 flex flex-col justify-between")
@@ -249,7 +250,9 @@ block scripts
         script(src="/js/addComment.js")
 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+    
     script(src="/js/clicksPublication.js")
+
     script(src="/js/sliderRecomendations.js")
     script(src="/js/modifyRating.js")
     script(src="/js/getOverallRating.js")

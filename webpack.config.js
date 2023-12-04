@@ -27,6 +27,7 @@ export default {
         alertAccount: './src/js/user/alertAccount.js',
         picturesAccount: './src/js/user/picturesAccount.js',
         coverAccount: './src/js/user/coverAccount.js',
+        userProfile: './src/js/user/profile.js',
         getResolution: './src/js/helpers/getResolution.js',
         homePublications: './src/js/publications/homePublications.js',
     },

@@ -20,14 +20,14 @@ stars.forEach((star, index) => {
         numero = index + 1
 
         //Agarrar la ultima estrella que tenga el checked
-        console.log(stars)
-        console.log(star)
+        //console.log(stars)
+        //console.log(star)
 
         const remove = sameStar(star) //Hay que eliminar la puntuación?
         if (remove) {
             axios.delete(`/rating/delete/${idPublication}`, { headers: { 'CSRF-Token': token } })
                 .then(function (response) {
-                    console.log(response)
+                    //console.log(response)
                     deleteChecked(stars, -1)
                     ultimaEstrella = null
                     getOverallRating()
@@ -52,6 +52,7 @@ stars.forEach((star, index) => {
                 getOverallRating()
             })
             .catch(function (error) {
+                debugger
                 const errKey = error.response.data.key
                 if (errKey && errKey == 'not user') {
                     alertLogin.classList.remove('hidden')
@@ -100,9 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
             addChecked(stars, rating - 1)
         })
         .catch(function (error) {
-            const errKey = error.response.data.key
+
+            const errKey = error.response.data?.key
             if (errKey && errKey == 'not user') {
-                console.log('Debera iniciar sesion para calificar la imagen')
+                //console.log('Debera iniciar sesion para calificar la imagen')
             }
         })
 });

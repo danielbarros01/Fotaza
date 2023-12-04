@@ -20,7 +20,7 @@ w.addEventListener('scroll', e => {
 
     console.log(Math.ceil(scrollTop), scrollHeight, clientHeight)
 
-    if ((Math.ceil(scrollTop) + clientHeight) >= scrollHeight) {
+    if ((Math.ceil(scrollTop) + clientHeight + 5) >= scrollHeight) {
         console.log("cargar mas")
         page++
         getPublications()

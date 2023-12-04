@@ -24,7 +24,7 @@ block contenido
                     span.font-bold= nameUserPhoto
 
             //- Seccion fotos en general
-            section#images(class="lg:columns-3 columns-2xs gap-4 my-8 space-y-4 max-w-7xl m-auto") 
+            section#images(class="lg:columns-3 columns-2xs gap-4 my-8 space-y-4 max-w-7xl m-auto p-3") 
             
             .loader(class="w-full grid place-content-center mb-2 hidden")
                 img(src="/img/project/spinning-circles.svg" class="")
@@ -33,7 +33,7 @@ block contenido
 
     template#publication
         div(class="relative group")
-            a.linkPublication(target="_blank" class="relative block overflow-hidden cursor-pointer") 
+            a.linkPublication(class="relative block overflow-hidden cursor-pointer") 
 
                 img.principalImage(class="w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
 

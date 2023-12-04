@@ -57,7 +57,7 @@ function getMoreComments(cb) {
 
 //Agregar comentario al DOM
 function addCommentDom(comment) {
-    $template.querySelector(".commentUserImage").style.backgroundImage = `url(${comment.user.image_url})`
+    $template.querySelector(".commentUserImage").style.backgroundImage = `url(/img/profiles/${comment.user.image_url})`
     $template.querySelector(".commentTimeThatPassed").textContent = comment.timeThatPassed
     $template.querySelector(".commentFullName").textContent = `${comment.user.name} ${comment.user.lastname}`
     $template.querySelector(".commentDescription").textContent = comment.description
