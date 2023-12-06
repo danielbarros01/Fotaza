@@ -25,7 +25,7 @@ let url = new URL(w.location.href)
 let params = new URLSearchParams(url.search);
 
 //Variables para la paginación
-let page = 0, size = 5
+let page = 0, size = 12
 
 //Cant publicaciones
 let count = 0
@@ -44,6 +44,7 @@ d.addEventListener('DOMContentLoaded', async () => {
 
 radioButtons.forEach(r => {
     r.addEventListener('change', async function () {
+        page = 0
         selectedValue = this.value
         getPublications(`/publications/user/${username}?page=${page}&type=${selectedValue}`)
         changeUrl(selectedValue)

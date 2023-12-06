@@ -2,7 +2,7 @@
 node_modules/
 package-lock.json
 public/uploads
-public/img/profiles
-images/uploads
-images/uploadsWithWatermark
+public/img/profiles/
+images/uploads/
+images/uploadsWithWatermark/
 images/watermarks

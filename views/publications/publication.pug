@@ -60,8 +60,8 @@ block contenido
 
             .rightOfUse.flex.items-center.relative
                 div#infoRightOfUse(class="hidden absolute bottom-10 bg-secondary-gray text-xs p-2 text-polished-white rounded-[10px] rounded-br-[0px]")
-                    p= rightOfUse.description
-                p.text-principal-gray.text-xl.underline= rightOfUse.name
+                    p= rightOfUse ? rightOfUse.description : ''
+                p.text-principal-gray.text-xl.underline= rightOfUse ? rightOfUse.name : 'Sin licencia'
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
         #sectionBottom(class="w-full flex px-10 mt-10 mb-8") 

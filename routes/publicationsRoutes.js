@@ -73,7 +73,7 @@ router.get('/image/:id', authenticateUser, async (req, res) => {
             res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
         } else {
             //Si es copyright o venta unica mostrar con marca de agua
-            if ((publication.license.name.toLowerCase() == 'copyright')
+            if ((publication.license?.name.toLowerCase() == 'copyright')
                 || (publication.type == 'sale' /* && publication.typeSale == 'unique' */)) {
                     res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
             } else {
