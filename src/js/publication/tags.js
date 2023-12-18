@@ -19,6 +19,11 @@ function deleteTag(ev, tags) {
 
     if (index > -1) {
         tags.splice(index, 1);
+
+        //Evento etiqueta eliminada
+        const tagEvent = new CustomEvent('tagRemoved', { detail: { tag: textTag } })
+        // Disparar el evento personalizado
+        document.dispatchEvent(tagEvent);
     }
 
     $tagDelete.remove();
@@ -86,9 +91,9 @@ function addTag(tags, tagText, $tags, $spanErrTag, $fragment) {
     //que no exista el tag ya en el array
     if (tags.includes(tagText)) return
 
-    if(tagText.length === 0) return
+    if (tagText.length === 0) return
 
-    if(maxLetters(tagText, $spanErrTag)) return
+    if (maxLetters(tagText, $spanErrTag)) return
 
     //agregar al array el nuevo tag
     tags.push(tagText)
@@ -99,6 +104,10 @@ function addTag(tags, tagText, $tags, $spanErrTag, $fragment) {
     //$tags por parametro
     $tags.appendChild($fragment);
 
+    //Evento nueva etiqueta
+    const tagEvent = new CustomEvent('tagAdded', { detail: { tag: tagText } })
+    // Disparar el evento personalizado
+    document.dispatchEvent(tagEvent);
 
     //ELIMINAR TAG del dom y del array
     const $btnDeletesTag = document.querySelectorAll('.btnDeleteTag')
@@ -106,7 +115,7 @@ function addTag(tags, tagText, $tags, $spanErrTag, $fragment) {
 }
 
 
-function maxLetters(tagText, $spanErrTag){
+function maxLetters(tagText, $spanErrTag) {
     if (tagText.length > 15) {
         $spanErrTag.textContent = 'Máx 15 letras'
         $spanErrTag.classList.remove('hidden')

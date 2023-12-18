@@ -30,6 +30,11 @@ export default {
         userProfile: './src/js/user/profile.js',
         getResolution: './src/js/helpers/getResolution.js',
         homePublications: './src/js/publications/homePublications.js',
+
+        homeSearch: './src/js/search/homeSearch.js',
+        searchTags: './src/js/search/searchTags.js',
+        searchFilters: './src/js/search/searchFilters.js',
+        ajaxSearch: './src/js/search/ajaxSearch.js',
     },
     output:{
         filename: '[name].js',

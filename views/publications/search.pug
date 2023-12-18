@@ -1,0 +1,89 @@
+extends ../layout/index
+
+block styles 
+    link(rel="stylesheet", href="/css/tags.css")
+    link(rel="stylesheet", href="/css/responsiveImages.css")
+    link(rel="stylesheet", href="/css/categoryFilter.css")
+
+block contenido
+    include ../layout/headerWithSearch
+    
+    main
+        section(class="pt-12 bg-white")
+            h1(class="w-full text-center text-3xl font-medium") Imágenes de 
+                span(class="text-4xl font-bold ml-1")= title
+
+            section.types(class="sm:mx-10 mt-14 flex justify-center sm:justify-start")
+                div(class="")
+                    input(type="radio" name="typePost" id="input-free" value="free" class="hidden peer" checked)
+                    label#typeLibre(for="input-free" class="w-28 sm:w-32 h-24 flex flex-col justify-center items-center cursor-pointer border-b-8 border-b-transparent peer-checked:border-b-principal-gray transition-all duration-300 ease-in-out")
+                        i(class="fa-solid fa-dove text-4xl text-principal-gray")
+                        p(class="text-center pt-1 pb-1 text-principal-gray my-2") Gratis
+                div(class="")
+                    input(type="radio" name="typePost" id="input-general" value="general" class="hidden peer")
+                    label#typeGeneral(for="input-general" class="w-28 sm:w-32 h-24 flex flex-col justify-center items-center cursor-pointer border-b-8 border-b-transparent peer-checked:border-b-principal-gray transition-all duration-300 ease-in-out")
+                        i(class="fa-solid fa-sack-dollar text-4xl text-principal-gray")
+                        p(class="text-center pt-1 pb-1 text-principal-gray my-2") De pago
+                if user
+                    div(class="")
+                        input(type="radio" name="typePost" id="input-unique" value="unique" class="hidden peer")
+                        label#typeUnique(for="input-unique" class="w-28 sm:w-32 h-24 flex flex-col justify-center items-center cursor-pointer border-b-8 border-b-transparent peer-checked:border-b-principal-gray transition-all duration-300 ease-in-out")
+                            i(class="fa-solid fa-fire text-4xl text-principal-gray")
+                            p(class="text-center pt-1 pb-1 text-principal-gray my-2") Unicas
+
+        section.general(class="mx-4 sm:mx-10 mt-4") 
+            .btnsQualificationAndFilters(class="flex justify-between") 
+                select(id="filterQualification" class="font-medium rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 cursor-pointer")
+                    option(value="qualification" selected) Calificación
+                    option(value="recent") Recientes
+                
+                div(class="relative inline-block text-left")
+                    button#btnFilters(class="inline-flex w-full justify-center items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" type="button") 
+                        i(class="fa-solid fa-filter")
+                        span Filtros
+            
+            hr(class="h-px my-4 bg-secondary-gray border-0")      
+            
+            .categories-content(class="w-full flex items-center justify-between h-16")
+                button#btnLeft(type="button" class="w-16 h-full cursor-pointer z-20 bg-polished-white hover:opacity-90")
+                    i(class="fa-solid fa-circle-chevron-left text-3xl text-principal-gray")
+                .categories(class="flex-1 h-full flex items-center overflow-hidden")
+                    .calle(class="flex transition-transform duration-300 ease gap-4")
+                        each category in categories 
+                            input(type="checkbox" name="category" id=`category-${category.id}` value=`${category.id}` class="hidden")
+                            label.category-content(for=`category-${category.id}` class="rounded-full min-w-[150px] h-10 max-w-[300px] bg-cover bg-center bg-no-repeat cursor-pointer shadow-md hover:opacity-80 transition-all duration-100 ease-linear" style=`background-image: url(/img/backgroundsCategories/${category.image})`)
+                                span(class="bg-black/20 text-white grid place-content-center w-full h-full rounded-full")= category.name
+
+                button#btnRight(type="button" class="w-16 h-full cursor-pointer z-20 bg-polished-white hover:opacity-90")
+                    i(class="fa-solid fa-circle-chevron-right text-3xl text-principal-gray")
+
+            .filters(class="mt-8 flex flex-col sm:flex-row justify-between border-b transition-all duration-200 ease-in-out opacity-0 hidden") 
+                .tags 
+                    .flex.justify-between.items-center.mb-1
+                        label(for="tag" class="text-xl text-principal-gray") Etiquetas 
+                        span(id="errTag").text-red-500.text-xs.hidden
+                    input(id="tag" type="text" placeholder="Ingrese sus etiquetas ( Ingrese con enter )" class="block w-full sm:w-80 border border-secondary-gray rounded-md py-1.5 pl-4 focus:outline-none" maxlength="15")
+                    ul(id="tags" class="w-full flex flex-wrap gap-2 my-2 h-10")
+
+                .size(class="flex flex-col") 
+                    label(for="filterSize" class="text-principal-gray mb-1 text-xl") Tamaño
+                    select(id="filterSize" class="font-medium rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 cursor-pointer")
+                        option(value="all" selected) Todos los tamaños
+                        option(value="large") Grande
+                        option(value="medium") Mediano
+                        option(value="small") Pequeño
+
+            div(class="relative lg:max-w-7xl 2xl:max-w-none m-auto")
+                section#images(class="max-w-7xl my-8 m-auto p-8 md:p-3")
+                .loader(class="mt-2 w-full grid place-content-center mb-2 transform transition-all duration-1000 opacity-0 hidden")
+                    img(src="/img/project/spinning-circles.svg" class="")
+                span(class="absolute top-4 w-full h-full grid place-content-center hidden").messages
+
+    include ../layout/publication
+
+block scripts
+    script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+    script(src="/js/categoriesOptions.js")
+    script(src="/js/searchTags.js")
+    script(src="/js/searchFilters.js")
+    script(src="/js/ajaxSearch.js")

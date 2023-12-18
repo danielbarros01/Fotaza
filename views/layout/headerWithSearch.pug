@@ -1,0 +1,52 @@
+header(class="px-3.5 bg-white sticky top-0 z-50")
+    .flex.justify-between.items-center.py-3.w-full.pr-4.pl-2
+        a(href="/") 
+            img(src="/img/project/logo.svg", alt="Logo").w-32
+
+        form#formSearch(action="s/fotos/" method="get" class="flex flex-1 mx-8") 
+            label(class="relative block w-full mx-auto")
+                span(class="sr-only") Search
+                button(type="submit" class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
+                    img(src="/img/project/search.svg" alt="").w-6
+                input#inputSearch(class="z-50 font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-gray-200 w-full rounded-md py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1" placeholder="Buscar imágenes" type="text" name="search" value= `${title ? `${title}` : ''}` )
+
+        nav(class="text-sm flex items-center gap-5 font-bold")
+
+            if viewBtnsAuth
+                a(href="/auth/login") 
+                    button(class="bg-principal-gray text-white py-2 px-4 border-2 border-principal-gray") Iniciar Sesion
+                a(href="/auth/signup") 
+                    button(class="bg-transparent border-2 text-principal-gray border-principal-gray py-2 px-4") Registrate
+            
+            if user 
+                a(href="/publications/create") 
+                    button(class="bg-principal-gray text-white py-2 px-8 border-2 border-principal-gray font-normal mr-2 hover:opacity-80") Crear
+                div#profileImage.w-14.h-14.border-2.border-principal-gray.cursor-pointer.shadow.relative
+                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' , alt="Imagen de perfil" class="w-full h-full")
+                
+                    div#menu(class="bg-principal-gray shadow-xl absolute top-14 right-0 min-h-[100px] min-w-[250px] z-50 hidden")
+                        ul(class="text-white") 
+
+                            a(href=`/users/${user.username}`)
+                                li(class="text-lg hover:bg-hard-gray py-4 flex justify-evenly items-center") 
+                                    img(src=user.image_url ? `/img/profiles/${user.image_url}` : '/img/profiles/profilePredeterminated.png' , alt="Imagen de perfil" class="w-16 h-16 rounded") 
+                                    div(class="flex flex-col") 
+                                        span(class="text-sm")= user.name + " " + user.lastname
+                                        span(class="text-xs font-light")= user.username     
+                            
+                            a(href="/categories/select" class="")
+                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis intereses
+                            
+                            hr(class="w-4/5 m-auto")
+                            
+                            li(class="text-lg hover:bg-hard-gray cursor-pointer")
+                                form(action="/auth/sign-off" method="POST")
+                                    input(type="hidden" name="_csrf" value=csrfToken)
+                                    input(type="submit" value="Cerrar Sesión" class="cursor-pointer w-full text-left py-3 pl-6")
+
+
+block scripts 
+    if user 
+        script(src="/js/userMenu.js") 
+
+    script(src="/js/homeSearch.js")

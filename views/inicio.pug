@@ -5,7 +5,7 @@ block styles
 
 block contenido
     main(class="min-h-screen flex flex-col")
-        include ./layout/header
+        include ./layout/headerWithSearch
 
         div
             //- Seccion buscador
@@ -15,11 +15,12 @@ block contenido
                         span.font-bold Fotaza
                     p.text-xl.text-polished-white.mt-2 Busca las imagenes mas hermosas
 
-                    label(class="relative block w-5/12 mx-auto mt-7")
-                        span(class="sr-only") Search
-                        span(class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
-                            img(src="/img/project/search.svg" alt="").w-6
-                        input(class="font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-polished-white w-full rounded-md py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1 sm:text-sm" placeholder="Buscar imágenes" type="text" name="search")
+                    //form(action="" class="w-5/12") 
+                        label(class="relative block w-full mx-auto mt-7")
+                            span(class="sr-only") Search
+                            span(class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
+                                img(src="/img/project/search.svg" alt="").w-6
+                            input#inputSearch(class="z-50 font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-polished-white w-full rounded-md py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1 sm:text-sm" placeholder="Buscar imágenes" type="text" name="search")
                 
                 p(class="absolute bottom-8 right-8 text-white") Fotografía de 
                     span.font-bold= nameUserPhoto
@@ -27,30 +28,7 @@ block contenido
             //- Seccion fotos en general
             section#images(class="max-w-7xl my-8 m-auto p-8 md:p-3")
 
-    template#publication
-        //div(class="relative group item")
-        div(class="relative group item father")
-            a.linkPublication(class="relative block overflow-hidden cursor-pointer") 
-
-                img.principalImage(class="masonry-content w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
-
-                div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full h-full p-2 flex flex-col justify-between transition-all duration-500 opacity-0 group-hover:opacity-100") 
-                    
-                //- info creador
-                div(class="absolute top-0 transition-all duration-500 opacity-0 group-hover:opacity-100 p-2")
-                    a.linkUser(class="hover:underline text-white flex items-center gap-2") 
-                        img.imgProfileUser(class="w-9 h-8 rounded-full")
-                        span.name(class="text-white text-xs")
-
-
-                //- info nombre de imagen y categoria
-                div(class="absolute bottom-0 flex justify-between items-center transition-all duration-500 opacity-0 group-hover:opacity-100 w-full p-2")
-                    span.title(class="text-white")
-
-                    a(href="#") 
-                        div(class="flex flex-col items-center pb-3") 
-                            img.categoryImage(class="w-9 h-8 rounded-full")
-                            span.categoryName(class="text-white text-xs")
+    include ./layout/publication
 
 
 block scripts

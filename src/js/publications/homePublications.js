@@ -8,7 +8,7 @@ const $sectionImages = d.getElementById('images')
 const $template = d.getElementById('publication').content
 
 let page = 0
-let size = 6
+let size = 12
 let count = 0
 let totalPublications = 0
 
@@ -19,7 +19,7 @@ d.addEventListener('DOMContentLoaded', () => {
 w.addEventListener('scroll', e => {
     const { scrollTop, scrollHeight, clientHeight } = d.documentElement
 
-    if ((Math.ceil(scrollTop) + clientHeight + 5) >= scrollHeight) {
+    if ((Math.ceil(scrollTop) + clientHeight + 10) >= scrollHeight) {
         page++
         getPublications()
     }

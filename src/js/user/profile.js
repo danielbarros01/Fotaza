@@ -88,7 +88,6 @@ function getPublications(route) {
         })
 
         .catch((error) => {
-            console.log(error)
             $message.classList.remove('hidden')
             $message.textContent = 'Ha ocurrido un error, intente de nuevo más tarde'
         })
