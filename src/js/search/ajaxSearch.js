@@ -139,6 +139,7 @@ document.addEventListener('tagAdded', function (event) {
 
 //Cuando elimino una etiqueta
 document.addEventListener('tagRemoved', function (event) {
+    debugger
     const tag = event.detail.tag
 
     //Si existe la etiqueta eliminala
@@ -205,8 +206,9 @@ function getPublications(category, tag) {
 
             let arrayTags = tag.split(',')
 
-            arrayTags.forEach(tag => addTag(tags, tag.toLowerCase(), $tags, $spanErrTag, $fragmentTag, true))
+            arrayTags.forEach(tag => addTag(tags, tag.toLowerCase(), $tags, $spanErrTag, $fragmentTag, true, true))
             
+            console.log(tags)
         }
         url = `/search/s/${searchedWord}?page=${page}&type=${typePost}&priority=${priority}&size=${size}&tags=${tags.join(',')}&categories=${categories.join(',')}`
 

@@ -9,6 +9,4 @@ const tags = []
 addTags(tags, $tag, $tags, $spanErrTag, undefined, true);
 /*-- TAGS --*/
 
-document.addEventListener('DOMContentLoaded', () => {
 
-})

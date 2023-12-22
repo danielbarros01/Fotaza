@@ -12,13 +12,14 @@ function maxTags(tags, $spanErrTag) {
     }
 }
 
-function deleteTag(ev, tags) {
+function deleteTag(ev, tags, fromUrl) {
+    debugger
     const $tagDelete = ev.target.closest('.tag');
     const textTag = $tagDelete.querySelector('li').textContent;
     const index = tags.indexOf(textTag);
 
     if (index > -1) {
-        tags.splice(index, 1);
+        !fromUrl ? tags.splice(index, 1) : ''
 
         //Evento etiqueta eliminada
         const tagEvent = new CustomEvent('tagRemoved', { detail: { tag: textTag } })
@@ -75,16 +76,16 @@ function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false, isUnlim
     $btnDeletesTag: botones de eliminar de los tags
     tags: array de tags
 */
-function addDeleteButtons($btnDeletesTag, tags) {
+function addDeleteButtons($btnDeletesTag, tags, fromUrl) {
     $btnDeletesTag.forEach(element => {
         element.addEventListener('click', (ev) => {
-            deleteTag(ev, tags)
+            deleteTag(ev, tags, fromUrl)
         })
     });
 }
 
 /* Agregar tag al dom */
-function addTag(tags, tagText, $tags, $spanErrTag, $fragment, isUnlimited) {
+function addTag(tags, tagText, $tags, $spanErrTag, $fragment, isUnlimited, fromUrl) {
     //$spanErrTag por parametro, si debo controlar maximo de 3 tags
     if (!isUnlimited) {
         if (maxTags(tags, $spanErrTag)) return
@@ -93,7 +94,7 @@ function addTag(tags, tagText, $tags, $spanErrTag, $fragment, isUnlimited) {
     //que no exista el tag ya en el array
     if (tags.includes(tagText)) return
 
-    if (tagText.length === 0) return
+    if (tagText.trim().length === 0) return
 
     if (maxLetters(tagText, $spanErrTag)) return
 
@@ -113,7 +114,7 @@ function addTag(tags, tagText, $tags, $spanErrTag, $fragment, isUnlimited) {
 
     //ELIMINAR TAG del dom y del array
     const $btnDeletesTag = document.querySelectorAll('.btnDeleteTag')
-    addDeleteButtons($btnDeletesTag, tags)
+    addDeleteButtons($btnDeletesTag, tags, fromUrl)
 }
 
 
