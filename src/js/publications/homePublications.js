@@ -7,10 +7,12 @@ const w = window
 const $sectionImages = d.getElementById('images')
 const $template = d.getElementById('publication').content
 
-let page = 0
-let size = 12
-let count = 0
-let totalPublications = 0
+let page = 0,
+    size = 12,
+    totalPublications = 0,
+    firstTime = true,
+    numberPublications = 0,
+    numberPublicationsDOM = 0
 
 d.addEventListener('DOMContentLoaded', () => {
     getPublications()
@@ -37,35 +39,40 @@ function onProgress(imgLoad, image) {
 }
 
 function getPublications() {
-    const $fragment = d.createDocumentFragment()
+    if ((numberPublications > numberPublicationsDOM) || firstTime) {
 
-    axios.get(`/publications?page=${page}&size=${size}`)
+        firstTime = false
+        const $fragment = d.createDocumentFragment()
 
-        .then((response) => {
-            const { publications } = response.data
-            count = response.data.total
+        axios.get(`/publications?page=${page}&size=${size}`)
 
-            publications.forEach(p => {
-                addPublicationDOM(p, $fragment)
-                $sectionImages.appendChild($fragment)
-                totalPublications++
-            });
+            .then((response) => {
+                const { publications, count } = response.data
+                console.log(count)
+                numberPublications = count
+                console.log('number',numberPublications)
+                publications.forEach(p => {
+                    addPublicationDOM(p, $fragment)
+                    $sectionImages.appendChild($fragment)
+                    totalPublications++
+                });
 
-            resizeAllMasonryItems()
+                resizeAllMasonryItems()
 
-            //Para la carga del loader interno
-            let imgLoad = imagesLoaded($sectionImages);
-            imgLoad.on('progress', onProgress);
-        })
+                //Para la carga del loader interno
+                let imgLoad = imagesLoaded($sectionImages);
+                imgLoad.on('progress', onProgress);
+            })
 
-        .catch((error) => {
-            console.error(error)
-        })
+            .catch((error) => {
+                console.error(error)
+            })
 
-        .finally(() => {
-            /* Do a resize once more when all the images finish loading */
-            waitForImages();
-        })
+            .finally(() => {
+                /* Do a resize once more when all the images finish loading */
+                waitForImages();
+            })
+    }
 }
 
 
@@ -89,6 +96,10 @@ function addPublicationDOM(publication, $fragment) {
     $template.querySelector('.categoryImage').setAttribute('alt', `Imagen de categoria ${publication.category.name}`)
     $template.querySelector('.categoryName').textContent = publication.category.name
 
+    /* ---------------- */
+    $template.querySelector('.linkSearchCategory').setAttribute('href', `/search/allPublications?categories=${publication.category.id}`)
+    /* ---------------- */
+
     let $clone = document.importNode($template, true)
 
     const div = $template.querySelector('.father')
@@ -97,6 +108,8 @@ function addPublicationDOM(publication, $fragment) {
     div.classList.add('is-loading');
 
     $fragment.appendChild($clone)
+
+    numberPublicationsDOM++
 }
 
 

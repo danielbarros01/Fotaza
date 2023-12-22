@@ -80,7 +80,9 @@ block contenido
     template#btnPagination 
         button(class="pagination-btn relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0")
 
-    template#publication
+    include ../layout/publication
+
+    //template#publication
         div(class="relative group")
             a.linkPublication(class="relative block overflow-hidden") 
                 img.principalImage(class="rounded-md w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")

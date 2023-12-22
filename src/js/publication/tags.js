@@ -53,7 +53,7 @@ tag: array con los nombres de taggs
     $tags: elemento del dom donde vas a insertar el nuevo tag
     $spanErrTag: el span donde se va a mostrar el error en caso de que haya 
 */
-function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false) {
+function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false, isUnlimited) {
     let $fragment = document.createDocumentFragment();
 
     //$tag por parametro
@@ -63,7 +63,7 @@ function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false) {
 
             const tagText = $tag.value
 
-            addTag(tags, tagText.toLowerCase(), $tags, $spanErrTag, $fragment)
+            addTag(tags, tagText.toLowerCase(), $tags, $spanErrTag, $fragment, isUnlimited = false)
 
             //Elimino el value~
             $tag.value = null
@@ -84,9 +84,11 @@ function addDeleteButtons($btnDeletesTag, tags) {
 }
 
 /* Agregar tag al dom */
-function addTag(tags, tagText, $tags, $spanErrTag, $fragment) {
-    //$spanErrTag por parametro
-    if (maxTags(tags, $spanErrTag)) return
+function addTag(tags, tagText, $tags, $spanErrTag, $fragment, isUnlimited) {
+    //$spanErrTag por parametro, si debo controlar maximo de 3 tags
+    if (!isUnlimited) {
+        if (maxTags(tags, $spanErrTag)) return
+    }
 
     //que no exista el tag ya en el array
     if (tags.includes(tagText)) return

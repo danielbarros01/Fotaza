@@ -53,9 +53,9 @@ block contenido
 
         div.flex.justify-between.mx-10.my-4
             .category.flex.gap-4.items-center
-                h3.font-bold.text-secondary-gray.text-2xl.underline= category.name
+                a(href=`/search/allPublications?categories=${category.id}`).font-bold.text-secondary-gray.text-2xl.underline= category.name
                 each tag in tags
-                    a(href="#") 
+                    a(href=`/search/allPublications?tags=${tag.name}`) 
                         p(class="text-slate-500 bg-slate-200 w-24 rounded-lg text-center")= tag.name
 
             .rightOfUse.flex.items-center.relative

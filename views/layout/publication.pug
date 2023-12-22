@@ -1,24 +1,22 @@
 template#publication
-        //div(class="relative group item")
-        div(class="relative group item father")
-            a.linkPublication(class="relative block overflow-hidden cursor-pointer") 
+    div(class="relative group item father")
+        a.linkPublication(class="relative block overflow-hidden cursor-pointer") 
 
-                img.principalImage(class="masonry-content w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
+            img.principalImage(class="masonry-content w-full transform object-cover transition-all duration-1000 transition-filter hover:scale-105")
 
-                div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full h-full p-2 flex flex-col justify-between transition-all duration-500 opacity-0 group-hover:opacity-100") 
-                    
-                //- info creador
-                div(class="absolute top-0 transition-all duration-500 opacity-0 group-hover:opacity-100 p-2")
-                    a.linkUser(class="hover:underline text-white flex items-center gap-2") 
-                        img.imgProfileUser(class="w-9 h-8 rounded-full")
-                        span.name(class="text-white text-xs")
+            div(class="absolute bg-black bg-opacity-60 bottom-0 left-0 w-full h-full p-2 flex flex-col justify-between transition-all duration-500 opacity-0 group-hover:opacity-100") 
+                
+            //- info creador
+            div(class="absolute top-0 transition-all duration-500 opacity-0 group-hover:opacity-100 p-2")
+                a.linkUser(class="hover:underline text-white flex items-center gap-2") 
+                    img.imgProfileUser(class="w-9 h-8 rounded-full")
+                    span.name(class="text-white text-xs")
 
 
-                //- info nombre de imagen y categoria
-                div(class="absolute bottom-0 flex justify-between items-center transition-all duration-500 opacity-0 group-hover:opacity-100 w-full p-2")
-                    span.title(class="text-white")
+            //- info nombre de imagen y categoria
+            div(class="absolute bottom-0 flex justify-between items-center transition-all duration-500 opacity-0 group-hover:opacity-100 w-full p-2")
+                span.title(class="text-white")
 
-                    a(href="#") 
-                        div(class="flex flex-col items-center pb-3") 
-                            img.categoryImage(class="w-9 h-8 rounded-full")
-                            span.categoryName(class="text-white text-xs")
+                a.linkSearchCategory(class="flex flex-col items-center pb-3 cursor-pointer") 
+                    img.categoryImage(class="w-9 h-8 rounded-full")
+                    span.categoryName(class="text-white text-xs hover:underline")

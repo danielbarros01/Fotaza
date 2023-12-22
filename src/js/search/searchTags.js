@@ -6,7 +6,7 @@ const $tags = document.querySelector("#tags")
 const $spanErrTag = document.getElementById('errTag')
 const tags = []
 
-addTags(tags, $tag, $tags, $spanErrTag);
+addTags(tags, $tag, $tags, $spanErrTag, undefined, true);
 /*-- TAGS --*/
 
 document.addEventListener('DOMContentLoaded', () => {

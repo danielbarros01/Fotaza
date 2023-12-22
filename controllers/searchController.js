@@ -11,11 +11,12 @@ const search = async (req, res) => {
 
 
         res.render('publications/search', {
-            title: value,
+            title: value != 'allPublications' ? value : null,
             categories,
             user,
             csrfToken: req.csrfToken(),
         })
+
     } catch (error) {
         console.error(error)
         return res.status(500)
@@ -31,6 +32,7 @@ const searchPublications = async (req, res) => {
         const { per_page = 12 } = req.headers
 
         let includes = []
+        let forTitle = {}
 
         //Para determinar el tipo de publicacion a traer si es de venta o si es free
         let optionsType = {}
@@ -137,12 +139,20 @@ const searchPublications = async (req, res) => {
         }
         //--
 
+        //Si es allPublications, no buscar publicaciones por titulo, esto para cuando busco desde otras paginas
+        if (value != 'allPublications') {
+            forTitle = {
+                title: {
+                    [Op.like]: `%${value}%`
+                }
+            }
+        }
+        //--
+
         //Busqueda
         const { count, rows: publications } = await Publication.findAndCountAll({
             where: {
-                title: {
-                    [Op.like]: `%${value}%`
-                },
+                ...forTitle,
                 privacy: allowedPrivacy,
                 ...optionsType,
                 ...sizeCondition

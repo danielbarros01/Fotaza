@@ -1,10 +1,13 @@
 import axios from "axios"
 import imagesLoaded from "imagesloaded"
+import { addTag } from "../publication/tags.js"
 
 const d = document,
     w = window,
     url = new URL(w.location.href),
     searchedWord = url.pathname.split('/').pop(),
+    categoriesValue = url.searchParams.get('categories'),
+    tagsValue = url.searchParams.get('tags'),
     $sectionImages = d.getElementById('images'),
     $template = d.getElementById('publication').content
 
@@ -13,6 +16,8 @@ const $typeRadios = d.querySelectorAll('input[name="typePost"]')
 const $selectQualification = d.getElementById('filterQualification')
 const $categories = d.querySelectorAll('input[name="category"]')
 const $inputTags = d.getElementById('tag')
+const $tags = document.querySelector("#tags")
+const $spanErrTag = document.getElementById('errTag')
 const $selectSize = d.getElementById('filterSize')
 
 const $loader = d.querySelector('.loader')
@@ -20,7 +25,7 @@ const $message = d.querySelector('.messages')
 //----------------------------------------------------------------
 
 //Variables para consulta
-let page = 0, per_page = 2, prevPage = 0, numberPublications = 0, numberPublicationsDOM = 0, firstTime = true
+let page = 0, per_page = 12, prevPage = 0, numberPublications = 0, numberPublicationsDOM = 0, firstTime = true
 
 let typePost = 'free' //free, general o unique
 let priority = 'qualification' //qualification o recent
@@ -33,7 +38,7 @@ let size = 'all' // all, small, medium, large
 
 /* Apenas carga la pagina */
 d.addEventListener('DOMContentLoaded', () => {
-    getPublications()
+    categoriesValue ? getPublications(categoriesValue) : tagsValue ? getPublications(null, tagsValue) : getPublications()
 })
 
 /* -- */
@@ -174,10 +179,8 @@ $selectSize.addEventListener('change', function () {
 
 /* -- */
 
-function getPublications() {
-    console.log(categories)
-
-    if ((numberPublications > numberPublicationsDOM) || firstTime) {
+function getPublications(category, tag) {
+    if ((numberPublications > numberPublicationsDOM) || firstTime || (numberPublications == 0 && numberPublicationsDOM == 0)) {
         firstTime = false
 
         const $fragment = d.createDocumentFragment()
@@ -186,10 +189,35 @@ function getPublications() {
         //Loader
         $loader.classList.remove('opacity-0', 'hidden')
 
-        axios.get(`/search/s/${searchedWord}?page=${page}&type=${typePost}&priority=${priority}&size=${size}&tags=${tags.join(',')}&categories=${categories.join(',')}`, {
+        //Manejar si ya vienen category o alguna etiqueta para la busqueda
+        let url
+
+        if (category) {
+            //agrego al array de categories
+            categories.push(category)
+
+            //Activar del DOM la categoria que viene
+            const $category = d.getElementById(`category-${category}`)
+            if ($category) $category.checked = true
+            //--
+        } else if (tag) {
+            let $fragmentTag = d.createDocumentFragment();
+
+            let arrayTags = tag.split(',')
+
+            arrayTags.forEach(tag => addTag(tags, tag.toLowerCase(), $tags, $spanErrTag, $fragmentTag, true))
+            
+        }
+        url = `/search/s/${searchedWord}?page=${page}&type=${typePost}&priority=${priority}&size=${size}&tags=${tags.join(',')}&categories=${categories.join(',')}`
+
+        // --
+
+        axios.get(url, {
             headers: { per_page, }
         })
             .then(response => {
+                w.history.pushState({}, "", `/search/${searchedWord}?page=${page}&type=${typePost}&priority=${priority}&size=${size}&tags=${tags.join(',')}&categories=${categories.join(',')}`)
+
                 const { publications, count } = response.data
 
                 if (publications.length === 0 && count == 0) {
@@ -197,8 +225,6 @@ function getPublications() {
                     $message.textContent = 'No hay publicaciones para mostrar'
                 } else {
                     numberPublications = count
-
-                    console.log(count, publications)
 
                     publications.forEach(p => {
                         addPublicationDOM(p, $fragment)
@@ -252,6 +278,10 @@ function addPublicationDOM(publication, $fragment) {
     $template.querySelector('.categoryImage').setAttribute('alt', `Imagen de categoria ${publication.category.name}`)
     $template.querySelector('.categoryName').textContent = publication.category.name
 
+    /* ---------------- */
+    $template.querySelector('.linkSearchCategory').setAttribute('href', `/search/allPublications?categories=${publication.category.id}`)
+    /* ---------------- */
+
     let $clone = document.importNode($template, true)
 
     const div = $template.querySelector('.father')
@@ -264,8 +294,10 @@ function addPublicationDOM(publication, $fragment) {
 }
 
 
+//Funcion por si viene del exterior la url
+function getData() {
 
-
+}
 
 
 

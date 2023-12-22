@@ -52,7 +52,7 @@ const viewPublications = async (req, res) => {
                 offset: (+page) * (+size)
             })
 
-            return res.status(200).json({ status: 'success', total: count, publications })
+            return res.status(200).json({ status: 'success', count, publications })
         }
         /* -- */
 
@@ -116,7 +116,7 @@ const viewPublications = async (req, res) => {
         /* -- */
 
 
-        return res.status(200).json({ status: 'success', total: count, publications })
+        return res.status(200).json({ status: 'success', count, publications })
     } catch (error) {
         console.error(error)
         return res.status(500).json({ status: 'error' })
@@ -182,7 +182,14 @@ const viewPublicationsOf = async (req, res) => {
             {
                 where: options,
                 order: [['date_and_time', 'DESC']],
-                include: [{ model: Category, as: 'category' }],
+                include: [
+                    { model: Category, as: 'category' },
+                    {
+                        model: User, as: 'user', attributes: {
+                            exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                        }
+                    },
+                ],
                 limit: +per_page,
                 offset: (+page) * (+per_page)
             })

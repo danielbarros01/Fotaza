@@ -88,6 +88,7 @@ function getPublications(route) {
         })
 
         .catch((error) => {
+            console.log(error)
             $message.classList.remove('hidden')
             $message.textContent = 'Ha ocurrido un error, intente de nuevo más tarde'
         })
@@ -108,11 +109,23 @@ function addPublicationDOM(publication, $fragment) {
     $template.querySelector('.principalImage').setAttribute('src', `/publications/image/${publication.image}`)
     $template.querySelector('.principalImage').setAttribute('alt', `Imagen ${publication.title}`)
 
+    $template.querySelector('.linkUser').setAttribute('href', `/users/${publication.user.username}`)
+
+    $template.querySelector('.imgProfileUser').setAttribute('src', `/img/profiles/${publication.user.image_url}`)
+    $template.querySelector('.imgProfileUser').setAttribute('alt', `Imagen de usuario ${publication.user.username}`)
+
+    $template.querySelector('.name').textContent = publication.user.name
+
     $template.querySelector('.title').textContent = publication.title
 
     $template.querySelector('.categoryImage').setAttribute('src', `/img/backgroundsCategories/${publication.category.image}`)
     $template.querySelector('.categoryImage').setAttribute('alt', `Imagen de categoria ${publication.category.name}`)
     $template.querySelector('.categoryName').textContent = publication.category.name
+
+    /* ---------------- */
+    $template.querySelector('.linkSearchCategory').setAttribute('href', `/search/allPublications?categories=${publication.category.id}`)
+    /* ---------------- */
+
 
     let $clone = document.importNode($template, true)
 
