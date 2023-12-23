@@ -4,6 +4,8 @@ const $divInfoRightOfUse = document.getElementById('infoRightOfUse')
 const $btnOptions = document.getElementById('btnOptions')
 const $optionsPublication = document.getElementById('optionsPublication')
 
+//proximamente paypal
+const $proximamente = document.getElementById('proximamente')
 
 $btnInfo.addEventListener('click', () => {
   $divInfoRightOfUse.classList.toggle('hidden')
@@ -31,4 +33,16 @@ document.addEventListener('click', (event) => {
       $optionsPublication.classList.add('hidden');
     }
   }
+
+  //proximamente paypal
+  if (event.target.htmlFor == 'radio-paypal') {
+    $proximamente.classList.remove('opacity-0')
+    $proximamente.classList.add('opacity-1')
+
+    setTimeout(() => {
+      $proximamente.classList.add('opacity-0')
+      $proximamente.classList.remove('opacity-1')
+    }, 1200);
+  }
 });
+

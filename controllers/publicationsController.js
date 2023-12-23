@@ -2,6 +2,7 @@ import { Op, Sequelize } from 'sequelize'
 import db from '../config/db.js'
 import sharp from 'sharp'
 import svg2img from 'svg2img'
+import format from '../helpers/dateFormat.js'
 
 import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest } from '../models/Index.js'
 import fs from 'fs'
@@ -557,9 +558,13 @@ const viewPublication = async (req, res) => {
         }
         /* RECOMENDACIONES */
 
+        //formatear fecha
+        let fechaFormateada = format(publication.date)
+
         if (!user) {
             return res.render('publications/publication', {
                 publication,
+                fechaFormateada,
                 viewBtnsAuth: user ? false : true,
                 userPost,
                 tags,
@@ -576,6 +581,7 @@ const viewPublication = async (req, res) => {
         //si el user_id del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
             publication,
+            fechaFormateada,
             viewBtnsAuth: user ? false : true,
             user,
             userPost,
