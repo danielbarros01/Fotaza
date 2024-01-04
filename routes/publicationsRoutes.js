@@ -2,7 +2,7 @@ import express from 'express'
 
 import {
     viewPublications, createPublication, savePublication, viewMyPublications,
-    viewPublication, downloadImage, editPublication, deletePublication, viewPublicationsOf
+    viewPublication, downloadImage, editPublication, deletePublication, viewPublicationsOf, bestPublications
 } from '../controllers/publicationsController.js'
 import { Publication, RightOfUse } from '../models/Index.js'
 import protectRoute from '../Middlewares/protectRoute.js'
@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 //----------------------
 
 const router = express.Router()
+
+// GET /publications/best
+router.get('/best', authenticateUser, bestPublications)
 
 // GET /publications
 router.get('/', authenticateUser, viewPublications)
@@ -48,8 +51,6 @@ router.patch('/:id', authenticateUser, editPublication)
 //DELETE /publications/:id
 router.delete('/:id', authenticateUser, deletePublication)
 
-
-
 //Devolver imagenes
 router.get('/image/:id', authenticateUser, async (req, res) => {
     //Traer usuario
@@ -75,7 +76,7 @@ router.get('/image/:id', authenticateUser, async (req, res) => {
             //Si es copyright o venta unica mostrar con marca de agua
             if ((publication.license?.name.toLowerCase() == 'copyright')
                 || (publication.type == 'sale' /* && publication.typeSale == 'unique' */)) {
-                    res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
+                res.sendFile(`${baseDir}/images/uploadsWithWatermark/watermark_${req.params.id}`);
             } else {
                 //Mostrar sin marca de agua
                 res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);

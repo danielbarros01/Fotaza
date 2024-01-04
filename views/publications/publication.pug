@@ -64,7 +64,7 @@ block contenido
                 p.text-principal-gray.text-xl.underline= rightOfUse ? rightOfUse.name : 'Sin licencia'
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
-        if publication.type == 'sale'  && user.id !== userPost.id
+        if publication.type == 'sale' && user ? (user.id !== userPost.id) : ''
             .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
                 div(class="flex flex-col justify-between")
                     .infoSale(class="flex flex-col") 
@@ -115,7 +115,7 @@ block contenido
                     i(class="fa-solid fa-dove")
                     span Publicación gratuita
             
-            if publication.type == 'sale' && user.id === userPost.id
+            if publication.type == 'sale' && user ? (user.id === userPost.id) : ''
                 .info(class="flex gap-1 items-center text-principal-gray")
                     i(class="fa-solid fa-dollar-sign")
                     span #{publication.currency.toUpperCase()} $#{publication.price}

@@ -26,6 +26,9 @@ Publication.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
 // Definir la relación de rating
 Publication.belongsToMany(User, { through: Rating })
 
+//Para consultar desde rating
+Rating.belongsTo(Publication);
+
 // Definir las relaciones de comment
 User.hasMany(Comment, { foreignKey: 'user_id' })
 //Para poder utilizar usuario en comentario
@@ -44,6 +47,7 @@ Publication.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
 
 /* Publicacion tiene una licencia */
 Publication.belongsTo(RightOfUse, { foreignKey: 'rights_of_use_id', as: 'license' })
+
 
 export {
     Interest,
