@@ -34,7 +34,9 @@ export default {
         homeSearch: './src/js/search/homeSearch.js',
         searchTags: './src/js/search/searchTags.js',
         searchFilters: './src/js/search/searchFilters.js',
-        ajaxSearch: './src/js/search/ajaxSearch.js'
+        ajaxSearch: './src/js/search/ajaxSearch.js',
+
+        homeCaraousel: './src/js/homeCarousel.js',
     },
     output:{
         filename: '[name].js',

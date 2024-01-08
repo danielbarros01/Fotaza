@@ -1,0 +1,48 @@
+doctype html
+html(lang="en")
+
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Document
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+  body
+
+    #default-carousel(class="relative w-full" data-carousel="slide")
+      //- Carousel wrapper
+      div(class="md:h-96 relative h-56 overflow-hidden rounded-lg")
+        //- Item 1
+        div(class="hidden duration-700 ease-in-out")(data-carousel-item)
+          img(class="-translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 absolute block w-full" src="https://img.freepik.com/foto-gratis/retrato-abstracto-ojo-elegancia-mujeres-jovenes-generado-ai_188544-9712.jpg?w=1380&t=st=1704478665~exp=1704479265~hmac=26713f4bb625016fb8c2e1ab81d6133a0040fae470e330042b49a2cdeb514d55", alt="...")
+
+        //- Item 2
+        div(class="hidden duration-700 ease-in-out")(data-carousel-item)
+          img(class="-translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 absolute block w-full" src="https://img.freepik.com/vector-gratis/fondo-cultura-fanzine-degradado_23-2149156314.jpg?w=1380&t=st=1704478668~exp=1704479268~hmac=e4fdf7af4872e9d9ec692858997890ebb385e4f721e4ac2f1a2595d8c43087ef", alt="...")
+
+        //- Item 3
+        div(class="hidden duration-700 ease-in-out")(data-carousel-item)
+          img(class="-translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 absolute block w-full" src="https://img.freepik.com/foto-gratis/mujer-joven-disfrutando-vida-conexion_23-2149172712.jpg?w=1380&t=st=1704478675~exp=1704479275~hmac=a2d7eb56952c16331168857069491bd2eec97173b3591909804a81958e384cf2", alt="...")
+
+
+      //- Slider indicators
+      div(class="-translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse absolute z-30 flex")
+        button(type="button" class="w-3 h-3 rounded-full" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0")
+        button(type="button" class="w-3 h-3 rounded-full" aria-current="false" aria-label="Slide 2" data-carousel-slide-to="1")
+        button(type="button" class="w-3 h-3 rounded-full" aria-current="false" aria-label="Slide 3" data-carousel-slide-to="2")
+        button(type="button" class="w-3 h-3 rounded-full" aria-current="false" aria-label="Slide 4" data-carousel-slide-to="3")
+        button(type="button" class="w-3 h-3 rounded-full" aria-current="false" aria-label="Slide 5" data-carousel-slide-to="4")
+
+      //- Slider controls
+      button(type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev)
+        span(class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none")
+          svg(class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10")
+            path(stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4")
+          span(class="sr-only") Previous
+
+      button(type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next)
+        span(class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none")
+          svg(class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10")
+            path(stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4")
+          span(class="sr-only") Next
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>

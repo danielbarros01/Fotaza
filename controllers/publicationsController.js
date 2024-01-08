@@ -795,7 +795,7 @@ const bestPublications = async (req, res) => {
 
     if (user) {
         //Traigo las publicaciones
-        const { rows: publications } = await Rating.findAndCountAll(
+        const { rows: items } = await Rating.findAndCountAll(
             {
                 attributes: [
                     'publicationId',
@@ -819,15 +819,20 @@ const bestPublications = async (req, res) => {
                                 { privacy: 'private' }
                             ]
                         }
-                    }
+                    },
+                    include: [{
+                        model: User, as: 'user', attributes: {
+                            exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                        }
+                    }]
                 }],
                 limit,
             })
 
-        return res.status(200).json({ status: 'success', publications })
+        return items
     } else {
         //Si no estoy autenticado mostrar las mejores que no sean unicas
-        const { rows: conditionalPublications } = await Rating.findAndCountAll(
+        const { rows: items } = await Rating.findAndCountAll(
             {
                 attributes: [
                     'publicationId',
@@ -839,17 +844,24 @@ const bestPublications = async (req, res) => {
                     Sequelize.where(Sequelize.fn('COUNT', 'publicationId'), '>=', minRatings),
                     Sequelize.where(Sequelize.fn('AVG', Sequelize.col('value')), '>=', minPromRating),
                 ],
-                include: [{
-                    model: Publication,
-                    where: {
-                        date: { [Op.gte]: weekAgo },    //Op.gte (mayor o igual que)
-                        privacy: { [Op.notIn]: ['private', 'protected'] }
+                include: [
+                    {
+                        model: Publication,
+                        where: {
+                            date: { [Op.gte]: weekAgo },    //Op.gte (mayor o igual que)
+                            privacy: { [Op.notIn]: ['private', 'protected'] }
+                        },
+                        include: [{
+                            model: User, as: 'user', attributes: {
+                                exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                            }
+                        }]
                     }
-                }],
+                ],
                 limit
             })
 
-        return res.status(200).json({ status: 'success', conditionalPublications })
+        return items
     }
 }
 

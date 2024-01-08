@@ -1,6 +1,8 @@
 import { Op, Sequelize } from 'sequelize'
 import { Publication, Category, Interest, User, RightOfUse } from '../models/Index.js'
 
+import { bestPublications } from './publicationsController.js'
+
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
@@ -15,6 +17,7 @@ const home = async (req, res) => {
     let publications
 
     try {
+        /* Si el usuario no está autenticado, se obtienen las publicaciones públicas ordenadas por fecha descendente */
         if (!user) {
             publications = await Publication.findAll({
                 where: {
@@ -33,17 +36,25 @@ const home = async (req, res) => {
             })
 
 
+            /* Obtener mejores publicaciones */
+            let best = await bestPublications(req, res)
+
+            if (best.length == 0) {
+                best = null
+            }
 
             return res.render('inicio', {
                 viewBtnsAuth: true,
                 imageUrl: "/img/backgrounds/fondo6.jpg",
                 nameUserPhoto: "Khaled Ali",
                 csrfToken: req.csrfToken(),
-                publications
+                publications,
+                bestPublications: best
             })
         }
 
-        //si usuario esta autenticado
+        /* Si el usuario está autenticado, se recuperan los intereses del usuario y se utiliza esa 
+        información para ordenar las publicaciones de manera personalizada. */
         const interests = await Interest.findAll({
             where: { userId: req.user.id },
             include: [{ model: Category, as: 'category' }],
@@ -88,6 +99,7 @@ const home = async (req, res) => {
             limit: 6
         })
 
+        /* Se obtiene la calificación para cada publicación y se crea un nuevo array de publicaciones con esa información. */
         const publicationsWithQualification =
             await Promise.all(
                 publications.map(async p => {
@@ -95,6 +107,12 @@ const home = async (req, res) => {
                     return { ...p.get(), qualification }
                 }))
 
+        /* Obtener mejores publicaciones */
+        let best = await bestPublications(req, res)
+
+        if (best.length == 0) {
+            best = null
+        }
 
         res.render('inicio', {
             viewBtnsAuth: false,
@@ -102,7 +120,8 @@ const home = async (req, res) => {
             imageUrl: "/img/backgrounds/fondo6.jpg",
             nameUserPhoto: "Khaled Ali",
             csrfToken: req.csrfToken(),
-            publications: publicationsWithQualification
+            publications: publicationsWithQualification,
+            bestPublications: best
         })
     } catch (error) {
         console.log(error)

@@ -2,6 +2,8 @@ extends ./layout/index
 
 block styles 
     link(rel="stylesheet", href="/css/responsiveImages.css")
+    if bestPublications != null
+        link(href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet")
 
 block contenido
     main(class="min-h-screen flex flex-col")
@@ -9,11 +11,45 @@ block contenido
 
         div
             //- Seccion buscador
-            section(class="h-[calc(100vh-80px)] bg-cover bg-center bg-no-repeat flex flex-col justify-center" style=`background-image: url(${imageUrl})`)
-                div.flex.items-center.flex-col
-                    h2.text-5xl.text-polished-white Bienvenido a 
-                        span.font-bold Fotaza
-                    p.text-xl.text-polished-white.mt-2 Busca las imagenes mas hermosas
+            if bestPublications == null
+                section(class="h-[calc(100vh-80px)] bg-cover bg-center bg-no-repeat flex flex-col justify-center" style=`background-image: url(/img/backgrounds/fondo6.jpg)`)
+                    div.flex.items-center.flex-col
+                        h2.text-5xl.text-polished-white Bienvenido a 
+                            span.font-bold Fotaza
+                        p.text-xl.text-polished-white.mt-2 Busca las imagenes mas hermosas
+            else
+                //CAROUSEL -----
+                #default-carousel(class="h-[calc(100vh-80px)] relative w-full" data-carousel="slide")
+                    //- Carousel wrapper
+                    div#carouselPhotos(class="h-full w-full relative overflow-hidden")
+                        each item in bestPublications
+                            //- Item 1
+                            div(class="hidden duration-400 ease-in bg-cover bg-center bg-no-repeat" style=`background-image: url(/publications/image/${item.publication.image})`)(data-carousel-item)
+                                a(href=`/users/${item.publication.user.username}` class="absolute bottom-0 right-0 text-white z-50 m-4 opacity-80 hover:opacity-100") Fotografía de 
+                                    span(class="font-bold hover:underline")= item.publication.user.username
+
+                                a(href=`/publications/${item.publication.id}` class="absolute bottom-0 left-0 text-white z-50 m-4 flex gap-2 items-center opacity-80 hover:opacity-100")
+                                    span Ir 
+                                    i(class="fa-solid fa-arrow-up-right-from-square")
+
+                    //- Slider indicators
+                    div#carouselIndicators(class="-translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse absolute z-30 flex")
+                        - var i= 0
+                        each item in bestPublications
+                            button(type="button" class="w-3 h-3 rounded-full" aria-current=`${i != 0 ? false : true}` aria-label=`Slide ${i+1}` data-carousel-slide-to=i++)
+
+                    //- Slider controls
+                    button#data-carousel-prev(type="button" class="absolute top-1/2 transform -translate-y-1/2 start-0 z-30 flex items-center justify-center h-fit px-4 cursor-pointer group focus:outline-none" data-carousel-prev)
+                        span(class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none")
+                            svg(class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10")
+                                path(stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4")
+                            span(class="sr-only") Previous
+
+                    button#data-carousel-next(type="button" class="absolute top-1/2 transform -translate-y-1/2 end-0 z-30 flex items-center justify-center h-fit px-4 cursor-pointer group focus:outline-none" data-carousel-next)
+                        span(class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none")
+                            svg(class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10")
+                                path(stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4")
+                            span(class="sr-only") Next
 
                     //form(action="" class="w-5/12") 
                         label(class="relative block w-full mx-auto mt-7")
@@ -21,10 +57,12 @@ block contenido
                             span(class="absolute inset-y-0 left-0 flex items-center pl-2 mr-2")
                                 img(src="/img/project/search.svg" alt="").w-6
                             input#inputSearch(class="z-50 font-medium h-14 pl-12 placeholder-italic placeholder-principal-gray block bg-polished-white w-full rounded-md py-2 pr-3 shadow-sm focus:outline-none focus:border-stone-950 focus:ring-stone-950 focus:ring-1 sm:text-sm" placeholder="Buscar imágenes" type="text" name="search")
-                
-                p(class="absolute bottom-8 right-8 text-white") Fotografía de 
-                    span.font-bold= nameUserPhoto
 
+                    div(class="z-40 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit flex items-center flex-col")
+                        h2.text-5xl.text-polished-white Bienvenido a 
+                            span.font-bold Fotaza
+                        p.text-xl.text-polished-white.mt-2 Busca las imagenes mas hermosas
+                    //CAROUSEL -----
             //- Seccion fotos en general
             section#images(class="max-w-7xl my-8 m-auto p-8 md:p-3")
 
@@ -33,3 +71,7 @@ block contenido
 
 block scripts
     script(src="/js/homePublications.js")
+    //script(src="/js/homeCaraousel.js") not found
+    if bestPublications != null
+        script(defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js")
+        script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
