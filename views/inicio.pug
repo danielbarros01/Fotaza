@@ -2,7 +2,7 @@ extends ./layout/index
 
 block styles 
     link(rel="stylesheet", href="/css/responsiveImages.css")
-    if bestPublications != null
+    if bestPublications != null && bestPublications.length > 1
         link(href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet")
 
 block contenido
@@ -11,7 +11,7 @@ block contenido
 
         div
             //- Seccion buscador
-            if bestPublications == null
+            if bestPublications == null || bestPublications.length < 2
                 section(class="h-[calc(100vh-80px)] bg-cover bg-center bg-no-repeat flex flex-col justify-center" style=`background-image: url(/img/backgrounds/fondo6.jpg)`)
                     div.flex.items-center.flex-col
                         h2.text-5xl.text-polished-white Bienvenido a 
@@ -36,8 +36,8 @@ block contenido
                     div#carouselIndicators(class="-translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse absolute z-30 flex")
                         - var i= 0
                         each item in bestPublications
-                            button(type="button" class="w-3 h-3 rounded-full" aria-current=`${i != 0 ? false : true}` aria-label=`Slide ${i+1}` data-carousel-slide-to=i++)
-
+                            button(type="button" class="w-3 h-3 rounded-full" aria-current=`${i != 0 ? true : false}` aria-label=`Slide ${i+1}` data-carousel-slide-to=i++)
+                            
                     //- Slider controls
                     button#data-carousel-prev(type="button" class="absolute top-1/2 transform -translate-y-1/2 start-0 z-30 flex items-center justify-center h-fit px-4 cursor-pointer group focus:outline-none" data-carousel-prev)
                         span(class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none")
@@ -72,6 +72,6 @@ block contenido
 block scripts
     script(src="/js/homePublications.js")
     //script(src="/js/homeCaraousel.js") not found
-    if bestPublications != null
+    if bestPublications != null && bestPublications.length > 1
         script(defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js")
         script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

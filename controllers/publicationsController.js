@@ -791,11 +791,14 @@ const bestPublications = async (req, res) => {
     const limit = 4
 
     //Hace una semana
-    const weekAgo = new Date().setDate(new Date().getDate() - 7)
+    let weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    let items
 
     if (user) {
         //Traigo las publicaciones
-        const { rows: items } = await Rating.findAndCountAll(
+        const { rows } = await Rating.findAndCountAll(
             {
                 attributes: [
                     'publicationId',
@@ -829,10 +832,10 @@ const bestPublications = async (req, res) => {
                 limit,
             })
 
-        return items
+        items = rows
     } else {
         //Si no estoy autenticado mostrar las mejores que no sean unicas
-        const { rows: items } = await Rating.findAndCountAll(
+        const { rows } = await Rating.findAndCountAll(
             {
                 attributes: [
                     'publicationId',
@@ -861,8 +864,55 @@ const bestPublications = async (req, res) => {
                 limit
             })
 
-        return items
+        items = rows
     }
+
+
+    /* En caso de que la cantidad de imagenes sea menor a limit, buscar demás imágenes deberán seguir un criterio 
+    aleatorio que comprenda no más de una imagen del mismo usuario y cuyas imágenes no sean más de 1 año de antigüedad. */
+    const additionalItems = limit - items.length
+
+    if (additionalItems > 0) {
+        //Hace un año
+        let oneYearGo = new Date();
+        oneYearGo.setFullYear(oneYearGo.getFullYear() - 1);
+
+        const randomImages = await Publication.findAll({
+            where: {
+                id: {
+                    [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+                },
+                date: { [Op.gte]: oneYearGo },
+                [Op.not]: {
+                    [Op.and]: [
+                        { type: { [Op.ne]: 'sale' } },
+                        { privacy: 'private' }
+                    ]
+                }
+            },
+            include: [{
+                model: User, as: 'user',
+                attributes: {
+                    exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                }
+            }],
+            order: Sequelize.literal('rand()'),
+            subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
+            group: ['User.id'],
+            limit: additionalItems,
+            having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
+        })
+
+        /* La estrucutura de items funciona asi, con un item padre, por eso hago esto */
+        randomImages.forEach(i => {
+            const item = {}
+            item.publication = i
+
+            items.push(item)
+        })
+    }
+
+    return items
 }
 
 export {

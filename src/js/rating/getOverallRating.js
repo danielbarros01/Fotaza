@@ -17,7 +17,7 @@ function getOverallRating() {
             const average = response.data.average
 
             $totalOpinions.textContent = `${response.data.count} ${count == 1 ? 'valoración' : 'valoraciones'}`
-            $average.textContent = average
+            $average.textContent = average % 1 !== 0 ? average.toFixed(1) : average //Si tiene decimales toFixed
 
 
             for (let i = 0; i < $stars.length; i++) {
