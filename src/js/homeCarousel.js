@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { Carousel } from 'flowbite'
+//import { Carousel } from 'flowbite'
 
-const d = document;
+/* const d = document;
 
 const $carouselPhotos = d.getElementById('carouselPhotos');
-const $carouselIndicators = d.getElementById('carouselIndicators');
+const $carouselIndicators = d.getElementById('carouselIndicators'); */
 
 /* Busco las mejores fotos */
-axios.get("/publications/best")
+/* axios.get("/publications/best")
     .then(res => {
         debugger
         
@@ -88,3 +88,4 @@ function createIndicator(ariaCurrent, ariaLabel, dataCarouselSlideTo, number) {
     return button;
 }
 
+ */

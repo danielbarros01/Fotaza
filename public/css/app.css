@@ -1450,9 +1450,6 @@ video {
 .bg-white\/30 {
   background-color: rgb(255 255 255 / 0.3);
 }
-.bg-white\/10 {
-  background-color: rgb(255 255 255 / 0.1);
-}
 .bg-opacity-25 {
   --tw-bg-opacity: 0.25;
 }
