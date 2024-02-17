@@ -92,7 +92,7 @@ block contenido
                             div#proximamente(class="absolute p-1.5 right-0 -bottom-8 bg-red-500 rounded-tl-lg rounded-tr-none rounded-bl-lg rounded-br-lg opacity-0 transition-all duration-200 ease-in-out")
                                 span Proximamente
 
-                    button(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90") Adquirir
+                    button#sendMessage(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
 
 
 
@@ -303,9 +303,14 @@ block scripts
             script(src="/js/editPublication.js")
             script(src="/js/deletePublication.js")
     
-    if user 
         script(src="/js/getComments.js")
         script(src="/js/addComment.js")
+
+        if user.id != userPost.id
+            script(src="/socket.io/socket.io.js")
+            script(src="/js/sendMessage.js")
+
+
 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     

@@ -7,7 +7,8 @@ import Rating from './Rating.js'
 import Tag from './Tag.js'
 import Comment from './Comment.js'
 import PublicationHasTag from './PublicationHasTag.js'
-
+import Conversation from './Conversation.js'
+import Message from './Message.js'
 
 // Definir la relación muchos a muchos entre Usuario y Categoria
 User.belongsToMany(Category, { through: Interest });
@@ -49,6 +50,37 @@ Publication.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
 Publication.belongsTo(RightOfUse, { foreignKey: 'rights_of_use_id', as: 'license' })
 
 
+/* Chat */
+User.associate(Conversation);
+Conversation.associate(User);
+
+Conversation.hasMany(Message, {
+    foreignKey: 'conversation_id',
+    as: 'messages',
+    onDelete: 'CASCADE' 
+});
+
+Message.belongsTo(Conversation, {
+    foreignKey: 'conversation_id',
+    as: 'conversation',
+});
+
+User.hasMany(Message, {
+    foreignKey: 'user_id',
+    as: 'messages'
+})
+
+Message.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user',
+});
+
+Message.belongsTo(Publication, {
+    foreignKey: 'publication_id',
+    as: 'publication'
+}) 
+/* -- */
+
 export {
     Interest,
     Category,
@@ -58,5 +90,7 @@ export {
     Tag,
     PublicationHasTag,
     Rating,
-    Comment
+    Comment,
+    Conversation,
+    Message
 }

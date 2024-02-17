@@ -37,6 +37,11 @@ export default {
         ajaxSearch: './src/js/search/ajaxSearch.js',
 
         homeCaraousel: './src/js/homeCarousel.js',
+
+        inputChatF: './src/js/chat/inputChatF.js',
+        chat: './src/js/chat/chat.js',
+        chatF: './src/js/chat/chatF.js',
+        sendMessage: './src/js/chat/publication/sendMessage.js',
     },
     output:{
         filename: '[name].js',

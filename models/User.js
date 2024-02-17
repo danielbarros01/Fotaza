@@ -59,9 +59,28 @@ const User = db.define('users', {
     }
 })
 
+
 /*this es la instancia de la base de datos, por eso utilizamos function en vez de funcion flecha*/
 User.prototype.verificarPassword = function (password) {
     return bcrypt.compareSync(password, this.password)
 }
+
+/* Para el chat */
+User.associate = (conversation) => {
+    User.hasMany(conversation, {
+        foreignKey: {
+            name: 'userId1',
+            field: 'user_id_1'
+        },
+      as: 'conversation1'
+    });
+    User.hasMany(conversation, {
+        foreignKey: {
+            name: 'userId2',
+            field: 'user_id_2'
+        },
+      as: 'conversation2'
+    });
+  };
 
 export default User

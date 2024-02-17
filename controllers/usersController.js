@@ -270,7 +270,7 @@ const changePassword = async (req, res) => {
         changePasswordEmail({
             name: user.name, lastname: user.lastname, email: user.email, token: user.token
         })
-        
+
         //limpiar cookie de sesion
         res.clearCookie('_token')
 
@@ -285,10 +285,76 @@ const changePassword = async (req, res) => {
     }
 }
 
+//GET USER JSON
+const getUserApi = async (req, res) => {
+    try {
+        const { username } = req.params
+
+        const userProfile = await getUserFor(req, username, null)
+
+        if (!userProfile) {
+            return res.status(404).render('404', { message: 'Uups, no encontramos al usuario' })
+        }
+
+        res.status(200).json({ success: true, user: userProfile })
+    } catch (error) {
+        console.log(error)
+        return res.status(500)
+    }
+}
+
+const getUserApiForId = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const user = await getUserFor(req, null, id)
+
+        if (!user) {
+            return res.status(404).render('404', { message: 'Uups, no encontramos al usuario' })
+        }
+
+        res.status(200).json({ success: true, user })
+    } catch (error) {
+        console.log(error)
+        return res.status(500)
+    }
+}
+
+async function getUserFor(req, username, id) {
+    let object
+
+    if (username) {
+        object = { username }
+    } else if (id) {
+        object = { id }
+    }
+
+    try {
+        //No encuentra al usuario del perfil
+        const userProfile = await User.findOne({
+            where: object,
+            attributes: {
+                exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+            }
+        })
+
+        if (!userProfile) {
+            return null
+        }
+
+        return userProfile
+
+    } catch (err) {
+        return new Error(err)
+    }
+}
+
 export {
     getUser,
     userAccount,
     editAccount,
     password,
-    changePassword
+    changePassword,
+    getUserApi,
+    getUserApiForId
 }

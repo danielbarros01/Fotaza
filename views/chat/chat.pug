@@ -1,0 +1,214 @@
+extends ../layout/index
+
+block styles 
+    meta(name="csrf-token" content= csrfToken)
+    link(rel="stylesheet", href="/css/chat.css")
+
+block contenido
+    include ../layout/headerWithSearch
+
+    main(class="w-full h-[calc(100vh-80px)] flex flex-col")
+        .pageBack(class="h-16 w-full px-5 py-5 flex items-center")
+            a(href="/" class="w-24 h-10 p-2 rounded-xl shadow-md flex justify-around items-center border-t group")
+                i(class="fa-solid fa-arrow-left group-hover:text-xl transition-all duration-200 ease-in-out")
+                span(class="group-hover:font-semibold") Volver
+        
+        section.chat(class="w-full flex flex-grow bg-white border-t pl-5")
+            
+            section.chats(class="w-96 h-full flex flex-col") 
+                .title(class="flex text-3xl py-4")
+                    span Mensajes 
+                    span#cantMgs(class="text-green-600 ml-1")= cantMsgsUnread ? `(${cantMsgsUnread})` : ''
+
+                .search(class="relative text-gray-600 mr-5")
+                    input#inputSearchContacts(type="text" name="chatSearch" placeholder="Buscar" class="bg-gray-input h-12 px-5 pr-10 rounded-xl focus:outline-none w-full text-lg text-principal-gray")
+                    button(type="button" class="absolute w-10 right-1 top-0 flex items-center h-full")
+                        i(class="fa-solid fa-magnifying-glass text-3xl text-principal-gray")
+
+                #contacts(class="overflow-y-scroll h-[calc(100vh-264px)] -ml-5 z-10")
+                    each conversation in conversations
+                        div
+                            input(type="radio" name="contact" class="hidden" id=`user-${conversation.user.id}` value=`conversation-${conversation.id}`) 
+                            label.contact(for=`user-${conversation.user.id}` class="flex pl-10 my-3 py-3 hover:bg-gray-input -ml-5 cursor-pointer mr-4")
+                                .photo(class="w-12") 
+                                    .photoProfile(class="relative w-12 h-12 m-auto") 
+                                        img(src=`/img/profiles/${conversation.user.image_url}`, alt=`Imagen de perfil de ${conversation.user.username}` class="w-full h-full rounded-full")
+                                        .online(class="w-3 h-3 rounded-full bg-gray-500 border border-white absolute right-0 bottom-0")
+                                .data(class="ml-2 w-8/12")
+                                    .name 
+                                        span(class="text-xl font-semibold")= `${conversation.user.name} ${conversation.user.lastname}`
+                                    .cutMessage(class="-mt-1 w-full overflow-hidden") 
+                                        span(class="text-sm text-secondary-gray inline-block whitespace-nowrap text-ellipsis overflow-hidden w-full")= conversation.lastMessage ? conversation.lastMessage.text : ''
+                                .info(class="w-2/12 flex flex-col items-center") 
+                                    .time 
+                                        span(class="text-xs text-secondary-gray")= conversation.lastMessage ? conversation.lastMessage.date : ''
+                                    .countMessages(class=`w-6 h-6 bg-green-600 rounded-full grid place-content-center ${!conversation.unreadMsgs ? 'invisible':''}`)
+                                        span(class="text-xs text-white")= conversation.unreadMsgs ? `+${conversation.unreadMsgs}` : ''
+                        
+            
+            section.conversation(class="flex-1 bg-white relative -ml-2 overflow-hidden")
+                .presentation(class="absolute w-full h-full grid place-content-center opacity-50 bg-gray-input")
+                    img(src="/img/project/logo.svg", alt="Logo fotaza")
+                
+                .sectionConversation(class="hidden w-full h-full flex flex-col pr-5")
+                    header(class="flex justify-between items-center -mr-5 pl-1 pr-5 relative")
+                        #contactHeader(class="w-fit flex cursor-pointer py-2 px-4")
+                            .photo(class="w-12") 
+                                #photoProfileConversation.photoProfile(class="relative w-12 h-12 m-auto") 
+                                    img(src="/img/profiles/@danielbarros.png", alt="Imagen de perfil de danielbarros" class="w-full h-full rounded-full")
+                            #nameProfileConversation.name(class="ml-2 grid place-content-center")
+                                span(class="text-2xl") Daniel Barros 
+                        
+                        button#btnOptionsChat(type="button" class="fa-solid fa-ellipsis-vertical text-2xl w-12 h-12 rounded-full hover:bg-slate-100")
+
+                        #optionsChat(class="hidden absolute right-10 top-14 bg-gray-700 shadow-2xl rounded-sm z-10")
+                            ul(class="")
+                                li 
+                                    button#btnContactInfo(type="button" class="text-white text-lg p-3 hover:bg-gray-900  cursor-pointer w-full text-left") Info. del contacto
+                                li
+                                    button#btnDeleteChat(type="button" class="text-white text-lg p-3 hover:bg-gray-900 cursor-pointer w-full text-left") Eliminar chat 
+                                li  
+                                    button#btnCloseChat(type="button" class="text-white text-lg p-3 hover:bg-gray-900 cursor-pointer w-full text-left") Cerrar chat 
+
+                    div(class="flex flex-col flex-grow flex-1 bg-gray-input rounded-t-3xl ml-5") 
+                        main.messages(class="w-full flex-grow")
+                            ul#messages(class="overflow-scroll flex flex-col h-full max-h-[calc(100vh-290px)]")
+  
+                        
+                        form#form(class="w-full h-14 flex items-center gap-2 p-4 mb-3")
+                            .sendMsg(class="max-h-24 bg-white p-2 flex-1 flex items-center min-h-[56px] rounded-xl relative overflow-hidden shadow-2xl border-t")
+                                button#btnEmojis(type="button" class="fa-solid fa-face-smile mr-4 text-xl text-principal-gray ml-1") 
+                                textarea#inputMessage(rows="1" type="text" placeholder="Mensaje" class="py-1 max-h-24 overflow-auto resize-none h-8 flex-1 pr-4 text-lg font-extralight focus:outline-none")
+                            button#buttonSendMsg(type="submit" class="fa-regular fa-paper-plane w-14 h-14 bg-principal-gray text-white text-2xl rounded-xl hover:opacity-90")
+
+                    #contactInfo(class="absolute h-full w-96 bg-white right-0 translate-x-96 transition-all duration-300 ease-in-out")
+                        #photosInfo(class="relative") 
+                            #background(class="w-full h-40 bg-cover bg-center bg-no-repeat" style="background-image: url(/img/covers/blackBrown.png)")
+                            #profilePhotoInfo(class="relative w-28 h-16 m-auto") 
+                                #photoInfo(class="absolute w-28 h-28 rounded-full bottom-5 shadow-md bg-cover bg-center bg-no-repeat" style="background-image: url(/img/profiles/profilePredeterminated.png)") 
+                            #btnClosePersonalInfo(class="absolute top-0 pl-6 pt-3")
+                                button(href="/" class="w-14 h-10 p-2 rounded-xl shadow-md flex justify-around items-center border-t group bg-white hover:opacity-90")
+                                    i(class="fa-solid fa-arrow-left text-black")
+                        .infoContact
+                            div(class="text-center") 
+                                span#nameMoreInfo(class="text-2xl text-principal-gray") Julieta Gonzalez 
+                            div(class="text-center") 
+                                span#usernameMoreInfo(class="text-sm text-gray-400") @julygon1231
+
+                        a#linkUserMoreInfo(href="" class="flex items-center space-x-1 text-blue-700 pl-8 mt-4 w-fit hover:underline" target="_blank") 
+                            i(class="fa-solid fa-arrow-up-right-from-square grid place-content-center")
+                            span Visitar perfil 
+
+    //pre= JSON.stringify(conversations, null, 2)
+
+    template#templateContact 
+        .contact(class="w-fit flex cursor-pointer py-2 px-4")
+            .photo(class="w-12") 
+                #photoProfileConversation.photoProfile(class="relative w-12 h-12 m-auto") 
+                    img(src="/img/profiles/@danielbarros.png", alt="Imagen de perfil de danielbarros" class="w-full h-full rounded-full")
+            #nameProfileConversation.name(class="ml-2 grid place-content-center")
+                span(class="text-2xl") Daniel Barros 
+
+    template#templateMessageSentContainer 
+        li.messageSentContainer(class="max-w-[80%] mx-3 mt-8 self-end")
+            div(class="flex") 
+                .message(class="flex-1 w-fit bg-principal-gray rounded-lg flex items-center flex-wrap p-2 ml-2 shadow-lg relative")
+                    span(class="text-white")
+                    .dateMessage(class="absolute -bottom-6 right-0")
+                        span(class="font-light text-sm whitespace-nowrap")        
+                .photoProfileChat(class="relative w-8 h-8 m-auto ml-1")
+                    img(class="w-full h-full rounded-full shadow-md")            
+
+    template#templateMessageBuySentContainer
+        li.messageBuySentContainer(class="max-w-[80%] mx-3 mt-8 min-w-[420px] self-end")
+            div(class="flex") 
+                .message(class="flex-1 w-fit bg-principal-gray rounded-lg flex-col items-center flex-wrap p-2 ml-2 shadow-lg relative")
+                    .publicationToBuy(class="bg-black/80 rounded-xl px-2 py-4")
+                        .titleMsgBuy(class="")
+                            span(class="font-bold text-lg text-white")
+                        .containerMsgBuy(class="flex") 
+                    
+                            div(class="imgBackgroundPublication w-3/4 bg-cover bg-center bg-no-repeat rounded-2xl xl:h-36 relative group overflow-hidden cursor-pointer h-32") 
+                                a(href="" class="linkPublication absolute top-0 w-full h-full bg-black/25 rounded-2xl grid place-content-center text-white cursor-pointer left-full group-hover:left-0 transition-all duration-200 ease-in-out" target="_blank")
+                                    div(class="flex space-x-2 items-center bg-black/10 p-2 rounded-2xl")
+                                        i(class="fa-solid fa-arrow-up-right-from-square text-xl")
+                                        span(class="text-xl") Ir
+                            
+                            .status(class="flex flex-col justify-center text-yellow-100 flex-1") 
+                                div(class="grid place-content-center")
+                                    i(class="fa-solid fa-clock text-3xl text-center")
+                                    span En espera
+                    .text
+                        span.textMsg(class="text-white")
+                        .dateMessage(class="absolute -bottom-6 right-0")
+                            span(class="font-light text-sm whitespace-nowrap")
+                .photoProfileChat(class="relative w-8 h-8 ml-1")
+                    img(class="w-full h-full rounded-full shadow-md")
+
+    template#templateMessageReceivedContainer
+        li.messageReceivedContainer(class="max-w-[80%] mx-3 mt-8")
+            div(class="flex") 
+                .photoProfileChat(class="relative w-8 h-8")
+                    img(class="w-full h-full rounded-full shadow-md")
+                .message(class="max-w-[flex-1] w-fit bg-white rounded-lg flex items-center flex-wrap p-2 ml-2 shadow-lg relative")
+                    span
+                    .dateMessage(class="absolute -bottom-6")
+                        span(class="font-light text-sm whitespace-nowrap")
+
+    template#templateMessageBuyReceivedContainer
+        li.messageBuyContainer(class="max-w-[80%] mx-3 mt-8 min-w-[420px]")
+            div(class="flex") 
+                .photoProfileChat(class="relative w-8 h-8")
+                    img(src="/img/profiles/@danielbarros.png", alt="Imagen de perfil de danielbarros" class="w-full h-full rounded-full shadow-md")
+                .message(class="flex-1 w-fit bg-white rounded-lg flex-col items-center flex-wrap p-2 ml-2 shadow-lg relative")
+                    .publicationToBuy(class="bg-gray-input rounded-xl px-2 py-4")
+                        .titleMsgBuy(class="")
+                            span(class="font-bold text-lg")
+                        .containerMsgBuy(class="flex") 
+                            
+                            div(class="imgBackgroundPublication w-3/4 bg-cover bg-center bg-no-repeat rounded-2xl xl:w-10/12 xl:h-36 2xl:flex-1 relative 2xl:h-44 group overflow-hidden cursor-pointer") 
+                                a(href="" class="linkPublication absolute top-0 w-full h-full bg-black/25 rounded-2xl grid place-content-center text-white cursor-pointer left-full group-hover:left-0 transition-all duration-200 ease-in-out" target="_blank")
+                                    div(class="flex space-x-2 items-center bg-black/10 p-2 rounded-2xl")
+                                        i(class="fa-solid fa-arrow-up-right-from-square text-xl")
+                                        span(class="text-xl") Ir
+
+                            div(class="flex flex-col flex-1 2xl:flex-initial 2xl:w-2/12 justify-center")
+                                div(class="grid place-content-center")
+                                    span(class="price text-green-700")
+                                div(class="grid place-content-center space-y-2") 
+                                    button(type="button" class="bg-green-700 text-white p-2 hover:opacity-75 w-20") Liberar 
+                                    button(type="button" class="bg-red-500 text-white p-2 hover:opacity-75 w-20") Rechazar
+
+                    .text
+                        span.textMsg
+                        .dateMessage(class="absolute -bottom-6")
+                            span(class="font-light text-sm whitespace-nowrap")
+
+    template#templateNewConversation 
+        div
+            input(type="radio" name="contact" class="") 
+            label.contact(class="flex pl-10 my-3 py-3 hover:bg-gray-input -ml-5 cursor-pointer mr-4")
+                .photo(class="w-12") 
+                    .photoProfile(class="relative w-12 h-12 m-auto") 
+                        img(class="w-full h-full rounded-full")
+                        .online(class="w-3 h-3 rounded-full bg-gray-500 border border-white absolute right-0 bottom-0")
+                .data(class="ml-2 w-8/12")
+                    .name 
+                        span(class="text-xl font-semibold")
+                    .cutMessage(class="-mt-1 w-full overflow-hidden") 
+                        span(class="text-sm text-secondary-gray inline-block whitespace-nowrap text-ellipsis overflow-hidden w-full")
+                .info(class="w-2/12 flex flex-col items-center") 
+                    .time 
+                        span(class="text-xs text-secondary-gray")
+                    .countMessages(class="w-6 h-6 bg-green-600 rounded-full grid place-content-center")
+                        span(class="text-xs text-white")
+
+block scripts
+    script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+    
+    //F indica que solo se dedica a lo visual
+    script(src="/js/inputChatF.js")
+
+    script(src="/socket.io/socket.io.js")
+    script(src="/js/chat.js")
+    script(src="/js/chatF.js")

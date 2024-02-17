@@ -23,9 +23,14 @@ block contenido
                             i(class="fa-solid fa-pen")
                             span Editar perfil
 
-            #infoUser(class="right-2 px-[3%]") 
-                p(class="text-3xl font-bold text-principal-gray")= userProfile.name + " " + userProfile.lastname 
-                p(class="text-lg text-secondary-gray")= userProfile.username
+            div(class="flex justify-between")
+                #infoUser(class="right-2 px-[3%]") 
+                    p(class="text-3xl font-bold text-principal-gray")= userProfile.name + " " + userProfile.lastname 
+                    p(class="text-lg text-secondary-gray")= userProfile.username
+                
+                if user && user.id != userProfile.id
+                    a#sendMessage(href=`/chat?new-message=true&touser=${userProfile.username}` class="bg-principal-gray text-white rounded-full mx-[3%] grid place-content-center w-14 h-14 -mt-10 hover:opacity-90")
+                        i(class="fa-regular fa-envelope text-2xl")
         
         #options(class="mt-16 mx-[3%]")  
             button(class="border border-transparent bg-gray-300 text-principal-gray w-40 py-2 px-3 flex justify-between items-center rounded-xl")            

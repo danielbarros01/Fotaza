@@ -5,8 +5,9 @@ import csurf from 'csurf'
 import passport from 'passport'
 import "./Middlewares/google.js"
 
-import { Server } from 'socket.io'
 import { createServer } from 'node:http'
+
+import { Server } from 'socket.io'
 
 import homeRoutes from './routes/homeRoutes.js'
 import authRoutes from './routes/authRoutes.js'
@@ -18,12 +19,14 @@ import usersRoutes from './routes/usersRoutes.js'
 import categoriesRoutes from './routes/categoriesRoutes.js'
 import rightOfUseRoutes from './routes/rightOfUseRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
+import chatRoutes from './routes/chatRoutes.js'
 
 import db from './config/db.js'
+import execSocket from './socket.js'
 
 const app = express()
 const server = createServer(app)
-const io = new Server(server)
+const io = new Server(server);
 
 //conexion a base de datos
 try {
@@ -60,6 +63,7 @@ app.use('/comments', commentsRoutes)
 app.use('/users', usersRoutes)
 app.use('/licenses', rightOfUseRoutes)
 app.use('/search', searchRoutes)
+app.use('/chat', chatRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))
@@ -72,6 +76,8 @@ const port = process.env.PORT || 3000;
 server.listen(port, () => {
     console.log('listening on port ' + port);
 })
+
+execSocket()
 
 export {
     io
