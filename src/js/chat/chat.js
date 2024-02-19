@@ -217,7 +217,7 @@ function getUserInfo() {
             $contactInfo.classList.remove('translate-x-96')
 
             //Completamos los campos
-            $contactInfo.querySelector('#background').style.backgroundImage = `url(/img/covers/${user.cover_url})`
+            $contactInfo.querySelector('#background').style.backgroundImage = user.cover_url ? `url(/img/covers/${user.cover_url})` : 'url(/img/covers/greenViolet.png)'
             $contactInfo.querySelector('#photoInfo').style.backgroundImage = user.image_url ? `url(/img/profiles/${user.image_url})` : 'url(/img/profiles/profilePredeterminated.png)'
 
             $contactInfo.querySelector('#nameMoreInfo').textContent = `${user.name} ${user.lastname}`
