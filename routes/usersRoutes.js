@@ -3,7 +3,9 @@ import upload from "../Middlewares/uploadImage.js"
 
 import authenticateUser from '../Middlewares/authenticateUser.js'
 import protectRoute from "../Middlewares/protectRoute.js";
-import { getUser, userAccount, editAccount, password, changePassword, getUserApi,getUserApiForId } from "../controllers/usersController.js";
+import { getUser, userAccount, editAccount, password, changePassword, getUserApi,getUserApiForId,
+    getConfigurePayment, configurePayment, editPaymentSettings
+} from "../controllers/usersController.js";
 
 const router = express.Router();
 
@@ -35,5 +37,14 @@ router.get('/account/password', protectRoute, password)
 
 //POST /users/account/password --> Cambiar contraseña
 router.post('/account/password', protectRoute, changePassword)
+
+//GET /users/account/configure-payment
+router.get('/account/configure-payment', protectRoute, getConfigurePayment)
+
+//POST /users/account/configure-payment
+router.post('/account/configure-payment', protectRoute, configurePayment)
+
+//POST /users/account/configure-payment
+router.post('/account/configure-payment/edit', protectRoute, editPaymentSettings)
 
 export default router

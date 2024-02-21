@@ -42,6 +42,8 @@ export default {
         chat: './src/js/chat/chat.js',
         chatF: './src/js/chat/chatF.js',
         sendMessage: './src/js/chat/publication/sendMessage.js',
+
+        configurePayment: './src/js/user/configure-payment.js',
     },
     output:{
         filename: '[name].js',
