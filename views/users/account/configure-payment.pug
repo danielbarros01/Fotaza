@@ -63,7 +63,11 @@ block contenido
                             div(class="flex items-center justify-between space-x-2")
                                 p(class="text-white font-bold text-xl") ********************************
                                 i(class="fa-solid fa-circle-check text-4xl text-white -mt-7")
-                
+
+                        div(class="m-auto w-11/12 -mt-1") 
+                            form(action=`/users/account/configure-payment/delete/?_csrf=${csrfToken}` method="POST")
+                                button(type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white") Eliminar  
+
                         div(class="w-full h-fit sm:text-center p-4")
                             button#btnEdit(type="button" class="bg-green-600 text-white font-normal w-full sm:w-44 p-3 mt-8 sm:m-8 md:mt-18 hover:opacity-90") Editar
 

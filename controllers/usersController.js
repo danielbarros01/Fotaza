@@ -328,7 +328,7 @@ const getConfigurePayment = async (req, res) => {
     try {
         const { user } = req
 
-        if(req.query.error){
+        if (req.query.error) {
             return res.render('users/account/configure-payment', {
                 csrfToken: req.csrfToken(),
                 user: req.user,
@@ -454,8 +454,8 @@ const editPaymentSettings = async (req, res) => {
             const configurePayment = await UserPayment.findByPk(user.id)
             await configurePayment.update({ accessToken: accessToken });
 
-            return res.status(500).redirect('/users/account/configure-payment')
-        } 
+            return res.status(result.status).redirect('/users/account/configure-payment')
+        }
     } catch (error) {
         console.log(error)
 
@@ -463,6 +463,23 @@ const editPaymentSettings = async (req, res) => {
         const userPayment = await UserPayment.findByPk(user.id)
         await userPayment.destroy()
 
+        return res.status(500).redirect('/users/account/configure-payment?error=500')
+    }
+}
+
+const deletePaymentSettings = async (req, res) => {
+    const { user } = req
+
+    try {
+        const userPayment = await UserPayment.findByPk(user.id)
+
+        if(userPayment){
+            await userPayment.destroy()
+        }
+
+        return res.status(204).redirect('/users/account/configure-payment')
+    } catch (error) {
+        console.error(error)
         return res.status(500).redirect('/users/account/configure-payment?error=500')
     }
 }
@@ -506,5 +523,6 @@ export {
     getUserApiForId,
     getConfigurePayment,
     configurePayment,
-    editPaymentSettings
+    editPaymentSettings,
+    deletePaymentSettings
 }

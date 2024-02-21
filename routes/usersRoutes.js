@@ -4,7 +4,7 @@ import upload from "../Middlewares/uploadImage.js"
 import authenticateUser from '../Middlewares/authenticateUser.js'
 import protectRoute from "../Middlewares/protectRoute.js";
 import { getUser, userAccount, editAccount, password, changePassword, getUserApi,getUserApiForId,
-    getConfigurePayment, configurePayment, editPaymentSettings
+    getConfigurePayment, configurePayment, editPaymentSettings, deletePaymentSettings
 } from "../controllers/usersController.js";
 
 const router = express.Router();
@@ -44,7 +44,10 @@ router.get('/account/configure-payment', protectRoute, getConfigurePayment)
 //POST /users/account/configure-payment
 router.post('/account/configure-payment', protectRoute, configurePayment)
 
-//POST /users/account/configure-payment
+//POST /users/account/configure-payment/edit
 router.post('/account/configure-payment/edit', protectRoute, editPaymentSettings)
+
+//POST /users/account/configure-payment/delete
+router.post('/account/configure-payment/delete', protectRoute, deletePaymentSettings)
 
 export default router
