@@ -3,6 +3,8 @@ import { addTags } from './tags.js'
 import { checkFields, validationImage, viewErrors } from './create/validations.js'
 import renderImage from './create/renderImage.js'
 import { viewErrorsInAlert } from './create/errorsBackend.js'
+import { ocultarPrice, ocultarTypesVenta } from './create/salePublication.js'
+import { consultaLicencias, viewOtherOptions } from './create/licenses.js'
 
 const $form = document.querySelector("#form")
 
@@ -28,6 +30,7 @@ const $spanErrTypes = document.getElementById('errTypes')
 const $spanErrTypeSale = document.getElementById('errTypeSale')
 const $spanErrPrice = document.getElementById('errPrice')
 const $spanErrCurrency = document.getElementById('errCurrency')
+const $alert = document.getElementById('alertConfigurePayment')
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 const tags = []
@@ -59,29 +62,57 @@ $form.addEventListener("submit", function (e) {
 
     document.getElementById('sectionLoader').classList.remove('hidden')
 
-    axios.post('/publications/create', formData, {
-        headers: {
-            'CSRF-Token': token
-        }
-    })
-        .then(response => {
-            const publicationId = response.data.publicationId;
-            window.location.href = `/publications/${publicationId}`
-        })
-        .catch(error => {
-            
-            document.getElementById('sectionLoader').classList.add('hidden')
+    /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
+    axios.get('/payment/configured')
+        .then(res => {
+            console.log(res.data)
 
-            if (error.response && error.response.status === 400) {
-                console.log('Errores de validación:', error.response.data);
-                // Muestra los errores de validación en la interfaz de usuario
-                viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
-                viewErrorsInAlert(error.response.data)
-            } else {
-                console.error('Error al enviar la solicitud:', error);
-                viewErrorsInAlert(error.response.data)
+            axios.post('/publications/create', formData, {
+                headers: {
+                    'CSRF-Token': token
+                }
+            })
+                .then(response => {
+                    const publicationId = response.data.publicationId;
+                    window.location.href = `/publications/${publicationId}`
+                })
+                .catch(error => {
+
+                    document.getElementById('sectionLoader').classList.add('hidden')
+
+                    if (error.response && error.response.status === 400) {
+                        console.log('Errores de validación:', error.response.data);
+                        // Muestra los errores de validación en la interfaz de usuario
+                        viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
+                        viewErrorsInAlert(error.response.data)
+                    } else {
+                        console.error('Error al enviar la solicitud:', error);
+                        viewErrorsInAlert(error.response.data)
+                    }
+                });
+        })
+        .catch(err => {
+            if (err.response.data.success === false) {
+                debugger
+                //Hay error
+                //Mostrar alerta que se debe configurar el metodo de pago
+                $alert.classList.remove('hidden')
+
+                //Cambiar al input de tipo libre
+                const $inputFree = document.getElementById('input-free');
+                $inputFree.checked = true
+                ocultarTypesVenta()
+                ocultarPrice()
+                consultaLicencias('free')
+                viewOtherOptions()
             }
-        });
+        })
+        .finally(() => {
+            document.getElementById('sectionLoader').classList.add('hidden')
+        })
+
+    /* ---- */
+
 })
 
 //Cuando empiezo a escribir un titulo

@@ -20,6 +20,7 @@ import categoriesRoutes from './routes/categoriesRoutes.js'
 import rightOfUseRoutes from './routes/rightOfUseRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import chatRoutes from './routes/chatRoutes.js'
+import paymentRoutes from './routes/paymentRoutes.js'
 
 import db from './config/db.js'
 import execSocket from './socket.js'
@@ -64,6 +65,7 @@ app.use('/users', usersRoutes)
 app.use('/licenses', rightOfUseRoutes)
 app.use('/search', searchRoutes)
 app.use('/chat', chatRoutes)
+app.use('/payment', paymentRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))

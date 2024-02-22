@@ -253,5 +253,7 @@ function viewOtherOptions() {
 }
 
 export {
-    modalCopyright
+    modalCopyright,
+    consultaLicencias,
+    viewOtherOptions
 }
