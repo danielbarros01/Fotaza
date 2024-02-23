@@ -92,8 +92,12 @@ block contenido
                             div#proximamente(class="absolute p-1.5 right-0 -bottom-8 bg-red-500 rounded-tl-lg rounded-tr-none rounded-bl-lg rounded-br-lg opacity-0 transition-all duration-200 ease-in-out")
                                 span Proximamente
 
-                    button#sendMessage(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
-
+                    if publication.typeSale == 'unique' || publication.rights_of_use_id == 2
+                        button#sendMessage(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
+                    else if publication.typeSale == 'general'
+                        form(action=`/payment/new-order/${publication.id}/?_csrf=${csrfToken}`, method="post") 
+                            button#sendMessage(type="submit" class="h-full bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
+                    
 
 
         .moreInfo(class="mx-10 mt-6 mb-4 space-y-2")
@@ -306,10 +310,11 @@ block scripts
         script(src="/js/getComments.js")
         script(src="/js/addComment.js")
 
-        if user.id != userPost.id
+        //Si la publicacion no es unica no hace falta mandarle mensaje al usuario si no comprarla directamente
+        //El button sendMessage pasa a ser un link para adquirirla
+        if (user.id != userPost.id) && (publication.typeSale == 'unique' || publication.rights_of_use_id == 2)
             script(src="/socket.io/socket.io.js")
             script(src="/js/sendMessage.js")
-
 
 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")

@@ -83,6 +83,14 @@ function execSocket() {
                         }
                     })
 
+                    //Los usuarios deben poder ver de nuevo la conversacion aunque la hayan borrado
+                    if (conversation[0].visibleUser1 === false || conversation[0].visibleUser2 === false) {
+                        conversation[0].visibleUser1 = true
+                        conversation[0].visibleUser2 = true
+
+                        await conversation[0].save()
+                    }
+
                     //Guardamos el mensaje en la base de datos
                     const msg = await Message.create(
                         {

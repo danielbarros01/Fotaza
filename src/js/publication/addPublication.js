@@ -63,10 +63,12 @@ $form.addEventListener("submit", function (e) {
     document.getElementById('sectionLoader').classList.remove('hidden')
 
     /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
+
+    //console.log(res.data)
+
+    /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
     axios.get('/payment/configured')
         .then(res => {
-            console.log(res.data)
-
             axios.post('/publications/create', formData, {
                 headers: {
                     'CSRF-Token': token
@@ -77,7 +79,7 @@ $form.addEventListener("submit", function (e) {
                     window.location.href = `/publications/${publicationId}`
                 })
                 .catch(error => {
-
+                    debugger
                     document.getElementById('sectionLoader').classList.add('hidden')
 
                     if (error.response && error.response.status === 400) {
@@ -89,7 +91,7 @@ $form.addEventListener("submit", function (e) {
                         console.error('Error al enviar la solicitud:', error);
                         viewErrorsInAlert(error.response.data)
                     }
-                });
+                })
         })
         .catch(err => {
             if (err.response.data.success === false) {
@@ -110,7 +112,6 @@ $form.addEventListener("submit", function (e) {
         .finally(() => {
             document.getElementById('sectionLoader').classList.add('hidden')
         })
-
     /* ---- */
 
 })

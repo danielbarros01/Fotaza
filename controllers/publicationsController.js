@@ -8,7 +8,7 @@ import deleteImage from '../helpers/deleteImage.js'
 import { setWatermark } from '../helpers/watermarks.js'
 import getResolution from '../helpers/getResolution.js'
 
-import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating } from '../models/Index.js'
+import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating, UserPayment } from '../models/Index.js'
 
 import path from 'path'
 import { routeImages } from '../config/generalConfig.js'
@@ -278,6 +278,14 @@ const savePublication = async (req, res) => {
 
             //si es de tipo sale
             if (req.body['typePost'] == 'sale') {
+                /* Validar que exista un pago */
+                const userPayment = await UserPayment.findByPk(req.user.id)
+
+                if (!userPayment) {
+                    errors.push({ path: 'payment', msg: `No tienes configurado el metodo de pago` })
+                }
+                /*  */
+
                 //typeVenta puede ser general o unique
                 const typeSale = req.body['typeSale']
 
@@ -877,31 +885,57 @@ const bestPublications = async (req, res) => {
         let oneYearGo = new Date();
         oneYearGo.setFullYear(oneYearGo.getFullYear() - 1);
 
-        const randomImages = await Publication.findAll({
-            where: {
-                id: {
-                    [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+        let randomImages
+
+        if (user) {
+            randomImages = await Publication.findAll({
+                where: {
+                    id: {
+                        [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+                    },
+                    date: { [Op.gte]: oneYearGo },
+                    [Op.not]: {
+                        [Op.and]: [
+                            { type: { [Op.ne]: 'sale' } },
+                            { privacy: 'private' }
+                        ]
+                    }
                 },
-                date: { [Op.gte]: oneYearGo },
-                [Op.not]: {
-                    [Op.and]: [
-                        { type: { [Op.ne]: 'sale' } },
-                        { privacy: 'private' }
-                    ]
-                }
-            },
-            include: [{
-                model: User, as: 'user',
-                attributes: {
-                    exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
-                }
-            }],
-            order: Sequelize.literal('rand()'),
-            subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
-            group: ['User.id'],
-            limit: additionalItems,
-            having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
-        })
+                include: [{
+                    model: User, as: 'user',
+                    attributes: {
+                        exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                    }
+                }],
+                order: Sequelize.literal('rand()'),
+                subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
+                group: ['User.id'],
+                limit: additionalItems,
+                having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
+            })
+        } else {
+            randomImages = await Publication.findAll({
+                where: {
+                    id: {
+                        [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+                    },
+                    date: { [Op.gte]: oneYearGo },
+                    privacy: { [Op.notIn]: ['private', 'protected'] }
+                },
+                include: [{
+                    model: User, as: 'user',
+                    attributes: {
+                        exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                    }
+                }],
+                order: Sequelize.literal('rand()'),
+                subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
+                group: ['User.id'],
+                limit: additionalItems,
+                having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
+            })
+
+        }
 
         /* La estrucutura de items funciona asi, con un item padre, por eso hago esto */
         randomImages.forEach(i => {
