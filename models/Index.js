@@ -10,6 +10,7 @@ import PublicationHasTag from './PublicationHasTag.js'
 import Conversation from './Conversation.js'
 import Message from './Message.js'
 import UserPayment from './UserPayment.js'
+import Transaction from './Transaction.js'
 
 // Definir la relación muchos a muchos entre Usuario y Categoria
 User.belongsToMany(Category, { through: Interest });
@@ -93,6 +94,27 @@ User.hasOne(UserPayment, {
     as: 'userPayment'
 })
 
+/* Transactions */
+User.hasMany(Transaction, {
+    foreignKey: 'user_id',
+    as: 'transaction'
+});
+
+Transaction.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user'
+});
+
+Publication.hasMany(Transaction, {
+    foreignKey: 'publication_id',
+    as: 'transaction'
+});
+
+Transaction.belongsTo(Publication, {
+    foreignKey: 'publication_id',
+    as: 'publication'
+});
+
 export {
     Interest,
     Category,
@@ -105,5 +127,6 @@ export {
     Comment,
     Conversation,
     Message,
-    UserPayment
+    UserPayment,
+    Transaction
 }

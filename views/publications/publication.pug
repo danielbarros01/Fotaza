@@ -64,39 +64,47 @@ block contenido
                 p.text-principal-gray.text-xl.underline= rightOfUse ? rightOfUse.name : 'Sin licencia'
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
-        if publication.type == 'sale' && user ? (user.id !== userPost.id) : ''
-            .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
-                div(class="flex flex-col justify-between")
-                    .infoSale(class="flex flex-col") 
-                        span Precio de la imagen 
-                        span #{publication.currency.toUpperCase()} $#{publication.price}
-                    .moreInfoSale(class="flex items-center")
-                        i(class="fa-solid fa-circle-info mr-2 text-lg")
-                        if publication.typeSale == 'general' && publication.rights_of_use_id == 2
-                            span Debes contactarte con el vendedor para adquirir esta publicación, ya que tiene licencia copyright
+        if transaction
+           .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
+                div(class="flex gap-2")
+                    i(class="fa-solid fa-floppy-disk text-5xl m-auto")
+                    p(class="text-2xl grid place-content-center") Ya has adquirido esta imagen
+                a(href="/transactions" class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90 flex justify-center")
+                    span(class="grid place-content-center") Ir a transacciones
+        else    
+            if publication.type == 'sale' && user ? (user.id !== userPost.id) : ''
+                .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
+                    div(class="flex flex-col justify-between")
+                        .infoSale(class="flex flex-col") 
+                            span Precio de la imagen 
+                            span #{publication.currency.toUpperCase()} $#{publication.price}
+                        .moreInfoSale(class="flex items-center")
+                            i(class="fa-solid fa-circle-info mr-2 text-lg")
+                            if publication.typeSale == 'general' && publication.rights_of_use_id == 2
+                                span Debes contactarte con el vendedor para adquirir esta publicación, ya que tiene licencia copyright
+                            if publication.typeSale == 'general' && publication.rights_of_use_id != 2
+                                span La imagen quedara guardada en tus adquisiciones.
+                            if publication.typeSale == 'unique'
+                                span Esta imagen es de transferencia unica, si deseas adquirirla, ponte en contacto con el propietario.
+                    div(class="flex")
+                        //2 es el id de copyright
                         if publication.typeSale == 'general' && publication.rights_of_use_id != 2
-                            span La imagen quedara guardada en tus adquisiciones.
-                        if publication.typeSale == 'unique'
-                            span Esta imagen es de transferencia unica, si deseas adquirirla, ponte en contacto con el propietario.
-                div(class="flex")
-                    //2 es el id de copyright
-                    if publication.typeSale == 'general' && publication.rights_of_use_id != 2
-                        .payment(class="flex gap-2 items-center mx-3 relative")
-                            input(type="radio" name="wayToPay" id='radio-mercadopago' checked class="hidden")
-                            label(for="radio-mercadopago" class="cursor-pointer w-16 h-16 bg-cover bg-center bg-no-repeat" style="background-image: url(/img/project/mp-payment.jpg)")
-                            
-                            input(type="radio" name="wayToPay" id='radio-paypal' disabled class="hidden")
-                            label(for="radio-paypal" class="cursor-pointer w-16 h-16 bg-cover bg-center bg-no-repeat opacity-50" style="background-image: url(/img/project/pp-payment.png)")
-                            
-                            //Funcionalidad en el script clicksPublication.js
-                            div#proximamente(class="absolute p-1.5 right-0 -bottom-8 bg-red-500 rounded-tl-lg rounded-tr-none rounded-bl-lg rounded-br-lg opacity-0 transition-all duration-200 ease-in-out")
-                                span Proximamente
+                            .payment(class="flex gap-2 items-center mx-3 relative")
+                                input(type="radio" name="wayToPay" id='radio-mercadopago' checked class="hidden")
+                                label(for="radio-mercadopago" class="cursor-pointer w-16 h-16 bg-cover bg-center bg-no-repeat" style="background-image: url(/img/project/mp-payment.jpg)")
+                                
+                                input(type="radio" name="wayToPay" id='radio-paypal' disabled class="hidden")
+                                label(for="radio-paypal" class="cursor-pointer w-16 h-16 bg-cover bg-center bg-no-repeat opacity-50" style="background-image: url(/img/project/pp-payment.png)")
+                                
+                                //Funcionalidad en el script clicksPublication.js
+                                div#proximamente(class="absolute p-1.5 right-0 -bottom-8 bg-red-500 rounded-tl-lg rounded-tr-none rounded-bl-lg rounded-br-lg opacity-0 transition-all duration-200 ease-in-out")
+                                    span Proximamente
 
-                    if publication.typeSale == 'unique' || publication.rights_of_use_id == 2
-                        button#sendMessage(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
-                    else if publication.typeSale == 'general'
-                        form(action=`/payment/new-order/${publication.id}/?_csrf=${csrfToken}`, method="post") 
-                            button#sendMessage(type="submit" class="h-full bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
+                        if publication.typeSale == 'unique' || publication.rights_of_use_id == 2
+                            button#sendMessage(class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
+                        else if publication.typeSale == 'general'
+                            form(action=`/payment/new-order/${publication.id}/?_csrf=${csrfToken}`, method="post") 
+                                button#sendMessage(type="submit" class="h-full bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Adquirir
                     
 
 

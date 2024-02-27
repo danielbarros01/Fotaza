@@ -1,0 +1,72 @@
+extends ../layout/index
+
+block styles 
+
+block contenido
+    include ../layout/headerWithSearch
+
+    main(class="px-10 relative min-h-screen")
+        h1(class="text-3xl font-semibold text-center my-8 text-principal-gray") Transacciones 
+
+        section#myShopping(class="mb-14 overflow-hidden")
+            header(class="z-10")
+                div(class="w-full") 
+                    button#btnPurchases(type="button" class="shadow-md rounded-md font-bold bg-gray-200 text-lg px-3 py-1 flex gap-2 text-principal-gray hover:text-black")
+                        i(class="fa-solid fa-arrow-down m-auto transition-all duration-300 ease-in-out")
+                        span Compras
+                hr(class="my-4 border-t border-dashed border-secondary-gray")
+            
+            section#containerSectionShopping(class="transition-all duration-300 ease-in-out")
+                section#shopping(class="space-y-6")   
+                
+                #pagination(class="flex justify-center m-8")  
+                    button#previous(class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                        i(class="fa-solid fa-arrow-left")
+                        span Anterior
+
+                    #btnsPagination(class="flex")
+
+                    button#next(class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                        span Siguiente
+                        i(class="fa-solid fa-arrow-right")
+
+        section.mySales
+            header
+                div(class="w-full") 
+                    button(type="button" class="shadow-md rounded-md font-bold bg-gray-200 text-lg px-3 py-1 flex gap-2 text-principal-gray hover:text-black")
+                        i(class="fa-solid fa-arrow-down m-auto")
+                        span Ventas
+                hr(class="my-4 border-t border-dashed border-secondary-gray")
+    
+        .loader(class="w-full grid place-content-center mb-2 transform transition-all duration-1000 hidden")
+            img(src="/img/project/spinning-circles.svg" class="")   
+
+    template#templateTransaction 
+        article(class="w-full h-40 bg-white shadow-lg rounded-lg flex")
+            .image(class="w-3/6 sm:w-2/6 md:w-1/4 h-full bg-cover bg-center bg-no-repeat rounded-tl-lg rounded-bl-lg")
+
+            main(class="flex-1 mx-5 py-3 flex flex-col h-full justify-between") 
+                header(class="flex flex-col")
+                    span.status(class="text-green-600 font-semibold") Compra efectuada 
+                    span.dateTransaction(class="text-principal-gray text-lg") 2 de Febrero del 2024
+                footer(class="flex gap-2")
+                    .info-price(class="rounded-full w-24 h-7 shadow-md hover:opacity-80 bg-green-500 flex justify-around pr-3")
+                        i(class="fa-solid fa-sack-dollar m-auto text-white")
+                        span.price(class="text-white grid place-content-center h-full rounded-full") $1500
+                    .category-content(class="rounded-full w-fit h-7 bg-cover bg-center bg-no-repeat cursor-pointer shadow-md hover:opacity-80" style=`background-image: url(/img/backgroundsCategories/animals.jpg)`)
+                        span(class="bg-black/20 text-white grid place-content-center w-full h-full rounded-full px-10") Animales
+                    .info-resolution(class="rounded-full w-36 h-7 bg-secondary-gray shadow-md hover:opacity-80")
+                        span(class="text-white grid place-content-center w-full h-full rounded-full px-4 text-sm") 1920x1080/JPEG
+
+            aside(class="w-1/6 flex justify-center items-center gap-4 pr-10")
+                a.linkPublication(href="" class="fa-solid fa-arrow-up-right-from-square text-4xl bg-gray-input rounded-full p-4 text-principal-gray hover:text-black") 
+                a.linkDownload(href="" class="fa-solid fa-download text-4xl bg-gray-input rounded-full p-4 text-principal-gray hover:text-black") 
+
+    template#btnPagination 
+        button(class="pagination-btn relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0")
+
+block scripts
+    script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+
+    script(src="./js/getPurchases.js") 
+    script(src="./js/getSales.js") 

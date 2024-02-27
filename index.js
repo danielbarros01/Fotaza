@@ -21,9 +21,11 @@ import rightOfUseRoutes from './routes/rightOfUseRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import chatRoutes from './routes/chatRoutes.js'
 import paymentRoutes from './routes/paymentRoutes.js'
+import transactionsRoutes from './routes/transactionsRoutes.js'
 
 import db from './config/db.js'
 import execSocket from './socket.js'
+import conditionalCSRF from './Middlewares/conditionalCSRF.js'
 
 const app = express()
 const server = createServer(app)
@@ -44,7 +46,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 //Habilitar CSURF(Cross-Site Request Forgery)
-app.use(csurf({ cookie: true }))
+app.use(conditionalCSRF)
 
 // Configurar el middleware para analizar el cuerpo de la solicitud JSON
 app.use(express.json())
@@ -66,6 +68,7 @@ app.use('/licenses', rightOfUseRoutes)
 app.use('/search', searchRoutes)
 app.use('/chat', chatRoutes)
 app.use('/payment', paymentRoutes)
+app.use('/transactions', transactionsRoutes)
 
 //Carpeta publica
 app.use(express.static('public'))

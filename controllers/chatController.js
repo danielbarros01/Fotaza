@@ -1,4 +1,4 @@
-import { Conversation, User, Message, Publication } from '../models/Index.js'
+import { Conversation, User, Message, Publication, Transaction } from '../models/Index.js'
 import { Op, literal } from 'sequelize'
 import { io } from '../index.js'
 import moment from 'moment'
@@ -94,15 +94,39 @@ const getApiConversation = async (req, res) => {
             ]
         })
 
-        const messages = conversation.messages.map(msg => {
+        const messages = await Promise.all(conversation.messages.map(async msg => {
             const msgData = { ...msg.get() }
 
             let myMsg = msgData.user_id == userId
 
             myMsg ? msgData.mine = true : msgData.mine = false
 
+            if (msgData.purchase) {
+                /* const userIdTransaction = await (function () {
+                    //Si yo no soy el dueno de la publicacion Y no soy el userId1 de conversacion
+                    //Entonces el id del usuario solicitando la transaccion es userId2
+                    if ((userId != msgData.publication.user_id) && (userId == conversation.userId1)) {
+                        return conversation.userId2
+                    } else {
+                        return conversation.userId1
+                    }
+                })() */
+
+                const transaction = await Transaction.findOne({
+                    where: {
+                        publication_id: msgData.publication_id,
+                        [Op.or]: [
+                            { user_id: conversation.userId1 },
+                            { user_id: conversation.userId2 }
+                        ]
+                    }
+                })
+
+                await transaction ? msgData.transaction = transaction : msgData.transaction = null
+            }
+
             return msgData
-        })
+        }))
 
         const modifiedConversation = (function modifiedConversation() {
             const conversationM = { ...conversation.get() }

@@ -1,6 +1,7 @@
 import axios from "axios"
 import { commonMessage, buyMessage } from "./newMessagesDom.js"
 import { socket } from "../chat.js"
+import { buttonFunctionality } from "../acceptOrDecline.js"
 
 const d = document
 
@@ -45,6 +46,8 @@ function addListenerChange($chat) {
 
             //Leer mensajes
             socket.emit('read-messages', conversation.id)
+            debugger
+            buttonFunctionality()
         })
     })
 }
@@ -69,8 +72,8 @@ function showMessages(messages, $messages = d.getElementById('messages')) {
     messages.forEach(msg => {
         let $clone
 
-        if (msg.purchase) {
-            if (msg.mine) {
+        if (msg.purchase) { //si es mensaje de compra
+            if (msg.mine) { //si el mensaje es mio
                 buyMessage($templateSentBuy, msg)
                 $clone = d.importNode($templateSentBuy, true)
             } else {

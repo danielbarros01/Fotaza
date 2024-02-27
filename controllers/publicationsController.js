@@ -8,7 +8,7 @@ import deleteImage from '../helpers/deleteImage.js'
 import { setWatermark } from '../helpers/watermarks.js'
 import getResolution from '../helpers/getResolution.js'
 
-import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating, UserPayment } from '../models/Index.js'
+import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating, UserPayment, Transaction } from '../models/Index.js'
 
 import path from 'path'
 import { routeImages } from '../config/generalConfig.js'
@@ -590,6 +590,16 @@ const viewPublication = async (req, res) => {
 
         const categories = await Category.findAll()
         const rightsOfUse = await RightOfUse.findAll()
+
+        /* Verificar que no haya comprado ya la publicacion */
+        const transaction = await Transaction.findOne({
+            where: {
+                user_id: user.id,
+                publication_id: publication.id
+            }
+        })
+        /*  */
+
         //si el user_id del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
             publication,
@@ -606,6 +616,7 @@ const viewPublication = async (req, res) => {
             myId: user.id ?? '',
             csrfToken: req.csrfToken(),
             imageUrl: `/publications/image/${publication.image}`,
+            transaction
         })
     } catch (error) {
         console.error(error)
@@ -628,8 +639,20 @@ const downloadImage = async (req, res) => {
     if (publication.type != 'sale') {
         filePath = path.join(process.cwd(), 'images', 'uploads', fileName)
     } else {
-        //Si la imagen es de venta descargar con marca de agua
-        filePath = path.join(process.cwd(), 'images', 'uploadsWithWatermark', `watermark_${fileName}`)
+        //Si la imagen es de venta pero ya la adquiri descargar sin marca de agua
+        const transaction = await Transaction.findOne({
+            where: {
+                user_id: req.user.id,
+                publication_id: publication.id
+            }
+        })
+
+        if (transaction && transaction.status == 'approved') {
+            filePath = path.join(process.cwd(), 'images', 'uploads', fileName)
+        } else {
+            //Si la imagen es de venta descargar con marca de agua
+            filePath = path.join(process.cwd(), 'images', 'uploadsWithWatermark', `watermark_${fileName}`)
+        }
     }
 
     res.download(filePath, fileName, (err) => {

@@ -1,5 +1,6 @@
 import mercadopago from 'mercadopago'
-import { Publication, User, UserPayment } from '../models/Index.js'
+import { Op } from 'sequelize'
+import { Category, Publication, Transaction, User, UserPayment } from '../models/Index.js'
 
 const isItConfigured = async (req, res) => {
     //Traigo al usuario
@@ -31,7 +32,11 @@ const newOrder = async (req, res) => {
                 model: User, as: 'user',
                 include: [{
                     model: UserPayment, as: 'userPayment'
-                }]
+                },
+                {
+                    model: Category, as: 'categories'
+                }
+                ]
             }]
         })
 
@@ -47,6 +52,25 @@ const newOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: 'No se puede adquirir esta publicacion' })
         }
 
+        /* Verificar que este aprobado para comprar (status:hold) */
+        const transaction = await Transaction.findOne({
+            where: {
+                user_id: user.id,
+                publication_id: publication.id,
+                status: 'hold'
+            },
+        })
+
+        /* Si no existe transaccion, y Si la publicacion es de venta unica y  copyright, entonces no se puede comprar
+            contrariamente, si no es ninguna de estas dos, no hace falta que exista un registro en transaction
+        */
+        if (!transaction) {
+            if (publication.typeSale == 'unique' || publication.category.name.toLowerCase() == 'copyright') {
+                return res.status(404).json({ success: false, message: 'No puedes adquirir esta publicacion' })
+            }
+        }
+        /* ---- */
+
         //Obtener el access_token y descifrarlo
         const accessToken = await userPublication.userPayment.verificarAccessToken()
 
@@ -58,16 +82,35 @@ const newOrder = async (req, res) => {
         const result = await mercadopago.preferences.create({
             items: [
                 {
-                    title: publication.title,
+                    id: publication.id,
+                    title: `Foto ${publication.title}`,
                     unit_price: publication.price,
                     currency_id: publication.currency.toUpperCase(),
-                    quantity: 1
+                    quantity: 1,
+                    description: `Estas a punto de comprar una foto de ${publication.user.username} con una resolucion de ${publication.resolution}`,
+                    picture_url: `${process.env.BACKEND_URL}:${process.env.PORT}/publications/image/${publication.image}`,
+                    category_id: 'Fotos'
                 }
-            ]
+            ],
+            back_urls: {
+                success: "http://localhost:3000/payment/success",
+                failure: "http://localhost:3000/payment/failure",
+                pending: "http://localhost:3000/payment/pending",
+            },
+            notification_url: `https://15ff-138-59-172-60.ngrok-free.app/payment/webhook`,
+            auto_return: "approved",
+            payer: {
+                name: user.name,
+                surname: user.lastname,
+                email: user.email
+            },
+            metadata: {
+                user_id: user.id
+            }
         })
 
-        console.log(result)
-        return res.status(200).redirect()
+        //console.log(result)
+        return res.status(200).redirect(result.body.init_point)
 
     } catch (error) {
         console.error(error)
@@ -76,7 +119,56 @@ const newOrder = async (req, res) => {
 
 }
 
+const webhook = async (req, res) => {
+    const payment = req.query //recibo los datos del webhook
+
+    try {
+        if (payment.type === 'payment') {
+            const data = await mercadopago.payment.findById(payment['data.id'])
+
+            if (data.body.status_detail) {
+                //Guardamos la transaccion en la base de datos
+
+                const item = data.body.additional_info.items[0]
+                const idUserPayer = data.body.metadata.user_id
+                const { status, currency_id: currency } = data.body
+
+                if (item.id && idUserPayer) {
+                    const transaction = await Transaction.findOrCreate({
+                        where: {
+                            user_id: idUserPayer,
+                            publication_id: item.id
+                        },
+                        defaults: {
+                            id: payment['data.id'],
+                            user_id: idUserPayer,
+                            publication_id: item.id,
+                            date: new Date(),
+                            price: Number(item.unit_price),
+                            status,
+                            currency
+                        }
+                    })
+
+                    transaction[0].status = status
+                    await transaction[0].save()
+                }
+            }
+        }
+
+        res.sendStatus(204)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const success = async (req, res) => {
+    return res.status(200).redirect('/transactions')
+}
+
 export {
     isItConfigured,
-    newOrder
+    newOrder,
+    webhook,
+    success
 }
