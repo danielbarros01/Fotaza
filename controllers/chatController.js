@@ -86,7 +86,8 @@ const getApiConversation = async (req, res) => {
                             }
                         },
                         {
-                            model: Publication, as: 'publication'
+                            model: Transaction, as: 'transaction',
+                            include: [{ model: Publication, as: 'publication' }]
                         }
                     ],
                     order: [['date', 'DESC']]
@@ -101,29 +102,21 @@ const getApiConversation = async (req, res) => {
 
             myMsg ? msgData.mine = true : msgData.mine = false
 
-            if (msgData.purchase) {
-                /* const userIdTransaction = await (function () {
-                    //Si yo no soy el dueno de la publicacion Y no soy el userId1 de conversacion
-                    //Entonces el id del usuario solicitando la transaccion es userId2
-                    if ((userId != msgData.publication.user_id) && (userId == conversation.userId1)) {
-                        return conversation.userId2
-                    } else {
-                        return conversation.userId1
-                    }
-                })() */
-
+            /* if (msgData.purchase) {
                 const transaction = await Transaction.findOne({
                     where: {
                         publication_id: msgData.publication_id,
                         [Op.or]: [
                             { user_id: conversation.userId1 },
                             { user_id: conversation.userId2 }
-                        ]
+                        ],
+                        order: [['date', 'DESC']]
                     }
                 })
 
+
                 await transaction ? msgData.transaction = transaction : msgData.transaction = null
-            }
+            } */
 
             return msgData
         }))

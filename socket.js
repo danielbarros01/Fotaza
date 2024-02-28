@@ -44,30 +44,29 @@ function execSocket() {
 
         socket.on('acquire', async ({ publicationId, message: messageClient }) => {
             console.log('Adquirir la publicacion', publicationId)
+            try {
+                //Validar que la publicacion exista, si es acquire significa que la publicacion debe ser de transferencia unica
+                const publication = await Publication.findOne({
+                    where: {
+                        id: publicationId,
+                        [Op.or]: [
+                            { type: 'sale', typeSale: 'unique' },
+                            { '$license.name$': 'Copyright' }
+                        ]
+                    },
+                    include: [{ model: RightOfUse, as: 'license' }]
+                })
 
-            //Validar que la publicacion exista, si es acquire significa que la publicacion debe ser de transferencia unica
-            const publication = await Publication.findOne({
-                where: {
-                    id: publicationId,
-                    [Op.or]: [
-                        { type: 'sale', typeSale: 'unique' },
-                        { '$license.name$': 'Copyright' }
-                    ]
-                },
-                include: [{ model: RightOfUse, as: 'license' }]
-            })
-
-            if (!publication) {
-                //Le decimos al cliente que no se puede
-                return io.emit('acquire-not')
-            } else {
-                try {
-
+                if (!publication) {
+                    //Le decimos al cliente que no se puede
+                    return io.emit('acquire-not')
+                } else {
                     //Creamos la transaccion
                     const [transaction, flag] = await Transaction.findOrCreate({
                         where: {
                             publication_id: publication.id,
-                            user_id: socket.user.id
+                            user_id: socket.user.id,
+                            [Op.or]: [{ status: 'waiting' }, { status: 'hold' }]
                         },
                         include: [{ model: Publication, as: 'publication' }],
                         defaults: {
@@ -77,7 +76,8 @@ function execSocket() {
                             date: new Date(),
                             price: publication.price,
                             status: 'waiting',
-                            currency: publication.currency
+                            currency: publication.currency,
+                            typeSale: publication.typeSale
                         }
                     })
 
@@ -118,7 +118,7 @@ function execSocket() {
                             purchase: true,
                             user_id: socket.user.id,
                             conversation_id: conversation[0].id,
-                            publication_id: publication.id,
+                            transaction_id: transaction.id,
                             read: false
                         })
 
@@ -126,7 +126,7 @@ function execSocket() {
                     const message = { ...msg.get() }
                     message.user = socket.user
                     message.conversation = conversation[0]
-                    message.publication = publication
+                    message.transaction = transaction
 
                     //Agrego la propiedad ultimo mensaje a la conversacion
                     const conversationData = { ...message.conversation.get() }
@@ -146,10 +146,10 @@ function execSocket() {
                         io.to(`conversation-${conversation[0].id}`).emit('new-message-ok',
                             { message, msgUserId: msg.user_id, fromUser: socket.user.id, toUser: publication.user_id, transaction })
                     }
-                } catch (error) {
-                    //Le decimos al cliente que no se puede
-                    io.emit('acquire-not')
                 }
+            } catch (error) {
+                //Le decimos al cliente que no se puede
+                io.emit('acquire-not')
             }
         })
 
@@ -286,7 +286,8 @@ function execSocket() {
                 const [transaction, flag] = await Transaction.findOrCreate({
                     where: {
                         publication_id: publication.id,
-                        user_id: requestingUserId
+                        user_id: requestingUserId,
+                        status: 'waiting'
                     },
                     include: [{ model: Publication, as: 'publication' }],
                     defaults: {
@@ -296,7 +297,8 @@ function execSocket() {
                         date: new Date(),
                         price: publication.price,
                         status: 'hold',
-                        currency: publication.currency
+                        currency: publication.currency,
+                        typeSale: publication.typeSale
                     },
                     order: [['date', 'ASC']], // Ordenar por fecha ascendente
                     limit: 1 // Obtener solo el primer resultado
@@ -368,7 +370,8 @@ function execSocket() {
                         date: new Date(),
                         price: publication.price,
                         status: 'rejected',
-                        currency: publication.currency
+                        currency: publication.currency,
+                        typeSale: publication.typeSale
                     },
                     order: [['date', 'ASC']], // Ordenar por fecha ascendente
                     limit: 1 // Obtener solo el primer resultado

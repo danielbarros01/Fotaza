@@ -643,7 +643,8 @@ const downloadImage = async (req, res) => {
         const transaction = await Transaction.findOne({
             where: {
                 user_id: req.user.id,
-                publication_id: publication.id
+                publication_id: publication.id,
+                status: 'approved'
             }
         })
 

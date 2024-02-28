@@ -64,13 +64,32 @@ block contenido
                 p.text-principal-gray.text-xl.underline= rightOfUse ? rightOfUse.name : 'Sin licencia'
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
 
-        if transaction
-           .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
+        if transaction && transaction.status == 'approved'
+            .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
                 div(class="flex gap-2")
                     i(class="fa-solid fa-floppy-disk text-5xl m-auto")
                     p(class="text-2xl grid place-content-center") Ya has adquirido esta imagen
                 a(href="/transactions" class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90 flex justify-center")
                     span(class="grid place-content-center") Ir a transacciones
+        if transaction && transaction.status == 'hold'
+            .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
+                div(class="flex gap-2")
+                    i(class="fa-solid fa-circle-info text-5xl m-auto")
+                    p(class="text-xl grid place-content-center") Ya tienes liberada la publicación, paga para tener acceso a ella
+                form#formPayment(action=`/payment/new-order/${publication.id}/?_csrf=${csrfToken}`, method="post") 
+                    button(type="submit" class="h-full bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90" data-id= publication.id) Pagar
+        
+            #alertConfigurePayment(class="z-50 absolute top-0 left-0 w-screen h-screen bg-gray-400/50 grid place-content-center hidden" style="position:fixed;")
+                div(class="bg-white p-8")
+                    div(class="w-full text-center p-4") 
+                        i(class="fa-solid fa-circle-exclamation text-8xl text-red-600")
+                    div(class="m-auto text-center w-1/2 space-y-3 p-4 pb-6")
+                        h3(class="text-3xl text-principal-gray font-semibold") Hubo un problema
+                        p#messageErrorPayment(class="text-gray-400 font-light text-sm" style="text-wrap:balance")
+                    div(class="flex flex-col w-1/2 m-auto space-y-3") 
+                        div(class="w-full")
+                            button#sendMessage(type="button" class="bg-sky-500 py-2 px-4 text-white w-full hover:bg-sky-600" data-id= publication.id) Enviar mensaje
+                        button#btnCloseAlertPayment(type="button" class="py-2 px-4 bg-gray-input text-principal-gray w-full hover:bg-gray-input/90") Volver  
         else    
             if publication.type == 'sale' && user ? (user.id !== userPost.id) : ''
                 .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
@@ -320,10 +339,10 @@ block scripts
 
         //Si la publicacion no es unica no hace falta mandarle mensaje al usuario si no comprarla directamente
         //El button sendMessage pasa a ser un link para adquirirla
-        if (user.id != userPost.id) && (publication.typeSale == 'unique' || publication.rights_of_use_id == 2)
-            script(src="/socket.io/socket.io.js")
-            script(src="/js/sendMessage.js")
-
+        //if (user.id != userPost.id) && (publication.typeSale == 'unique' || publication.rights_of_use_id == 2)
+        script(src="/socket.io/socket.io.js")
+        script(src="/js/sendMessage.js")
+        script(src="/js/formPayment.js") 
 
     script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
     

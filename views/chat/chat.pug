@@ -99,7 +99,15 @@ block contenido
                             i(class="fa-solid fa-arrow-up-right-from-square grid place-content-center")
                             span Visitar perfil 
 
-    //pre= JSON.stringify(conversations, null, 2)
+    #alertConfigurePayment(class="z-50 absolute top-0 left-0 w-screen h-screen bg-gray-400/50 grid place-content-center hidden" style="position:fixed;")
+        div(class="bg-white p-8")
+            div(class="w-full text-center p-4") 
+                i(class="fa-solid fa-circle-exclamation text-8xl text-red-600")
+            div(class="m-auto text-center w-1/2 space-y-3 p-4 pb-6")
+                h3(class="text-3xl text-principal-gray font-semibold") Hubo un problema
+                p#messageErrorPayment(class="text-gray-400 font-light text-sm" style="text-wrap:balance")
+            div(class="flex flex-col w-1/2 m-auto space-y-3") 
+                button#btnCloseAlertPayment(type="button" class="py-2 px-4 bg-gray-input text-principal-gray w-full hover:bg-gray-input/90") Volver  
 
     template#templateContact 
         .contact(class="w-fit flex cursor-pointer py-2 px-4")

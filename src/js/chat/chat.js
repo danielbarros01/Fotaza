@@ -37,6 +37,7 @@ d.addEventListener('DOMContentLoaded', () => {
 
 //Mandar mensajes
 $form.addEventListener('submit', (e) => {
+    debugger
     e.preventDefault()
 
     if ($message.value) {
@@ -241,6 +242,28 @@ d.addEventListener('click', (e) => {
     //Si hago click en el nombre de la conversacion
     if (d.getElementById("contactHeader").contains(e.target)) {
         getUserInfo()
+    }
+
+    //Boton para pagar
+    if (e.target.classList.contains("btnCreateOrder")) {
+        debugger
+        const publicationId = e.target.dataset.publicationId
+
+        axios.post(`/payment/new-order/${publicationId}/?_csrf=${token}`)
+            .then((res) => {
+                /* Redirigir */
+                window.location.href = res.data.init_point
+            })
+            .catch((error) => {
+                const $alertConfigurePayment = document.getElementById('alertConfigurePayment'),
+                    $pError = document.getElementById('messageErrorPayment')
+
+                console.log(error)
+                /* Mostrar error */
+                $alertConfigurePayment.classList.remove('hidden')
+                $pError.textContent = error.response.data.message
+            })
+            .finally(() => { })
     }
 })
 

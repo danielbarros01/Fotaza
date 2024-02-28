@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 import db from '../config/db.js'
 
 const Transaction = db.define('transactions', {
-    id:{
+    id: {
         type: DataTypes.STRING,
         allowNull: false,
         primaryKey: true
@@ -15,6 +15,11 @@ const Transaction = db.define('transactions', {
         type: DataTypes.DECIMAL,
         allowNull: false
     },
+    typeSale: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: 'type_sale'
+    },
     status: {
         type: DataTypes.STRING,
         allowNull: true
@@ -22,7 +27,7 @@ const Transaction = db.define('transactions', {
     currency: {
         type: DataTypes.STRING,
         allowNull: true
-    }
+    },
 })
 
 export default Transaction

@@ -2,9 +2,12 @@ import axios from 'axios'
 import { socket, token } from "./chat.js"
 import { userId } from './helpers/getChatsDom.js'
 
-const d = document
+const d = document,
+    $btnCloseAlert = d.querySelector('#btnCloseAlertPayment'),
+    $alertConfigurePayment = d.getElementById('alertConfigurePayment')
 
 function buttonFunctionality() {
+    debugger
     const $btnsAccept = d.querySelectorAll('.accept'),
         $btnsDecline = d.querySelectorAll('.decline')
 
@@ -33,6 +36,7 @@ function buttonFunctionality() {
 
 d.addEventListener('DOMContentLoaded', () => {
     socket.on('accept-transaction-ok', (transaction) => {
+        debugger
         //Si userId es el mismo que de transaction tengo el chat abierto
         //Si tengo abierto el chat y yo solicite una compra
         if (userId == transaction.publication.user_id) {
@@ -49,9 +53,9 @@ d.addEventListener('DOMContentLoaded', () => {
                         icon.classList.remove('fa-clock')
                         icon.classList.add('fa-circle-check')
                         span.textContent = 'Aceptado'
-                        const form = createPayButton(transaction.publication_id, token)
+                        const div = createPayButton(transaction.publication_id, token)
 
-                        t.querySelector('.status').appendChild(form)
+                        t.querySelector('.status').appendChild(div)
                     }
                 }
             })
@@ -100,22 +104,33 @@ d.addEventListener('DOMContentLoaded', () => {
             }
         })
     })
+
+    socket.on('error', (error) => {
+        $alertConfigurePayment.classList.remove('hidden')
+        $alertConfigurePayment.querySelector('#messageErrorPayment').textContent = error.message
+    })
 })
 
 function createPayButton(publicationId, csrfToken) {
-    const form = d.createElement('form')
-    form.setAttribute('method', `POST`)
-    form.setAttribute('action', `/payment/new-order/${publicationId}/?_csrf=${csrfToken}`)
-    
+    const div = d.createElement('div')
+    div.classList.add('grid', 'place-content-center')
+
+    debugger
+
     const button = d.createElement('button')
-    button.type = 'submit'
-    button.classList.add('bg-green-700', 'text-white', 'p-2', 'hover:opacity-75', 'w-20', 'm-auto')
+    button.type = 'button'
+    button.classList.add('bg-green-700', 'text-white', 'p-2', 'hover:opacity-75', 'w-20', 'm-auto', 'btnCreateOrder')
     button.textContent = 'Pagar'
+    button.dataset.publicationId = publicationId
 
-    form.appendChild(button)
+    div.appendChild(button)
 
-    return form
+    return div
 }
+
+$btnCloseAlert.addEventListener('click', () => {
+    $alertConfigurePayment.classList.add('hidden')
+})
 
 export {
     buttonFunctionality,

@@ -77,9 +77,9 @@ Message.belongsTo(User, {
     as: 'user',
 });
 
-Message.belongsTo(Publication, {
-    foreignKey: 'publication_id',
-    as: 'publication'
+Message.belongsTo(Transaction, {
+    foreignKey: 'transaction_id',
+    as: 'transaction'
 })
 /* -- */
 

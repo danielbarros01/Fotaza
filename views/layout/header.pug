@@ -25,11 +25,13 @@ header(class="px-3.5 bg-white")
                                     div(class="flex flex-col") 
                                         span(class="text-sm")= user.name + " " + user.lastname
                                         span(class="text-xs font-light")= user.username     
-                            
-                            a(href="/categories/select" class="")
-                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis intereses
                             a(href="/chat" class="")
                                 li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Chat
+                            a(href="/transactions" class="")
+                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis transacciones
+                            a(href="/categories/select" class="")
+                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis intereses
+
                             
                             hr(class="w-4/5 m-auto")
                             

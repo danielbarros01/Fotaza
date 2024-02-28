@@ -47,7 +47,9 @@ export default {
         isTherePayment: './src/js/publication/create/isTherePayment.js',
 
         getPurchases: './src/js/transactions/getPurchases.js',
-        getSales: './src/js/transactions/getSales.js'
+        getSales: './src/js/transactions/getSales.js',
+
+        formPayment: './src/js/chat/publication/formPayment.js',
     },
     output:{
         filename: '[name].js',

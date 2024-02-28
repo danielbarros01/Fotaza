@@ -48,8 +48,8 @@ const newOrder = async (req, res) => {
         const userPublication = publication.user
 
         //El usuario dueño de la publicacion no tiene un access_token
-        if (!userPublication.userPayment.accessToken) {
-            return res.status(404).json({ success: false, message: 'No se puede adquirir esta publicacion' })
+        if (!userPublication.userPayment || !userPublication.userPayment.accessToken) {
+            return res.status(404).json({ success: false, message: 'No se puede adquirir esta publicacion, el propietario no tiene configurado un metodo para recibir el pago' })
         }
 
         /* Verificar que este aprobado para comprar (status:hold) */
@@ -97,7 +97,7 @@ const newOrder = async (req, res) => {
                 failure: "http://localhost:3000/payment/failure",
                 pending: "http://localhost:3000/payment/pending",
             },
-            notification_url: `https://15ff-138-59-172-60.ngrok-free.app/payment/webhook`,
+            notification_url: `https://9d36-138-59-172-60.ngrok-free.app/payment/webhook`,
             auto_return: "approved",
             payer: {
                 name: user.name,
@@ -110,11 +110,12 @@ const newOrder = async (req, res) => {
         })
 
         //console.log(result)
-        return res.status(200).redirect(result.body.init_point)
+        //return res.status(200).redirect(result.body.init_point)
+        return res.status(200).json({ success: false, message: 'Redirigir', init_point:result.body.init_point })
 
     } catch (error) {
         console.error(error)
-        return res.status(200).redirect(`/publications/${idPublication}`)
+        return res.status(500).redirect(`/publications/${idPublication}`)
     }
 
 }
@@ -128,12 +129,17 @@ const webhook = async (req, res) => {
 
             if (data.body.status_detail) {
                 //Guardamos la transaccion en la base de datos
-
                 const item = data.body.additional_info.items[0]
                 const idUserPayer = data.body.metadata.user_id
                 const { status, currency_id: currency } = data.body
 
                 if (item.id && idUserPayer) {
+
+                    /* Busco la publicacion */
+                    const publication = await Publication.findByPk(item.id)
+                    /* ---- */
+
+                    /* Creo la transaccion */
                     const transaction = await Transaction.findOrCreate({
                         where: {
                             user_id: idUserPayer,
@@ -146,12 +152,42 @@ const webhook = async (req, res) => {
                             date: new Date(),
                             price: Number(item.unit_price),
                             status,
-                            currency
+                            currency,
+                            typeSale: publication.typeSale
                         }
                     })
 
                     transaction[0].status = status
                     await transaction[0].save()
+
+                    /* 
+                    1.Creamos la transaccion -- LISTO
+                    VERIFICAR SI LA PUBLICACION ES DE TIPO UNIQUE
+                    */
+                    if (publication.typeSale == 'unique') {
+                        /* Si la publicacion es unica debo transferirla al nuevo usuario*/
+                        publication.user_id = idUserPayer
+                        await publication.save()
+
+                        /* . */
+                        /*2.Vamos a realizar la consulta, vamos a traer las ultimas 2 transactions, la ultima tiene que ser approved, pero si la anterior es tambien approved y type_sale=unique tengo que cambiarla a sold, para que el usuario no pueda descargarla mas */
+                        const transactions = await Transaction.findAll({
+                            where: {
+                                publication_id: item.id
+                            },
+                            order: [['date', 'DESC']],
+                            limit: 2, // Obtener solo los últimos 2 registros
+                        })
+
+                        //Elegimos el 1 porque es el mas viejo, por lo tanto el que hay que modificar
+                        if(transactions.length > 1){
+                            if (transactions[1].status == 'approved' && transactions[1].typeSale == 'unique') {
+                                transactions[1].status = 'sold'
+                                await transactions[1].save()
+                            }
+                        }
+                    }
+
                 }
             }
         }
