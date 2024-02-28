@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import { Category, Publication, Transaction } from '../models/Index.js'
 
 const getTransactions = async (req, res) => {
@@ -23,7 +24,10 @@ const getTransactionsApi = async (req, res) => {
 
     try {
         const { count, rows: transactions } = await Transaction.findAndCountAll({
-            where: { user_id: user.id },
+            where: {
+                user_id: user.id,
+                [Op.or]: [{ status: 'approved' }, { status: 'sold' }]
+            },
             order: [['date', 'DESC']],
             include: [
                 {
@@ -69,7 +73,7 @@ const acceptTransaction = async (req, res) => {
             }
         })
 
-        if(!transaction){
+        if (!transaction) {
             return res.status(404).json({ success: false, message: 'No hay solicitud de compra' })
         }
 
@@ -77,7 +81,7 @@ const acceptTransaction = async (req, res) => {
         transaction.status = 'hold'
         await transaction.save()
 
-        return res.status(200).json({ success: true})
+        return res.status(200).json({ success: true })
     } catch (error) {
         console.error(error)
         return res.status(500).redirect('/chat')

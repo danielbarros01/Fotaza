@@ -30,7 +30,7 @@ block contenido
                         span Siguiente
                         i(class="fa-solid fa-arrow-right")
 
-        section.mySales
+        //section.mySales
             header
                 div(class="w-full") 
                     button(type="button" class="shadow-md rounded-md font-bold bg-gray-200 text-lg px-3 py-1 flex gap-2 text-principal-gray hover:text-black")
@@ -47,16 +47,18 @@ block contenido
 
             main(class="flex-1 mx-5 py-3 flex flex-col h-full justify-between") 
                 header(class="flex flex-col")
-                    span.status(class="text-green-600 font-semibold") Compra efectuada 
-                    span.dateTransaction(class="text-principal-gray text-lg") 2 de Febrero del 2024
+                    span.status(class="text-green-600 font-semibold") 
+                    span.dateTransaction(class="text-principal-gray text-lg") 
                 footer(class="flex gap-2")
+                    .info-transaction-status(class="rounded-full w-24 h-7 shadow-md hover:opacity-80 flex justify-around hidden")
+                        span(class="text-white grid place-content-center h-full rounded-full") 
                     .info-price(class="rounded-full w-24 h-7 shadow-md hover:opacity-80 bg-green-500 flex justify-around pr-3")
                         i(class="fa-solid fa-sack-dollar m-auto text-white")
-                        span.price(class="text-white grid place-content-center h-full rounded-full") $1500
+                        span.price(class="text-white grid place-content-center h-full rounded-full") 
                     .category-content(class="rounded-full w-fit h-7 bg-cover bg-center bg-no-repeat cursor-pointer shadow-md hover:opacity-80" style=`background-image: url(/img/backgroundsCategories/animals.jpg)`)
-                        span(class="bg-black/20 text-white grid place-content-center w-full h-full rounded-full px-10") Animales
+                        span(class="bg-black/20 text-white grid place-content-center w-full h-full rounded-full px-10") 
                     .info-resolution(class="rounded-full w-36 h-7 bg-secondary-gray shadow-md hover:opacity-80")
-                        span(class="text-white grid place-content-center w-full h-full rounded-full px-4 text-sm") 1920x1080/JPEG
+                        span(class="text-white grid place-content-center w-full h-full rounded-full px-4 text-sm") 
 
             aside(class="w-1/6 flex justify-center items-center gap-4 pr-10")
                 a.linkPublication(href="" class="fa-solid fa-arrow-up-right-from-square text-4xl bg-gray-input rounded-full p-4 text-principal-gray hover:text-black") 

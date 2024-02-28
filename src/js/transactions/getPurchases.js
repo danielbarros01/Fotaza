@@ -13,6 +13,8 @@ const d = document,
     $btnPrevious = d.getElementById('previous'),
     $btnNext = d.getElementById('next')
 
+moment.locale('es');
+
 //Variables para la paginación
 let page = 0, size = 2, count = 0, cantBtns = 0
 
@@ -88,25 +90,56 @@ function getTransactions() {
 }
 
 function addTransactionDOM(transaction, $template, $fragment) {
+    debugger
+    const $clonedTemplate = d.importNode($template, true);
+
     const publication = transaction.publication
 
-    $template.querySelector('.image').style.backgroundImage = `url(/publications/image/${publication.image})`
-    $template.querySelector('.dateTransaction').textContent = moment(transaction.date).format('ll')
+    $clonedTemplate.querySelector('.image').style.backgroundImage = `url(/publications/image/${publication.image})`
 
-    if (transaction.status == 'approved') {
-        $template.querySelector('.status').textContent = 'Compra efectuada'
+    const $date = $clonedTemplate.querySelector('.dateTransaction')
+    $date.textContent = moment(transaction.date).format('LLL')
+
+    if (transaction.status == 'approved' && transaction.typeSale == 'unique') {
+        $clonedTemplate.querySelector('.status').textContent = 'Compra unica efectuada'
+
+        //rounded propietario
+        const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
+        containerStatus.classList.add('bg-green-700')
+        containerStatus.classList.remove('hidden')
+        containerStatus.querySelector('span').textContent = `Propietario`
     }
 
-    $template.querySelector('.price').textContent = '$' + transaction.price
-    $template.querySelector('.category-content').style.backgroundImage = `url(/img/backgroundsCategories/${publication.category.image})`
-    $template.querySelector('.category-content span').textContent = publication.category.name
+    if (transaction.status == 'sold' && transaction.typeSale == 'unique') {
+        const $text = $clonedTemplate.querySelector('.status')
+        $text.classList.add('text-red-700')
+        $text.textContent = 'Publicación unica vendida'
 
-    $template.querySelector('.info-resolution span').textContent = `${publication.resolution}/${publication.format.split('/')[1].toUpperCase()}`
+        //rounded propietario
+        const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
+        containerStatus.classList.add('bg-red-600')
+        containerStatus.classList.remove('hidden')
+        containerStatus.querySelector('span').textContent = `Vendida`
 
-    $template.querySelector('.linkPublication').setAttribute('href', `/publications/${publication.id}`)
-    $template.querySelector('.linkDownload').setAttribute('href', `/publications/${publication.id}/download`)
+        $date.textContent = `Vendida el ${moment(transaction.date).format('LLL')}`
+    }
 
-    let $clone = document.importNode($template, true)
+    if(transaction.typeSale == 'general'){
+        $clonedTemplate.querySelector('.status').textContent = 'Compra efectuada'
+    }
+
+    //rounded price
+    $clonedTemplate.querySelector('.price').textContent = '$' + transaction.price
+    //rounded category
+    $clonedTemplate.querySelector('.category-content').style.backgroundImage = `url(/img/backgroundsCategories/${publication.category.image})`
+    $clonedTemplate.querySelector('.category-content span').textContent = publication.category.name
+    //rounded resolution
+    $clonedTemplate.querySelector('.info-resolution span').textContent = `${publication.resolution}/${publication.format.split('/')[1].toUpperCase()}`
+
+    $clonedTemplate.querySelector('.linkPublication').setAttribute('href', `/publications/${publication.id}`)
+    $clonedTemplate.querySelector('.linkDownload').setAttribute('href', `/publications/${publication.id}/download`)
+
+    let $clone = document.importNode($clonedTemplate, true)
 
     $fragment.appendChild($clone)
 }

@@ -1,6 +1,6 @@
 import mercadopago from 'mercadopago'
 import { Op } from 'sequelize'
-import { Category, Publication, Transaction, User, UserPayment } from '../models/Index.js'
+import { Category, Publication, RightOfUse, Transaction, User, UserPayment } from '../models/Index.js'
 
 const isItConfigured = async (req, res) => {
     //Traigo al usuario
@@ -32,12 +32,12 @@ const newOrder = async (req, res) => {
                 model: User, as: 'user',
                 include: [{
                     model: UserPayment, as: 'userPayment'
-                },
-                {
-                    model: Category, as: 'categories'
-                }
-                ]
-            }]
+                }]
+            },
+            {
+                model: RightOfUse, as: 'license'
+            }
+            ]
         })
 
         if (!publication || publication.type != 'sale') {
@@ -65,7 +65,7 @@ const newOrder = async (req, res) => {
             contrariamente, si no es ninguna de estas dos, no hace falta que exista un registro en transaction
         */
         if (!transaction) {
-            if (publication.typeSale == 'unique' || publication.category.name.toLowerCase() == 'copyright') {
+            if (publication.typeSale == 'unique' || publication.license.name.toLowerCase() == 'copyright') {
                 return res.status(404).json({ success: false, message: 'No puedes adquirir esta publicacion' })
             }
         }
@@ -111,7 +111,7 @@ const newOrder = async (req, res) => {
 
         //console.log(result)
         //return res.status(200).redirect(result.body.init_point)
-        return res.status(200).json({ success: false, message: 'Redirigir', init_point:result.body.init_point })
+        return res.status(200).json({ success: false, message: 'Redirigir', init_point: result.body.init_point })
 
     } catch (error) {
         console.error(error)
@@ -139,12 +139,49 @@ const webhook = async (req, res) => {
                     const publication = await Publication.findByPk(item.id)
                     /* ---- */
 
-                    /* Creo la transaccion */
+                    const previousOwner = publication.user_id
+
+                    /* AA - Si es la primera vez que se va a vender la publicacion y es de tipo unica
+                        debo crear 2, para que le quede registro al primer vendedor de la publicacion
+                        que la vendio.
+                    */
+                    if (publication.typeSale == 'unique') {
+                        const isThereTransaction = await Transaction.count({
+                            where: {
+                                publication_id: item.id,
+                                user_id: publication.user_id,
+                                [Op.or]: [{ status: 'approved' }, { status: 'sold' }]
+                            }
+                        })
+
+                        /* Si no hay transactions es porque es la primera vez que la va a vender  */
+                        if (isThereTransaction === 0) {
+                            const transaction = await Transaction.create({
+                                id: payment['data.id'],
+                                user_id: previousOwner,
+                                publication_id: item.id,
+                                date: new Date(),
+                                price: Number(item.unit_price),
+                                status: 'sold', //Aqui marco como que el primer usuario la vendio
+                                currency,
+                                typeSale: publication.typeSale
+                            })
+                        }/* AA- ---- */
+                    }
+
+
+
+                    /* Creo la transaccion, busca la mas reciente */
+                    /* Esto encontrara la solicitud aprobada en hold, el usuario que solicito comprarla 
+                    aparecera en userId */
+                    /* Los valores por default son para cuando una publicacion sea de tipo venta general ya que
+                    no se encontrara una transaccion guardada */
                     const transaction = await Transaction.findOrCreate({
                         where: {
                             user_id: idUserPayer,
                             publication_id: item.id
                         },
+                        order: [['date', 'DESC']],
                         defaults: {
                             id: payment['data.id'],
                             user_id: idUserPayer,
@@ -157,7 +194,9 @@ const webhook = async (req, res) => {
                         }
                     })
 
+
                     transaction[0].status = status
+                    transaction[0].date = new Date() //Nueva fecha que se pago
                     await transaction[0].save()
 
                     /* 
@@ -173,16 +212,18 @@ const webhook = async (req, res) => {
                         /*2.Vamos a realizar la consulta, vamos a traer las ultimas 2 transactions, la ultima tiene que ser approved, pero si la anterior es tambien approved y type_sale=unique tengo que cambiarla a sold, para que el usuario no pueda descargarla mas */
                         const transactions = await Transaction.findAll({
                             where: {
-                                publication_id: item.id
+                                publication_id: item.id,
+                                status: 'approved'
                             },
                             order: [['date', 'DESC']],
                             limit: 2, // Obtener solo los últimos 2 registros
                         })
 
                         //Elegimos el 1 porque es el mas viejo, por lo tanto el que hay que modificar
-                        if(transactions.length > 1){
+                        if (transactions.length > 1) {
                             if (transactions[1].status == 'approved' && transactions[1].typeSale == 'unique') {
                                 transactions[1].status = 'sold'
+                                transactions[1].date = transactions[0].date
                                 await transactions[1].save()
                             }
                         }
@@ -191,6 +232,10 @@ const webhook = async (req, res) => {
                 }
             }
         }
+        
+        mercadopago.configure({
+            access_token: null
+        })
 
         res.sendStatus(204)
     } catch (error) {
