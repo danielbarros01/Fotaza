@@ -844,6 +844,9 @@ video {
 .mb-10 {
   margin-bottom: 2.5rem;
 }
+.mr-8 {
+  margin-right: 2rem;
+}
 .block {
   display: block;
 }
@@ -2880,6 +2883,10 @@ video {
 
   .md\:w-4\/6 {
     width: 66.666667%;
+  }
+
+  .md\:w-9\/12 {
+    width: 75%;
   }
 
   .md\:max-w-5xl {

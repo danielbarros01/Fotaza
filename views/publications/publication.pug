@@ -30,9 +30,10 @@ block contenido
                         button#btnOptions(class="bg-transparent")
                             img(src="/img/project/options.svg", alt="").w-8.ml-2
                         div#optionsPublication(class="hidden absolute bg-secondary-gray top-16 right-4 w-2/3 rounded-[10px] rounded-tr-[0px] p-3 shadow-md")
-                            button#btnEdit(class="w-full flex justify-around items-center hover:transform hover:scale-110")
-                                p.text-white Editar 
-                                i(class="fa-solid fa-pen text-white")
+                            a(href=`/publications/edit/${publication.id}`) 
+                                button#btnEdit(class="w-full flex justify-around items-center hover:transform hover:scale-110")
+                                    p.text-white Editar 
+                                    i(class="fa-solid fa-pen text-white")
                             hr.my-2
                             button#btnDelete(class="w-full flex justify-around items-center hover:transform hover:scale-110")  
                                 p.text-red-700 Eliminar 

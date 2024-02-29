@@ -109,6 +109,13 @@ function ocultarModal() {
 //Estilo para cuando selecciono un label
 let prevLabels = []
 
+const inputSelected = document.querySelector(`input[name="category"]:checked`)
+
+if (inputSelected) {
+  prevLabels.push(inputSelected.nextElementSibling)
+}
+
+
 document.addEventListener('click', (e) => {
   if (e.target.name == 'category') { //si le doy click a un input de nombre category
     prevLabels.forEach(label => {

@@ -725,11 +725,6 @@ const editPublication = async (req, res) => {
     const updates = req.body
 
     /* VALIDACIONES */
-    //Si no hay usuario
-    if (!user) {
-        return res.status(401).json({ key: 'no user', msg: 'Debe estar autenticado' });
-    }
-
     //Que los campos tambien vengan
     const errors = []
     for (let campo in req.body) {
@@ -763,7 +758,7 @@ const editPublication = async (req, res) => {
 
     try {
         //valido publicacion
-        const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id }, transaction, })
+/*         const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id }, transaction, })
         if (!publication) {
             return res.status(404).json({ key: 'no publication', msg: 'No existe la publicacion' });
         }
@@ -829,7 +824,7 @@ const editPublication = async (req, res) => {
         await publication.save({ transaction });
         // Confirmar la transacción
         await transaction.commit();
-
+ */
         res.sendStatus(204)
     } catch (error) {
         // Si ocurre un error, deshacemos la transacción y manejamos el error
@@ -1057,6 +1052,53 @@ const bestPublications = async (req, res) => {
     return items
 }
 
+const getEditPublication = async (req, res) => {
+    const { user } = req
+    const { id } = req.params
+
+    try {
+        const publication = await Publication.findOne({
+            where: {
+                id,
+                user_id: user.id
+            },
+            include: [
+                { model: Category, as: 'category' },
+                { model: RightOfUse, as: 'license' },
+                { model: Tag, as: 'tags' },
+            ]
+        })
+
+        if (!publication) {
+            return res.status(404).render('404', { message: 'Uups, no encontramos esta publicación' })
+        }
+
+        /* Traigo todas las categorias */
+        const categories = await Category.findAll()
+
+        let rightsOfUse
+
+        if(publication.type == 'free'){
+            rightsOfUse = await RightOfUse.findAll({ where: { free: true } })
+        }else if(publication.type == 'sale' && publication.typeSale == 'general'){
+            rightsOfUse = await RightOfUse.findAll({ where: { general_sale: true } })
+        }else{
+            rightsOfUse = await RightOfUse.findAll({ where: { unique_sale: true } })
+        }
+
+        return res.render('publications/edit', {
+            user,
+            publication,
+            categories,
+            rightsOfUse,
+            viewBtnsAuth: user ? false : true,
+            csrfToken: req.csrfToken(),
+        })
+    } catch (error) {
+        return res.status(500).redirect('/')
+    }
+}
+
 export {
     viewPublications,
     viewPublicationsOf,
@@ -1067,5 +1109,6 @@ export {
     downloadImage,
     editPublication,
     deletePublication,
-    bestPublications
+    bestPublications,
+    getEditPublication
 }
