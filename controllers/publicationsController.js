@@ -718,7 +718,7 @@ const downloadImage = async (req, res) => {
     })
 }
 
-//PATCH /publications/:id
+//POST /publications/:id
 const editPublication = async (req, res) => {
     const { user } = req
     const { id: publicationId } = req.params
@@ -737,6 +737,14 @@ const editPublication = async (req, res) => {
                 errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
             }
         }
+    }
+
+    if (!('price' in updates) && updates.typePost == 'sale') {
+        errors.push({ path: 'price', msg: `Debe ponerle un precio` })
+    }
+
+    if (updates.typePost == 'sale' && !('typeSale' in updates)) {
+        errors.push({ path: 'typeSale', msg: `Debe seleccionar un tipo de venta` })
     }
 
     //Si hay campos vacios:
@@ -758,15 +766,74 @@ const editPublication = async (req, res) => {
 
     try {
         //valido publicacion
-/*         const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id }, transaction, })
+        const publication = await Publication.findOne(
+            {
+                where: { id: publicationId, user_id: user.id },
+                transaction,
+            })
+
         if (!publication) {
             return res.status(404).json({ key: 'no publication', msg: 'No existe la publicacion' });
         }
 
+        if (updates.typePost != publication.type) {
+            /* Validar que si la publicacion tiene transacciones no se pueda cambiar el tipo */
+            const transactions = await Transaction.count({
+                where: {
+                    publication_id: publication.id,
+                    [Op.not]: { status: 'rejected' }
+                }
+            })
+
+            if (transactions > 0) {
+                return res.status(400).json({ path: '-', msg: `Existen transacciones con esta publicacion, no puedes cambiar el tipo` })
+            }
+
+            publication.type = updates.typePost
+
+            if (updates.typePost == 'sale') {
+                publication.typeSale = updates.typeSale
+                publication.price = updates.price
+                publication.currency = 'ars'
+            }else{
+                publication.typeSale = null
+                publication.price = null
+                publication.currency = null
+            }
+        }
+
+
         if (updates.category != publication.category_id) publication.category_id = updates.category
-        if (updates.rightsOfUse != publication.rights_of_use_id) publication.rights_of_use_id = updates.rightsOfUse
         if (updates.title != publication.title) publication.title = updates.title
 
+        if (updates.license != publication.rights_of_use_id) {
+            let rightsOfUse
+
+            switch (updates.typePost) {
+                case 'free':
+                    rightsOfUse = await RightOfUse.findOne({
+                        where: {
+                            id: updates.license,
+                            free: true
+                        }
+                    })
+                    break;
+                case 'sale':
+                    rightsOfUse = await RightOfUse.findOne({
+                        where: {
+                            id: updates.license,
+                            [Op.or]: [{ general_sale: true }, { unique_sale: true }]
+                        }
+                    })
+                    break;
+            }
+
+            if (!rightsOfUse) {
+                return res.status(404).json({ key: 'rightsOfUse', msg: 'No existe la licencia que a la que quiere cambiar' });
+            }
+
+            publication.rights_of_use_id = updates.license
+        }
 
         let publicationTags = null
         //si esta vacio tags eliminar los tags de la publicacion si existiesen
@@ -824,12 +891,12 @@ const editPublication = async (req, res) => {
         await publication.save({ transaction });
         // Confirmar la transacción
         await transaction.commit();
- */
-        res.sendStatus(204)
+
+        res.status(201).json({ publicationId: publication.id })
     } catch (error) {
         // Si ocurre un error, deshacemos la transacción y manejamos el error
         await transaction.rollback(); //redundante?
-        res.status(500).json({ error: 'Error en la actualización de la publicación.' });
+        return res.status(500).json([{ path: '-', msg: 'Hemos tenido un error al procesar tu solicitud de actualizacion, intenta nuevamente más tarde' }]);
     }
 }
 
@@ -1078,11 +1145,11 @@ const getEditPublication = async (req, res) => {
 
         let rightsOfUse
 
-        if(publication.type == 'free'){
+        if (publication.type == 'free') {
             rightsOfUse = await RightOfUse.findAll({ where: { free: true } })
-        }else if(publication.type == 'sale' && publication.typeSale == 'general'){
+        } else if (publication.type == 'sale' && publication.typeSale == 'general') {
             rightsOfUse = await RightOfUse.findAll({ where: { general_sale: true } })
-        }else{
+        } else {
             rightsOfUse = await RightOfUse.findAll({ where: { unique_sale: true } })
         }
 
