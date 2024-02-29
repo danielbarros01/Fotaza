@@ -16,7 +16,7 @@
   \*************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\ndocument.getElementById('formSearch').addEventListener('submit', function(event) {\r\n    event.preventDefault();\r\n    var searchValue = document.getElementById('inputSearch').value;\r\n    window.location.href = '/search/' + searchValue;\r\n});\r\n\r\n\n\n//# sourceURL=webpack://fotazaproject/./src/js/search/homeSearch.js?");
+eval("__webpack_require__.r(__webpack_exports__);\ndocument.getElementById('formSearch').addEventListener('submit', function(event) {\r\n    event.preventDefault();\r\n    var searchValue = document.getElementById('inputSearch').value;\r\n\r\n    if(!searchValue){\r\n        searchValue = 'allPublications'\r\n    }\r\n\r\n    window.location.href = '/search/' + searchValue;\r\n});\r\n\r\n\n\n//# sourceURL=webpack://fotazaproject/./src/js/search/homeSearch.js?");
 
 /***/ })
 

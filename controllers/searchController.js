@@ -138,7 +138,6 @@ const searchPublications = async (req, res) => {
             },)
         }
         //--
-
         //Si es allPublications, no buscar publicaciones por titulo, esto para cuando busco desde otras paginas
         if (value != 'allPublications') {
             forTitle = {
@@ -147,6 +146,7 @@ const searchPublications = async (req, res) => {
                 }
             }
         }
+
         //--
 
         //Busqueda
