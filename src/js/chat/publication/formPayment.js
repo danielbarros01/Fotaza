@@ -29,6 +29,3 @@ if ($form) {
 $btnCloseAlert.addEventListener('click', () => {
     $alertConfigurePayment.classList.add('hidden')
 })
-
-
-alert('anja')

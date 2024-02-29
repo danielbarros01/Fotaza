@@ -16,7 +16,7 @@ const d = document,
 moment.locale('es');
 
 //Variables para la paginación
-let page = 0, size = 2, count = 0, cantBtns = 0
+let page = 0, size = 3, count = 0, cantBtns = 0
 
 let iBtnPurchase = 0
 
