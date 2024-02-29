@@ -1,6 +1,11 @@
 import { checkFields, validationImage, viewErrors } from './validations.js'
 
-const $isEdit = document.querySelector('meta[name="edit"]').getAttribute('content')
+const $edit = document.querySelector('meta[name="edit"]')
+let $isEdit
+
+if($edit){
+    $isEdit.getAttribute('content')
+}
 
 /* Spans para los errores */
 const $spanErrImg = document.getElementById('errImage')

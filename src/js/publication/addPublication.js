@@ -67,46 +67,28 @@ $form.addEventListener("submit", function (e) {
     //console.log(res.data)
 
     /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
-    axios.get('/payment/configured')
-        .then(res => {
-            axios.post('/publications/create', formData, {
-                headers: {
-                    'CSRF-Token': token
-                }
-            })
-                .then(response => {
-                    const publicationId = response.data.publicationId;
-                    window.location.href = `/publications/${publicationId}`
-                })
-                .catch(error => {
-                    debugger
-                    document.getElementById('sectionLoader').classList.add('hidden')
-
-                    if (error.response && error.response.status === 400) {
-                        console.log('Errores de validación:', error.response.data);
-                        // Muestra los errores de validación en la interfaz de usuario
-                        viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
-                        viewErrorsInAlert(error.response.data)
-                    } else {
-                        console.error('Error al enviar la solicitud:', error);
-                        viewErrorsInAlert(error.response.data)
-                    }
-                })
+    /* ---- */
+    axios.post('/publications/create', formData, {
+        headers: {
+            'CSRF-Token': token
+        }
+    })
+        .then(response => {
+            const publicationId = response.data.publicationId;
+            window.location.href = `/publications/${publicationId}`
         })
-        .catch(err => {
-            if (err.response.data.success === false) {
-                debugger
-                //Hay error
-                //Mostrar alerta que se debe configurar el metodo de pago
-                $alert.classList.remove('hidden')
+        .catch(error => {
+            debugger
+            document.getElementById('sectionLoader').classList.add('hidden')
 
-                //Cambiar al input de tipo libre
-                const $inputFree = document.getElementById('input-free');
-                $inputFree.checked = true
-                ocultarTypesVenta()
-                ocultarPrice()
-                consultaLicencias('free')
-                viewOtherOptions()
+            if (error.response && error.response.status === 400) {
+                console.log('Errores de validación:', error.response.data);
+                // Muestra los errores de validación en la interfaz de usuario
+                viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
+                viewErrorsInAlert(error.response.data)
+            } else {
+                console.error('Error al enviar la solicitud:', error);
+                viewErrorsInAlert(error.response.data)
             }
         })
         .finally(() => {
