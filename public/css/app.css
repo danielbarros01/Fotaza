@@ -2840,6 +2840,14 @@ video {
     margin-top: 0px;
   }
 
+  .md\:mb-8 {
+    margin-bottom: 2rem;
+  }
+
+  .md\:mt-20 {
+    margin-top: 5rem;
+  }
+
   .md\:flex {
     display: flex;
   }
