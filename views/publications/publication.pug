@@ -59,7 +59,7 @@ block contenido
                         p(class="text-slate-500 bg-slate-200 w-24 rounded-lg text-center")= tag.name
 
             .rightOfUse.flex.items-center.relative
-                div#infoRightOfUse(class="hidden absolute bottom-10 bg-secondary-gray text-xs p-2 text-polished-white rounded-[10px] rounded-br-[0px]")
+                div#infoRightOfUse(class="hidden absolute bottom-10 right-0 bg-secondary-gray text-xs p-2 text-polished-white rounded-[10px] rounded-br-[0px] w-48")
                     p= rightOfUse ? rightOfUse.description : ''
                 p.text-principal-gray.text-xl.underline= rightOfUse ? rightOfUse.name : 'Sin licencia'
                 img#btnInfoRightOfUse(src="/img/project/info.svg", alt="" class="ml-2 w-5 cursor-pointer")
@@ -208,8 +208,8 @@ block contenido
                         #imgsRecomendations
                             #slideTrack
                                 each recomendation in recomendations 
-                                        a(href=`/publications/${recomendation.id}` class="slide") 
-                                            img(src=`/publications/image/${recomendation.image}`, alt=`${recomendation.title}`)
+                                    a(href=`/publications/${recomendation.id}` class="slide") 
+                                        img(src=`/publications/image/${recomendation.image}`, alt=`${recomendation.title}`)
                 else
                     h3(class="text-3xl my-5 text-principal-gray") Otras imágenes que pueden gustarte 
                     div(class="w-5/6 h-72 bg-gray-300 rounded p-6 flex flex-col justify-between")

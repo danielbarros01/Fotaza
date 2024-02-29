@@ -534,36 +534,90 @@ const viewPublication = async (req, res) => {
         /* RECOMENDACIONES */
         //otras imagenes parecidas
         //Primero busco por las etiquetas
-        let recomendations = await Publication.findAll({
-            include: [{
-                model: Tag,
-                where: {
-                    name: {
-                        [Op.in]: tags.map(tag => tag.name)
+        let recomendations
+
+        /* Si no hay usuario solo buscar las publicas */
+        if (!user) {
+            recomendations = await Publication.findAll({
+                include: [{
+                    model: Tag,
+                    where: {
+                        name: {
+                            [Op.in]: tags.map(tag => tag.name)
+                        }
                     }
-                }
-            }],
-            where: {
-                id: {
-                    [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
-                }
-            },
-            order: [['date_and_time', 'DESC']],
-            limit: 10
-        });
+                }],
+                where: {
+                    id: {
+                        [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
+                    },
+                    privacy: 'public'
+                },
+                order: [['date_and_time', 'DESC']],
+                limit: 10
+            });
+        } else {
+            //Todas menos las que son privadas y gratis, que son solo vistas por usuario dueño
+            recomendations = await Publication.findAll({
+                include: [{
+                    model: Tag,
+                    where: {
+                        name: {
+                            [Op.in]: tags.map(tag => tag.name)
+                        }
+                    }
+                }],
+                where: {
+                    id: {
+                        [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
+                    },
+                    [Op.not]: {
+                        [Op.and]: [
+                            { privacy: 'private' },
+                            { type: 'free' }
+                        ]
+                    }
+                },
+                order: [['date_and_time', 'DESC']],
+                limit: 10
+            });
+        }
+
 
         //si la busqueda por etiquetas me devuelve 5 o menos publicaciones le agrego por categoria
         if (recomendations.length < 6) {
-            const recomendationsByCategory = await Publication.findAll({
-                where: {
-                    id: {
-                        [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+            let recomendationsByCategory
+            if (!user) {
+                recomendationsByCategory = await Publication.findAll({
+                    where: {
+                        id: {
+                            [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+                        },
+                        category_id: publication.category_id,
+                        privacy: 'public'
                     },
-                    category_id: publication.category_id
-                },
-                order: [['date_and_time', 'DESC']],
-                limit: 5
-            });
+                    order: [['date_and_time', 'DESC']],
+                    limit: 5
+                });
+            } else {
+                recomendationsByCategory = await Publication.findAll({
+                    where: {
+                        id: {
+                            [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+                        },
+                        category_id: publication.category_id,
+                        [Op.not]: {
+                            [Op.and]: [
+                                { privacy: 'private' },
+                                { type: 'free' }
+                            ]
+                        }
+                    },
+                    order: [['date_and_time', 'DESC']],
+                    limit: 5
+                });
+            }
+
 
             //Unir los arrays
             recomendations = [...recomendations, ...recomendationsByCategory]
