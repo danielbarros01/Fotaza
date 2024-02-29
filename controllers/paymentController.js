@@ -97,7 +97,7 @@ const newOrder = async (req, res) => {
                 failure: "http://localhost:3000/payment/failure",
                 pending: "http://localhost:3000/payment/pending",
             },
-            notification_url: `https://9d36-138-59-172-60.ngrok-free.app/payment/webhook`,
+            notification_url: `https://0a6d-138-59-172-60.ngrok-free.app/payment/webhook`,
             auto_return: "approved",
             payer: {
                 name: user.name,
@@ -230,12 +230,12 @@ const webhook = async (req, res) => {
                     }
 
                 }
+
+                mercadopago.configure({
+                    access_token: null
+                })
             }
         }
-        
-        mercadopago.configure({
-            access_token: null
-        })
 
         res.sendStatus(204)
     } catch (error) {

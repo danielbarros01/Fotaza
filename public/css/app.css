@@ -841,6 +841,9 @@ video {
 .mt-\[-10px\] {
   margin-top: -10px;
 }
+.mb-10 {
+  margin-bottom: 2.5rem;
+}
 .block {
   display: block;
 }
@@ -1000,6 +1003,10 @@ video {
 }
 .min-h-screen {
   min-height: 100vh;
+}
+.min-h-fit {
+  min-height: -moz-fit-content;
+  min-height: fit-content;
 }
 .w-0 {
   width: 0px;

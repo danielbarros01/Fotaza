@@ -801,10 +801,40 @@ const deletePublication = async (req, res) => {
 
     try {
         const rutePublication = publication.image
-        const imagePath = path.join(routeImages.uploadsFolder, rutePublication) //rutaServidor/public/uploads/imagenNombre
+        const imagePath = path.join(routeImages.uploadsImagesFolder, rutePublication) //rutaServidor/public/uploads/imagenNombre
+        const imagePathWatermark = path.join(routeImages.uploadsImagesWithWatermarkFolder, `watermark_${rutePublication}`) //rutaServidor/public/uploads/imagenNombre
 
+        /* Verificar que no exista transacciones con la publicacion */
+        //cuántas transacciones hay asociadas que no tienen status 'rejected'.
+        const { count: countTransactions, rows: transactions } = await Transaction.findAndCountAll({
+            where: {
+                publication_id: publication.id,
+                [Op.not]: {
+                    [Op.or]: [
+                        { status: 'rejected' },
+                        { status: 'waiting' },]
+                }
+            }
+        })
 
+        /* Si existe una o mas transacciones*/
+        if (countTransactions > 0) {
+            return res.status(403).json({ message: 'Existen transacciones con esta publicación' })
+        } else {
+            /* Elimino las transacciones asi puedo eliminar la publicacion*/
+            /* Lo hago asi, y no en cascada automaticamente por un tema de seguridad */
+            await Transaction.destroy({
+                where: {
+                    publication_id: publication.id
+                }
+            })
+        }
+
+        /* Eliminar publicacion */
         deleteImage(null, imagePath)
+        deleteImage(null, imagePathWatermark)
+
+
         await publication.destroy()
 
         return res.status(200).json({ message: 'Publicación eliminada' })

@@ -8,6 +8,7 @@ const getTransactions = async (req, res) => {
     try {
         return res.render('transactions/transactions', {
             user,
+            csrfToken: req.csrfToken()
         })
 
     } catch (error) {

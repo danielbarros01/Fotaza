@@ -71,7 +71,7 @@ block contenido
                     p(class="text-2xl grid place-content-center") Ya has adquirido esta imagen
                 a(href="/transactions" class="bg-green-600 w-44 rounded-3xl text-xl font-semibold hover:opacity-90 flex justify-center")
                     span(class="grid place-content-center") Ir a transacciones
-        if transaction && transaction.status == 'hold'
+        else if(transaction && transaction.status == 'hold')
             .sale(class="mx-10 flex justify-between p-4 rounded-3xl h-28 text-white bg-gradient-to-r from-black  via-gray-900 to-gray-700") 
                 div(class="flex gap-2")
                     i(class="fa-solid fa-circle-info text-5xl m-auto")
@@ -264,8 +264,8 @@ block contenido
                     button#btnSave(type="submit" class="bg-green-700 text-white font-normal mt-4 mr-2 w-28 p-2") Guardar
 
         div#deletePublication(class="hidden w-full h-screen fixed bottom-0 left-0 flex items-center justify-center bg-neutral-800 bg-opacity-40 z-20")
-            div#viewDelete(class="bg-white px-16 pt-12 pb-6 w-3/5 flex flex-col justify-between h-3/5") 
-                div(class="h-3/4 flex flex-col justify-between items-center")
+            div#viewDelete(class="bg-white px-16 pt-12 pb-6 w-3/5 flex flex-col justify-between mt-16") 
+                div(class="h-3/4 flex flex-col justify-between items-center gap-2 mb-10")
                     img(src="/img/project/deleteUnDraw.svg", alt="Lustracion eliminar" class="w-96")
                     h5#titleDelete(class="text-4xl font-bold text-principal-gray") Eliminar Publicación 
                     p#textDelete(class="text-lg text-principal-gray text-center") ¿Estás seguro de que deseas eliminar esta publicación? Ten en cuenta que esta acción no se puede deshacer y la publicación no podrá ser recuperada.
