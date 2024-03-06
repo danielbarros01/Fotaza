@@ -97,7 +97,7 @@ const newOrder = async (req, res) => {
                 failure: "http://localhost:3000/payment/failure",
                 pending: "http://localhost:3000/payment/pending",
             },
-            notification_url: `https://0a6d-138-59-172-60.ngrok-free.app/payment/webhook`,
+            notification_url: `${process.env.NGROK}/payment/webhook`,
             auto_return: "approved",
             payer: {
                 name: user.name,
@@ -129,6 +129,14 @@ const webhook = async (req, res) => {
 
             if (data.body.status_detail) {
                 //Guardamos la transaccion en la base de datos
+                /*
+                Si transaccion ya existe en la base de datos no volver a realizar la transaccion
+
+                mercadopago.configure({
+                    access_token: null
+                })
+                */
+
                 const item = data.body.additional_info.items[0]
                 const idUserPayer = data.body.metadata.user_id
                 const { status, currency_id: currency } = data.body
@@ -231,9 +239,7 @@ const webhook = async (req, res) => {
 
                 }
 
-                mercadopago.configure({
-                    access_token: null
-                })
+
             }
         }
 

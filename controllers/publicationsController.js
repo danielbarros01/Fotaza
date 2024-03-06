@@ -777,29 +777,32 @@ const editPublication = async (req, res) => {
         }
 
         if (updates.typePost != publication.type) {
-            /* Validar que si la publicacion tiene transacciones no se pueda cambiar el tipo */
-            const transactions = await Transaction.count({
-                where: {
-                    publication_id: publication.id,
-                    [Op.not]: { status: 'rejected' }
-                }
-            })
+            /* Si quiero cambiar la publicacion a unique */
+            if (updates.typeSale == 'unique') {
+                /* Validar que si la publicacion tiene transacciones no se pueda cambiar el tipo */
+                const transactions = await Transaction.count({
+                    where: {
+                        publication_id: publication.id,
+                        [Op.not]: { status: 'rejected' }
+                    }
+                })
 
-            if (transactions > 0) {
-                return res.status(400).json({ path: '-', msg: `Existen transacciones con esta publicacion, no puedes cambiar el tipo` })
+                if (transactions > 0) {
+                    return res.status(400).json([{ path: '-', msg: `Existen transacciones con esta publicacion, no puedes cambiar el tipo a publicacion unica` }])
+                }
             }
 
             publication.type = updates.typePost
+        }
 
-            if (updates.typePost == 'sale') {
-                publication.typeSale = updates.typeSale
-                publication.price = updates.price
-                publication.currency = 'ars'
-            }else{
-                publication.typeSale = null
-                publication.price = null
-                publication.currency = null
-            }
+        if (updates.typePost == 'sale') {
+            publication.typeSale = updates.typeSale
+            publication.price = parseFloat(updates.price.replace('.', ''))
+            publication.currency = 'ars'
+        } else {
+            publication.typeSale = null
+            publication.price = null
+            publication.currency = null
         }
 
 
@@ -845,7 +848,6 @@ const editPublication = async (req, res) => {
 
             //Comparar array del cliente con publicationTags
             if (publicationTags.length > updates.tags.length) {
-
                 //array de ids que deben quedar
                 const idsOk = publicationTags
                     .filter((tag, index) => {
@@ -868,6 +870,29 @@ const editPublication = async (req, res) => {
                     ]
                 })
             }
+
+            /* 
+            Puede venir la misma cantidad que antes, pero puede venir uno distinto, u todos
+            Comparar el array que tengo de tags en la publicacion con el actual,
+            los que son iguales dejarlos, si hay distintos, borrar el hasTag y poner el nuevo
+            */
+
+
+            const tagsAEliminar = publicationTags.filter(tag => !updates.tags.includes(tag.name));
+            tagsAEliminar.forEach(async tag => {
+                //Ya teniendo el tag que tengo que eliminar lo busco en HasTag y lo elimino
+                await PublicationHasTag.destroy({
+                    where: {
+                        tagId: tag.id,
+                        publicationId: publication.id
+                    }
+                })
+            });
+
+            console.log(tagsAEliminar)
+            //Comparo los ids anteriores con los actuales y dejo en el array los que debo eliminar
+            //array de ids que deben quedar
+
 
             //Recorro los tags que traigo del cliente
             for (const tag of updates.tags) {

@@ -14,6 +14,12 @@ const $alert = document.getElementById('alert')
 const $optionPublic = document.getElementById('privacy-public').nextElementSibling
 const $optionProtected = document.getElementById('privacy-protected').nextElementSibling
 
+const $edit = document.querySelector('meta[name="edit"]')
+let $isEdit
+
+if($edit){
+    $isEdit  = $edit.getAttribute('content')
+}
 
 //guardo el valor seleccionado de tipo de publicacion //free o sale
 $inputsRadioTypes.forEach(type => {
@@ -159,7 +165,7 @@ function mostrarLicencias(data) {
     const copyright = isCopyright($primerInput)
 
     //Mostrar texto para editar marca de agua
-    if (copyright) {
+    if (copyright && !$isEdit) {
         const b = document.createElement('button')
         b.textContent = 'Cambiar marca de agua'
         b.setAttribute('type', 'button')

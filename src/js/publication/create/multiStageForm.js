@@ -4,7 +4,7 @@ const $edit = document.querySelector('meta[name="edit"]')
 let $isEdit
 
 if($edit){
-    $isEdit.getAttribute('content')
+    $isEdit  = $edit.getAttribute('content')
 }
 
 /* Spans para los errores */
