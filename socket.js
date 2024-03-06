@@ -1,7 +1,8 @@
 import { io } from "./index.js";
 import getUserSocket from './Middlewares/getUserSocket.js'
 import { Op } from "sequelize";
-import { Publication, Conversation, Message, RightOfUse, User } from './models/Index.js'
+import { v4 as uuidv4 } from 'uuid'
+import { Publication, Conversation, Message, RightOfUse, User, Transaction } from './models/Index.js'
 import moment from "moment";
 
 function execSocket() {
@@ -43,24 +44,42 @@ function execSocket() {
 
         socket.on('acquire', async ({ publicationId, message: messageClient }) => {
             console.log('Adquirir la publicacion', publicationId)
+            try {
+                //Validar que la publicacion exista, si es acquire significa que la publicacion debe ser de transferencia unica
+                const publication = await Publication.findOne({
+                    where: {
+                        id: publicationId,
+                        [Op.or]: [
+                            { type: 'sale', typeSale: 'unique' },
+                            { '$license.name$': 'Copyright' }
+                        ]
+                    },
+                    include: [{ model: RightOfUse, as: 'license' }]
+                })
 
-            //Validar que la publicacion exista, si es acquire significa que la publicacion debe ser de transferencia unica
-            const publication = await Publication.findOne({
-                where: {
-                    id: publicationId,
-                    [Op.or]: [
-                        { type: 'sale', typeSale: 'unique' },
-                        { '$license.name$': 'Copyright' }
-                    ]
-                },
-                include: [{ model: RightOfUse, as: 'license' }]
-            })
-
-            if (!publication) {
-                //Le decimos al cliente que no se puede
-                return io.emit('acquire-not')
-            } else {
-                try {
+                if (!publication) {
+                    //Le decimos al cliente que no se puede
+                    return io.emit('acquire-not')
+                } else {
+                    //Creamos la transaccion
+                    const [transaction, flag] = await Transaction.findOrCreate({
+                        where: {
+                            publication_id: publication.id,
+                            user_id: socket.user.id,
+                            [Op.or]: [{ status: 'waiting' }, { status: 'hold' }]
+                        },
+                        include: [{ model: Publication, as: 'publication' }],
+                        defaults: {
+                            id: uuidv4(),
+                            user_id: socket.user.id,
+                            publication_id: publication.id,
+                            date: new Date(),
+                            price: publication.price,
+                            status: 'waiting',
+                            currency: publication.currency,
+                            typeSale: publication.typeSale
+                        }
+                    })
 
                     if (messageClient.trim().length < 1) {
                         return io.emit('error', { message: 'Escribe un mensaje' })
@@ -83,6 +102,14 @@ function execSocket() {
                         }
                     })
 
+                    //Los usuarios deben poder ver de nuevo la conversacion aunque la hayan borrado
+                    if (conversation[0].visibleUser1 === false || conversation[0].visibleUser2 === false) {
+                        conversation[0].visibleUser1 = true
+                        conversation[0].visibleUser2 = true
+
+                        await conversation[0].save()
+                    }
+
                     //Guardamos el mensaje en la base de datos
                     const msg = await Message.create(
                         {
@@ -91,7 +118,7 @@ function execSocket() {
                             purchase: true,
                             user_id: socket.user.id,
                             conversation_id: conversation[0].id,
-                            publication_id: publication.id,
+                            transaction_id: transaction.id,
                             read: false
                         })
 
@@ -99,7 +126,7 @@ function execSocket() {
                     const message = { ...msg.get() }
                     message.user = socket.user
                     message.conversation = conversation[0]
-                    message.publication = publication
+                    message.transaction = transaction
 
                     //Agrego la propiedad ultimo mensaje a la conversacion
                     const conversationData = { ...message.conversation.get() }
@@ -117,12 +144,12 @@ function execSocket() {
                         await socketToUser.join(`conversation-${conversation[0].id}`)
                         //Avisamos al cliente del nuevo mensaje
                         io.to(`conversation-${conversation[0].id}`).emit('new-message-ok',
-                            { message, msgUserId: msg.user_id, fromUser: socket.user.id, toUser: publication.user_id, })
+                            { message, msgUserId: msg.user_id, fromUser: socket.user.id, toUser: publication.user_id, transaction })
                     }
-                } catch (error) {
-                    //Le decimos al cliente que no se puede
-                    io.emit('acquire-not')
                 }
+            } catch (error) {
+                //Le decimos al cliente que no se puede
+                io.emit('acquire-not')
             }
         })
 
@@ -216,6 +243,152 @@ function execSocket() {
                 io.to(`conversation-${conversation.id}`).emit('read-messages-ok', { message: 'Mensajes leidos', total: count, conversationId, toUserId })
             } catch (error) {
                 io.emit('error', { message: 'Error al querer leer los mensajes' })
+            }
+        })
+
+        socket.on('accept-transaction', async ({ publicationId, requestingUserId }) => {
+            const { user } = socket
+
+            //Validaciones
+            if (!requestingUserId) {
+                return io.emit('error', { message: 'Debe enviar quien solicita la publicacion' })
+            }
+
+            //Valido que la conversacion exista
+            const conversation = await Conversation.findOne({
+                where: {
+                    [Op.or]: [
+                        { userId1: user.id, userId2: requestingUserId },
+                        { userId1: requestingUserId, userId2: user.id }
+                    ]
+                }
+            })
+
+            try {
+                //Validaciones
+                if (!conversation) {
+                    return io.emit('error', { message: 'La conversación no existe' })
+                }
+
+                //Publicacion con el id y que sea mia, debe estar en venta
+                const publication = await Publication.findOne({
+                    where: {
+                        id: publicationId,
+                        user_id: user.id,
+                        type: 'sale'
+                    }
+                })
+
+                if (!publication) {
+                    return io.emit('error', { success: false, message: 'La publicacion solicitada no existe' })
+                }
+
+                const [transaction, flag] = await Transaction.findOrCreate({
+                    where: {
+                        publication_id: publication.id,
+                        user_id: requestingUserId,
+                        status: 'waiting'
+                    },
+                    include: [{ model: Publication, as: 'publication' }],
+                    defaults: {
+                        id: uuidv4(),
+                        user_id: requestingUserId,
+                        publication_id: publication.id,
+                        date: new Date(),
+                        price: publication.price,
+                        status: 'hold',
+                        currency: publication.currency,
+                        typeSale: publication.typeSale
+                    },
+                    order: [['date', 'ASC']], // Ordenar por fecha ascendente
+                    limit: 1 // Obtener solo el primer resultado
+                })
+
+                if (!transaction) {
+                    return io.emit('error', { success: false, message: 'No hay solicitud de compra' })
+                }
+
+                //Cambio a hold, el usuario dueno acepto liberar la publicacion
+                transaction.status = 'hold'
+                await transaction.save()
+
+                io.to(`conversation-${conversation.id}`).emit('accept-transaction-ok', transaction)
+            } catch (error) {
+                console.log(error)
+                io.to(`conversation-${conversation.id}`).emit('error')
+            }
+
+        })
+
+        socket.on('decline-transaction', async ({ publicationId, requestingUserId }) => {
+            const { user } = socket
+
+            //Validaciones
+            if (!requestingUserId) {
+                return io.emit('error', { message: 'Debe enviar quien solicita la publicacion' })
+            }
+
+            //Valido que la conversacion exista
+            const conversation = await Conversation.findOne({
+                where: {
+                    [Op.or]: [
+                        { userId1: user.id, userId2: requestingUserId },
+                        { userId1: requestingUserId, userId2: user.id }
+                    ]
+                }
+            })
+
+            try {
+                //Validaciones
+                if (!conversation) {
+                    return io.emit('error', { message: 'La conversación no existe' })
+                }
+
+                //Publicacion con el id y que sea mia, debe estar en venta
+                const publication = await Publication.findOne({
+                    where: {
+                        id: publicationId,
+                        user_id: user.id,
+                        type: 'sale'
+                    }
+                })
+
+                if (!publication) {
+                    return io.emit('error', { success: false, message: 'La publicacion solicitada no existe' })
+                }
+
+                const [transaction, flag] = await Transaction.findOrCreate({
+                    where: {
+                        publication_id: publication.id,
+                        user_id: requestingUserId
+                    },
+                    include: [{ model: Publication, as: 'publication' }],
+                    defaults: {
+                        id: uuidv4(),
+                        user_id: requestingUserId,
+                        publication_id: publication.id,
+                        date: new Date(),
+                        price: publication.price,
+                        status: 'rejected',
+                        currency: publication.currency,
+                        typeSale: publication.typeSale
+                    },
+                    order: [['date', 'ASC']], // Ordenar por fecha ascendente
+                    limit: 1 // Obtener solo el primer resultado
+                })
+
+                if (!transaction) {
+                    return io.emit('error', { success: false, message: 'No hay solicitud de compra' })
+                }
+
+                //Cambio a hold, el usuario dueno acepto liberar la publicacion
+                transaction.status = 'rejected'
+                await transaction.save()
+
+                io.to(`conversation-${conversation.id}`).emit('decline-transaction-ok', transaction)
+            } catch (error) {
+                console.log(error)
+                io.to(`conversation-${conversation.id}`).emit('error')
             }
         })
     })

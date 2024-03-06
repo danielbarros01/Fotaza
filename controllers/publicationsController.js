@@ -8,7 +8,7 @@ import deleteImage from '../helpers/deleteImage.js'
 import { setWatermark } from '../helpers/watermarks.js'
 import getResolution from '../helpers/getResolution.js'
 
-import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating } from '../models/Index.js'
+import { User, Category, RightOfUse, Publication, Tag, PublicationHasTag, Comment, Interest, Rating, UserPayment, Transaction } from '../models/Index.js'
 
 import path from 'path'
 import { routeImages } from '../config/generalConfig.js'
@@ -278,6 +278,14 @@ const savePublication = async (req, res) => {
 
             //si es de tipo sale
             if (req.body['typePost'] == 'sale') {
+                /* Validar que exista un pago */
+                const userPayment = await UserPayment.findByPk(req.user.id)
+
+                if (!userPayment) {
+                    errors.push({ path: 'payment', msg: `No tienes configurado el metodo de pago` })
+                }
+                /*  */
+
                 //typeVenta puede ser general o unique
                 const typeSale = req.body['typeSale']
 
@@ -526,36 +534,90 @@ const viewPublication = async (req, res) => {
         /* RECOMENDACIONES */
         //otras imagenes parecidas
         //Primero busco por las etiquetas
-        let recomendations = await Publication.findAll({
-            include: [{
-                model: Tag,
-                where: {
-                    name: {
-                        [Op.in]: tags.map(tag => tag.name)
+        let recomendations
+
+        /* Si no hay usuario solo buscar las publicas */
+        if (!user) {
+            recomendations = await Publication.findAll({
+                include: [{
+                    model: Tag,
+                    where: {
+                        name: {
+                            [Op.in]: tags.map(tag => tag.name)
+                        }
                     }
-                }
-            }],
-            where: {
-                id: {
-                    [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
-                }
-            },
-            order: [['date_and_time', 'DESC']],
-            limit: 10
-        });
+                }],
+                where: {
+                    id: {
+                        [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
+                    },
+                    privacy: 'public'
+                },
+                order: [['date_and_time', 'DESC']],
+                limit: 10
+            });
+        } else {
+            //Todas menos las que son privadas y gratis, que son solo vistas por usuario dueño
+            recomendations = await Publication.findAll({
+                include: [{
+                    model: Tag,
+                    where: {
+                        name: {
+                            [Op.in]: tags.map(tag => tag.name)
+                        }
+                    }
+                }],
+                where: {
+                    id: {
+                        [Op.not]: parseInt(publication.id) // Excluir el ID 19, que es la publicación actual
+                    },
+                    [Op.not]: {
+                        [Op.and]: [
+                            { privacy: 'private' },
+                            { type: 'free' }
+                        ]
+                    }
+                },
+                order: [['date_and_time', 'DESC']],
+                limit: 10
+            });
+        }
+
 
         //si la busqueda por etiquetas me devuelve 5 o menos publicaciones le agrego por categoria
         if (recomendations.length < 6) {
-            const recomendationsByCategory = await Publication.findAll({
-                where: {
-                    id: {
-                        [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+            let recomendationsByCategory
+            if (!user) {
+                recomendationsByCategory = await Publication.findAll({
+                    where: {
+                        id: {
+                            [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+                        },
+                        category_id: publication.category_id,
+                        privacy: 'public'
                     },
-                    category_id: publication.category_id
-                },
-                order: [['date_and_time', 'DESC']],
-                limit: 5
-            });
+                    order: [['date_and_time', 'DESC']],
+                    limit: 5
+                });
+            } else {
+                recomendationsByCategory = await Publication.findAll({
+                    where: {
+                        id: {
+                            [Op.not]: [parseInt(publication.id), ...recomendations.map(r => r.id)] // Excluir el ID 19 y los que haya traido del anterior recomendations
+                        },
+                        category_id: publication.category_id,
+                        [Op.not]: {
+                            [Op.and]: [
+                                { privacy: 'private' },
+                                { type: 'free' }
+                            ]
+                        }
+                    },
+                    order: [['date_and_time', 'DESC']],
+                    limit: 5
+                });
+            }
+
 
             //Unir los arrays
             recomendations = [...recomendations, ...recomendationsByCategory]
@@ -582,6 +644,16 @@ const viewPublication = async (req, res) => {
 
         const categories = await Category.findAll()
         const rightsOfUse = await RightOfUse.findAll()
+
+        /* Verificar que no haya comprado ya la publicacion */
+        const transaction = await Transaction.findOne({
+            where: {
+                user_id: user.id,
+                publication_id: publication.id
+            }
+        })
+        /*  */
+
         //si el user_id del post es el mismo del user.id, mostrar para modificar
         return res.render('publications/publication', {
             publication,
@@ -598,6 +670,7 @@ const viewPublication = async (req, res) => {
             myId: user.id ?? '',
             csrfToken: req.csrfToken(),
             imageUrl: `/publications/image/${publication.image}`,
+            transaction
         })
     } catch (error) {
         console.error(error)
@@ -620,8 +693,21 @@ const downloadImage = async (req, res) => {
     if (publication.type != 'sale') {
         filePath = path.join(process.cwd(), 'images', 'uploads', fileName)
     } else {
-        //Si la imagen es de venta descargar con marca de agua
-        filePath = path.join(process.cwd(), 'images', 'uploadsWithWatermark', `watermark_${fileName}`)
+        //Si la imagen es de venta pero ya la adquiri descargar sin marca de agua
+        const transaction = await Transaction.findOne({
+            where: {
+                user_id: req.user.id,
+                publication_id: publication.id,
+                status: 'approved'
+            }
+        })
+
+        if (transaction && transaction.status == 'approved') {
+            filePath = path.join(process.cwd(), 'images', 'uploads', fileName)
+        } else {
+            //Si la imagen es de venta descargar con marca de agua
+            filePath = path.join(process.cwd(), 'images', 'uploadsWithWatermark', `watermark_${fileName}`)
+        }
     }
 
     res.download(filePath, fileName, (err) => {
@@ -632,18 +718,13 @@ const downloadImage = async (req, res) => {
     })
 }
 
-//PATCH /publications/:id
+//POST /publications/:id
 const editPublication = async (req, res) => {
     const { user } = req
     const { id: publicationId } = req.params
     const updates = req.body
 
     /* VALIDACIONES */
-    //Si no hay usuario
-    if (!user) {
-        return res.status(401).json({ key: 'no user', msg: 'Debe estar autenticado' });
-    }
-
     //Que los campos tambien vengan
     const errors = []
     for (let campo in req.body) {
@@ -656,6 +737,14 @@ const editPublication = async (req, res) => {
                 errors.push({ path: campo, msg: `Seleccione ${campo} disponible` })
             }
         }
+    }
+
+    if (!('price' in updates) && updates.typePost == 'sale') {
+        errors.push({ path: 'price', msg: `Debe ponerle un precio` })
+    }
+
+    if (updates.typePost == 'sale' && !('typeSale' in updates)) {
+        errors.push({ path: 'typeSale', msg: `Debe seleccionar un tipo de venta` })
     }
 
     //Si hay campos vacios:
@@ -677,15 +766,77 @@ const editPublication = async (req, res) => {
 
     try {
         //valido publicacion
-        const publication = await Publication.findOne({ where: { id: publicationId, user_id: user.id }, transaction, })
+        const publication = await Publication.findOne(
+            {
+                where: { id: publicationId, user_id: user.id },
+                transaction,
+            })
+
         if (!publication) {
             return res.status(404).json({ key: 'no publication', msg: 'No existe la publicacion' });
         }
 
+        if (updates.typePost != publication.type) {
+            /* Si quiero cambiar la publicacion a unique */
+            if (updates.typeSale == 'unique') {
+                /* Validar que si la publicacion tiene transacciones no se pueda cambiar el tipo */
+                const transactions = await Transaction.count({
+                    where: {
+                        publication_id: publication.id,
+                        [Op.not]: { status: 'rejected' }
+                    }
+                })
+
+                if (transactions > 0) {
+                    return res.status(400).json([{ path: '-', msg: `Existen transacciones con esta publicacion, no puedes cambiar el tipo a publicacion unica` }])
+                }
+            }
+
+            publication.type = updates.typePost
+        }
+
+        if (updates.typePost == 'sale') {
+            publication.typeSale = updates.typeSale
+            publication.price = parseFloat(updates.price.replace('.', ''))
+            publication.currency = 'ars'
+        } else {
+            publication.typeSale = null
+            publication.price = null
+            publication.currency = null
+        }
+
+
         if (updates.category != publication.category_id) publication.category_id = updates.category
-        if (updates.rightsOfUse != publication.rights_of_use_id) publication.rights_of_use_id = updates.rightsOfUse
         if (updates.title != publication.title) publication.title = updates.title
 
+        if (updates.license != publication.rights_of_use_id) {
+            let rightsOfUse
+
+            switch (updates.typePost) {
+                case 'free':
+                    rightsOfUse = await RightOfUse.findOne({
+                        where: {
+                            id: updates.license,
+                            free: true
+                        }
+                    })
+                    break;
+                case 'sale':
+                    rightsOfUse = await RightOfUse.findOne({
+                        where: {
+                            id: updates.license,
+                            [Op.or]: [{ general_sale: true }, { unique_sale: true }]
+                        }
+                    })
+                    break;
+            }
+
+            if (!rightsOfUse) {
+                return res.status(404).json({ key: 'rightsOfUse', msg: 'No existe la licencia que a la que quiere cambiar' });
+            }
+
+            publication.rights_of_use_id = updates.license
+        }
 
         let publicationTags = null
         //si esta vacio tags eliminar los tags de la publicacion si existiesen
@@ -697,7 +848,6 @@ const editPublication = async (req, res) => {
 
             //Comparar array del cliente con publicationTags
             if (publicationTags.length > updates.tags.length) {
-
                 //array de ids que deben quedar
                 const idsOk = publicationTags
                     .filter((tag, index) => {
@@ -720,6 +870,29 @@ const editPublication = async (req, res) => {
                     ]
                 })
             }
+
+            /* 
+            Puede venir la misma cantidad que antes, pero puede venir uno distinto, u todos
+            Comparar el array que tengo de tags en la publicacion con el actual,
+            los que son iguales dejarlos, si hay distintos, borrar el hasTag y poner el nuevo
+            */
+
+
+            const tagsAEliminar = publicationTags.filter(tag => !updates.tags.includes(tag.name));
+            tagsAEliminar.forEach(async tag => {
+                //Ya teniendo el tag que tengo que eliminar lo busco en HasTag y lo elimino
+                await PublicationHasTag.destroy({
+                    where: {
+                        tagId: tag.id,
+                        publicationId: publication.id
+                    }
+                })
+            });
+
+            console.log(tagsAEliminar)
+            //Comparo los ids anteriores con los actuales y dejo en el array los que debo eliminar
+            //array de ids que deben quedar
+
 
             //Recorro los tags que traigo del cliente
             for (const tag of updates.tags) {
@@ -744,11 +917,11 @@ const editPublication = async (req, res) => {
         // Confirmar la transacción
         await transaction.commit();
 
-        res.sendStatus(204)
+        res.status(201).json({ publicationId: publication.id })
     } catch (error) {
         // Si ocurre un error, deshacemos la transacción y manejamos el error
         await transaction.rollback(); //redundante?
-        res.status(500).json({ error: 'Error en la actualización de la publicación.' });
+        return res.status(500).json([{ path: '-', msg: 'Hemos tenido un error al procesar tu solicitud de actualizacion, intenta nuevamente más tarde' }]);
     }
 }
 
@@ -769,10 +942,40 @@ const deletePublication = async (req, res) => {
 
     try {
         const rutePublication = publication.image
-        const imagePath = path.join(routeImages.uploadsFolder, rutePublication) //rutaServidor/public/uploads/imagenNombre
+        const imagePath = path.join(routeImages.uploadsImagesFolder, rutePublication) //rutaServidor/public/uploads/imagenNombre
+        const imagePathWatermark = path.join(routeImages.uploadsImagesWithWatermarkFolder, `watermark_${rutePublication}`) //rutaServidor/public/uploads/imagenNombre
 
+        /* Verificar que no exista transacciones con la publicacion */
+        //cuántas transacciones hay asociadas que no tienen status 'rejected'.
+        const { count: countTransactions, rows: transactions } = await Transaction.findAndCountAll({
+            where: {
+                publication_id: publication.id,
+                [Op.not]: {
+                    [Op.or]: [
+                        { status: 'rejected' },
+                        { status: 'waiting' },]
+                }
+            }
+        })
 
+        /* Si existe una o mas transacciones*/
+        if (countTransactions > 0) {
+            return res.status(403).json({ message: 'Existen transacciones con esta publicación' })
+        } else {
+            /* Elimino las transacciones asi puedo eliminar la publicacion*/
+            /* Lo hago asi, y no en cascada automaticamente por un tema de seguridad */
+            await Transaction.destroy({
+                where: {
+                    publication_id: publication.id
+                }
+            })
+        }
+
+        /* Eliminar publicacion */
         deleteImage(null, imagePath)
+        deleteImage(null, imagePathWatermark)
+
+
         await publication.destroy()
 
         return res.status(200).json({ message: 'Publicación eliminada' })
@@ -877,31 +1080,57 @@ const bestPublications = async (req, res) => {
         let oneYearGo = new Date();
         oneYearGo.setFullYear(oneYearGo.getFullYear() - 1);
 
-        const randomImages = await Publication.findAll({
-            where: {
-                id: {
-                    [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+        let randomImages
+
+        if (user) {
+            randomImages = await Publication.findAll({
+                where: {
+                    id: {
+                        [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+                    },
+                    date: { [Op.gte]: oneYearGo },
+                    [Op.not]: {
+                        [Op.and]: [
+                            { type: { [Op.ne]: 'sale' } },
+                            { privacy: 'private' }
+                        ]
+                    }
                 },
-                date: { [Op.gte]: oneYearGo },
-                [Op.not]: {
-                    [Op.and]: [
-                        { type: { [Op.ne]: 'sale' } },
-                        { privacy: 'private' }
-                    ]
-                }
-            },
-            include: [{
-                model: User, as: 'user',
-                attributes: {
-                    exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
-                }
-            }],
-            order: Sequelize.literal('rand()'),
-            subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
-            group: ['User.id'],
-            limit: additionalItems,
-            having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
-        })
+                include: [{
+                    model: User, as: 'user',
+                    attributes: {
+                        exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                    }
+                }],
+                order: Sequelize.literal('rand()'),
+                subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
+                group: ['User.id'],
+                limit: additionalItems,
+                having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
+            })
+        } else {
+            randomImages = await Publication.findAll({
+                where: {
+                    id: {
+                        [Op.notIn]: items.map(item => item.publication.id), // Excluir las publicaciones que ya hay
+                    },
+                    date: { [Op.gte]: oneYearGo },
+                    privacy: { [Op.notIn]: ['private', 'protected'] }
+                },
+                include: [{
+                    model: User, as: 'user',
+                    attributes: {
+                        exclude: ['email', 'password', 'token', 'confirmed', 'google_id']
+                    }
+                }],
+                order: Sequelize.literal('rand()'),
+                subQuery: false, // Deshabilitar la subconsulta para mejorar la compatibilidad con MySQL,
+                group: ['User.id'],
+                limit: additionalItems,
+                having: Sequelize.literal('COUNT(DISTINCT `user`.`id`) = 1') // Hacer que solo haya una publicación por usuario
+            })
+
+        }
 
         /* La estrucutura de items funciona asi, con un item padre, por eso hago esto */
         randomImages.forEach(i => {
@@ -915,6 +1144,53 @@ const bestPublications = async (req, res) => {
     return items
 }
 
+const getEditPublication = async (req, res) => {
+    const { user } = req
+    const { id } = req.params
+
+    try {
+        const publication = await Publication.findOne({
+            where: {
+                id,
+                user_id: user.id
+            },
+            include: [
+                { model: Category, as: 'category' },
+                { model: RightOfUse, as: 'license' },
+                { model: Tag, as: 'tags' },
+            ]
+        })
+
+        if (!publication) {
+            return res.status(404).render('404', { message: 'Uups, no encontramos esta publicación' })
+        }
+
+        /* Traigo todas las categorias */
+        const categories = await Category.findAll()
+
+        let rightsOfUse
+
+        if (publication.type == 'free') {
+            rightsOfUse = await RightOfUse.findAll({ where: { free: true } })
+        } else if (publication.type == 'sale' && publication.typeSale == 'general') {
+            rightsOfUse = await RightOfUse.findAll({ where: { general_sale: true } })
+        } else {
+            rightsOfUse = await RightOfUse.findAll({ where: { unique_sale: true } })
+        }
+
+        return res.render('publications/edit', {
+            user,
+            publication,
+            categories,
+            rightsOfUse,
+            viewBtnsAuth: user ? false : true,
+            csrfToken: req.csrfToken(),
+        })
+    } catch (error) {
+        return res.status(500).redirect('/')
+    }
+}
+
 export {
     viewPublications,
     viewPublicationsOf,
@@ -925,5 +1201,6 @@ export {
     downloadImage,
     editPublication,
     deletePublication,
-    bestPublications
+    bestPublications,
+    getEditPublication
 }

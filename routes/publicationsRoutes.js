@@ -2,7 +2,8 @@ import express from 'express'
 
 import {
     viewPublications, createPublication, savePublication, viewMyPublications,
-    viewPublication, downloadImage, editPublication, deletePublication, viewPublicationsOf, bestPublications
+    viewPublication, downloadImage, editPublication, deletePublication, viewPublicationsOf, bestPublications,
+    getEditPublication
 } from '../controllers/publicationsController.js'
 import { Publication, RightOfUse } from '../models/Index.js'
 import protectRoute from '../Middlewares/protectRoute.js'
@@ -96,5 +97,10 @@ router.get('/image/:id', authenticateUser, async (req, res) => {
     //res.sendFile(`${baseDir}/images/uploads/${req.params.id}`);
 });
 
+// GET /publications/edit/:id
+router.get('/edit/:id', protectRoute, getEditPublication)
+
+// POST /publications/edit/:id
+router.post('/edit/:id', protectRoute, editPublication)
 
 export default router

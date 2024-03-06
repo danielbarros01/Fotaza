@@ -68,6 +68,8 @@ function addTags(tags, $tag, $tags, $spanErrTag, $btnDeletesTag = false, isUnlim
 
             //Elimino el value~
             $tag.value = null
+
+            console.log(tags)
         }
     })
 }

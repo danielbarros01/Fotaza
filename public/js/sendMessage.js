@@ -16,7 +16,7 @@
   \************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\nconst socket = io()\r\n\r\nconst $btn = document.getElementById('sendMessage')\r\nconst id = $btn.dataset.id\r\n\r\n$btn.addEventListener('click', function (event) {\r\n    socket.emit('acquire', { publicationId: id, message: 'Quisiera adquirir su publicación. ¿Estaría dispuesto a venderla?' })\r\n})\r\n\r\nsocket.on('acquire-ok', (conversationId) => {\r\n    console.log('Si puedes mandarle una solicitud', conversationId)\r\n\r\n    window.location.href = `/chat/c/${conversationId}`\r\n})\r\n\r\nsocket.on('acquire-not')\n\n//# sourceURL=webpack://fotazaproject/./src/js/chat/publication/sendMessage.js?");
+eval("__webpack_require__.r(__webpack_exports__);\nconst socket = io()\r\n\r\nconst $btn = document.getElementById('sendMessage')\r\nconst id = $btn.dataset.id\r\n\r\nif($btn){\r\n    $btn.addEventListener('click', function (event) {\r\n        socket.emit('acquire', { publicationId: id, message: 'Quisiera adquirir su publicación. ¿Estaría dispuesto a venderla?' })\r\n    })\r\n}\r\n\r\nsocket.on('acquire-ok', (conversationId) => {\r\n    console.log('Si puedes mandarle una solicitud', conversationId)\r\n\r\n    window.location.href = `/chat/c/${conversationId}`\r\n})\r\n\r\nsocket.on('acquire-not')\n\n//# sourceURL=webpack://fotazaproject/./src/js/chat/publication/sendMessage.js?");
 
 /***/ })
 

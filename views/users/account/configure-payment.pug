@@ -1,0 +1,108 @@
+extends ../../layout/index
+
+block styles 
+
+block contenido
+    include ../../layout/header
+
+    main(class="px-6 py-10 lg:flex relative") 
+        #alertInfo.w-full.absolute.flex.items-center.bg-blue-500.text-white.text-sm.font-bold.px-4.py-3.top-0.left-0(role='alert')
+            i(class="fa-solid fa-circle-info mr-2")
+            p Por el momento solo se aceptan pagos de Mercado Pago
+            div(class="flex-1")
+                button#btnCloseAlert(class="absolute top-0 right-4 h-full")
+                    span(class="text-center text-sm font-semibold text-white hover:text-red-300") X
+
+
+        //- Este aside debo pasarlo a otro archivo ya que lo usare en otra parte tambien
+        aside(class="bg-white mb-4 lg:mb-0 shadow-2xl lg:w-1/4 h-fit")
+            h1(class="border-principal-gray border-b-2 font-semibold text-xl p-4") Editar perfil 
+            a(href="/users/account") 
+                div(class="text-lg p-4 group") 
+                    span(class="group-hover:underline") Informacion personal
+            a(href="/users/account/password") 
+                div(class="text-lg p-4 group")  
+                    span(class="group-hover:underline") Cambiar contraseña
+            a(href="/users/account/configure-payment") 
+                div(class="bg-gray-300 text-lg p-4 group")  
+                    span(class="group-hover:underline") Gestionar pagos
+
+
+        section(class="bg-white shadow-2xl lg:w-3/4 lg:ml-6 overflow-hidden")
+            header(class="flex justify-between bg-gradient-to-b from-sky-500 to-slate-50 px-8 py-6") 
+                div(class="h-full flex items-center") 
+                    img(src="/img/project/mercadopago.png", alt="Logo de Mercado Pago" class="w-32")
+
+                button#btnHelp(type="button" class="flex bg-gray-500/30 h-10 p-2 space-x-2 hover:bg-gray-500/50 rounded-sm") 
+                    i(class="fa-solid fa-circle-question text-white text-lg m-auto")
+                    span(class="text-white") Ayuda
+
+            #warningAccessToken(class="bg-red-600 m-auto w-11/12 flex items-center space-x-2 p-5 my-6")
+                i(class="fa-solid fa-triangle-exclamation text-4xl text-white")
+                p(class="text-white text-sm") El ACCESS_TOKEN es un dato sensible, por lo tanto, te garantizamos que quedara seguro, usamos encriptacion para que los datos sensibles no puedan ser accedidos por mas nadie que no seas tu, no compartas este dato con ningun otro usuario.
+
+            if !configurePayment
+                form#formAccessToken(method="POST" action=`/users/account/configure-payment?_csrf=${csrfToken}` class="min-h-[270px]") 
+                    //- input(type="hidden" name="_csrf" value=csrfToken)
+                    div(class="px-12 my-4") 
+                        .input
+                            label.block(for="inputAccessToken" )
+                                span(class="block text-lg font-medium text-slate-700") Access Token:
+                            div(class="relative w-full")
+                                input#inputAccessToken(type="password" name="accessToken" class="pr-8 mt-1 px-3 py-2 bg-transparent border shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="Ingrese su access_token" autocomplete="off")
+                                button#viewToken(type="button" class="fa-solid fa-eye absolute right-0 top-0 h-full pr-2 text-secondary-gray hover:text-principal-gray hover:scale-105") 
+                                span.error(class=`absolute top-12 left-1 text-sm text-red-600 ${error ? '' : 'hidden'}`)= error ? error : ''
+
+                    div(class="w-full h-fit sm:text-center p-4")
+                        button#btnSave(type="submit" class="bg-sky-500 text-white font-normal w-full sm:w-44 p-3 mt-8 sm:m-8 md:mt-18 hover:opacity-90") Guardar
+            else 
+                section#sectionEdit(class="relative")
+                    div#AccessTokenSuccess(class="transition-all duration-300 ease-in-out")
+                        div(class="bg-green-500 m-auto w-11/12 flex flex-col p-5 my-6 ")
+                            h4(class="text-2xl text-white font-semibold") Access Token Configurado
+                            div(class="flex items-center justify-between space-x-2")
+                                p(class="text-white font-bold text-xl") ********************************
+                                i(class="fa-solid fa-circle-check text-4xl text-white -mt-7")
+
+                        div(class="m-auto w-11/12 -mt-1") 
+                            form(action=`/users/account/configure-payment/delete/?_csrf=${csrfToken}` method="POST")
+                                button(type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white") Eliminar  
+
+                        div(class="w-full h-fit sm:text-center p-4")
+                            button#btnEdit(type="button" class="bg-green-600 text-white font-normal w-full sm:w-44 p-3 mt-8 sm:m-8 md:mt-18 hover:opacity-90") Editar
+
+                    form#formAccessToken(method="POST" action=`/users/account/configure-payment/edit/?_csrf=${csrfToken}` class="absolute top-0 left-0 bg-white min-h-[270px] transform -translate-x-full transition-all duration-300 ease-in-out w-full") 
+                        //- input(type="hidden" name="_csrf" value=csrfToken)
+                        div(class="px-12 my-4") 
+                            .input
+                                label.block(for="inputAccessToken" )
+                                    span(class="block text-lg font-medium text-slate-700") Access Token:
+                                div(class="relative w-full")
+                                    input#inputAccessToken(type="password" name="accessToken" class="pr-8 mt-1 px-3 py-2 bg-transparent border shadow-sm border-secondary-gray placeholder-secondary-gray focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1" placeholder="Ingrese su access_token" autocomplete="off")
+                                    button#viewToken(type="button" class="fa-solid fa-eye absolute right-0 top-0 h-full pr-2 text-secondary-gray hover:text-principal-gray hover:scale-105") 
+                                    span.error(class=`absolute top-12 left-1 text-sm text-red-600 ${error ? '' : 'hidden'}`)= error ? error : ''
+
+                        div(class="w-full h-fit text-center p-4 flex justify-center space-x-4")
+                            button#btnCancelEdit(type="button" class="border-2 border-red-500 text-red-500 font-normal w-32 p-1 mt-8 sm:m-8 md:mt-18 hover:opacity-90 hover:bg-red-50") Cancelar
+                            button#btnSave(type="submit" class="bg-sky-500 text-white font-normal w-full sm:w-44 p-3 mt-8 sm:m-8 md:mt-18 hover:opacity-90") Guardar
+
+
+            #stepsMercadoPago(class="pl-10 hidden min-h-[268px]")
+                h3(class="text-2xl mb-2") Pasos para aceptar pagos con Mercado Pago:
+                ol(class="list-decimal pl-10 space-y-1 font-light") 
+                    li Accede a Mercado Pago 
+                    li Ve a “Configuracion” dentro de la seccion de “Tu negocio”
+                    li En “Gestion y administracion” solicita tus credenciales
+                    li Alli puedes conseguir el ACCESS_TOKEN
+    
+    if success
+        #alertSuccess(class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/2 bg-green-500 rounded-sm shadow-2xl border border-white m-auto flex flex-col")
+            div(class="w-full text-right")
+                button#btnCloseSuccess(type="button" class="fa-solid fa-circle-xmark text-xl text-white p-4 cursor-pointer hover:scale-105")
+            div(class="flex flex-col space-y-4 justify-center items-center flex-1 -mt-5")
+                i(class="fa-solid fa-thumbs-up text-5xl text-white")
+                span(class="text-white text-2xl")= success.message
+
+block scripts
+    script(src="https://kit.fontawesome.com/e6a1497caa.js" crossorigin="anonymous")
+    script(src="/js/configurePayment.js") 

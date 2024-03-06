@@ -99,7 +99,15 @@ block contenido
                             i(class="fa-solid fa-arrow-up-right-from-square grid place-content-center")
                             span Visitar perfil 
 
-    //pre= JSON.stringify(conversations, null, 2)
+    #alertConfigurePayment(class="z-50 absolute top-0 left-0 w-screen h-screen bg-gray-400/50 grid place-content-center hidden" style="position:fixed;")
+        div(class="bg-white p-8")
+            div(class="w-full text-center p-4") 
+                i(class="fa-solid fa-circle-exclamation text-8xl text-red-600")
+            div(class="m-auto text-center w-1/2 space-y-3 p-4 pb-6")
+                h3(class="text-3xl text-principal-gray font-semibold") Hubo un problema
+                p#messageErrorPayment(class="text-gray-400 font-light text-sm" style="text-wrap:balance")
+            div(class="flex flex-col w-1/2 m-auto space-y-3") 
+                button#btnCloseAlertPayment(type="button" class="py-2 px-4 bg-gray-input text-principal-gray w-full hover:bg-gray-input/90") Volver  
 
     template#templateContact 
         .contact(class="w-fit flex cursor-pointer py-2 px-4")
@@ -172,12 +180,12 @@ block contenido
                                         i(class="fa-solid fa-arrow-up-right-from-square text-xl")
                                         span(class="text-xl") Ir
 
-                            div(class="flex flex-col flex-1 2xl:flex-initial 2xl:w-2/12 justify-center")
+                            .status(class="flex flex-col flex-1 2xl:flex-initial 2xl:w-2/12 justify-center items-center")
                                 div(class="grid place-content-center")
                                     span(class="price text-green-700")
                                 div(class="grid place-content-center space-y-2") 
-                                    button(type="button" class="bg-green-700 text-white p-2 hover:opacity-75 w-20") Liberar 
-                                    button(type="button" class="bg-red-500 text-white p-2 hover:opacity-75 w-20") Rechazar
+                                    button.accept(type="button" class="bg-green-700 text-white p-2 hover:opacity-75 w-20") Liberar 
+                                    button.decline(type="button" class="bg-red-500 text-white p-2 hover:opacity-75 w-20") Rechazar
 
                     .text
                         span.textMsg
@@ -186,7 +194,7 @@ block contenido
 
     template#templateNewConversation 
         div
-            input(type="radio" name="contact" class="") 
+            input(type="radio" name="contact" class="hidden") 
             label.contact(class="flex pl-10 my-3 py-3 hover:bg-gray-input -ml-5 cursor-pointer mr-4")
                 .photo(class="w-12") 
                     .photoProfile(class="relative w-12 h-12 m-auto") 

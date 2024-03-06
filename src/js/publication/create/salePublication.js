@@ -125,3 +125,9 @@ function mostrarPrice() {
     $containerInputPrice.classList.remove('hidden')
 }
 /*  */
+
+
+export{
+    ocultarTypesVenta,
+    ocultarPrice
+}

@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const routeImages = {
     publicFolder: path.join(__dirname, '..', 'public'),
     uploadsFolder: path.join(__dirname, '..', 'public', 'uploads'), //donde van las imagenes publicas
+    uploadsImagesFolder: path.join(__dirname, '..', 'images', 'uploads'), //donde van las imagenes 
+    uploadsImagesWithWatermarkFolder: path.join(__dirname, '..', 'images', 'uploadsWithWatermark'), //donde van las imagenes 
 };
 
 export{

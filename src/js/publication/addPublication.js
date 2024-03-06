@@ -3,6 +3,8 @@ import { addTags } from './tags.js'
 import { checkFields, validationImage, viewErrors } from './create/validations.js'
 import renderImage from './create/renderImage.js'
 import { viewErrorsInAlert } from './create/errorsBackend.js'
+import { ocultarPrice, ocultarTypesVenta } from './create/salePublication.js'
+import { consultaLicencias, viewOtherOptions } from './create/licenses.js'
 
 const $form = document.querySelector("#form")
 
@@ -28,6 +30,7 @@ const $spanErrTypes = document.getElementById('errTypes')
 const $spanErrTypeSale = document.getElementById('errTypeSale')
 const $spanErrPrice = document.getElementById('errPrice')
 const $spanErrCurrency = document.getElementById('errCurrency')
+const $alert = document.getElementById('alertConfigurePayment')
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 const tags = []
@@ -59,6 +62,12 @@ $form.addEventListener("submit", function (e) {
 
     document.getElementById('sectionLoader').classList.remove('hidden')
 
+    /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
+
+    //console.log(res.data)
+
+    /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
+    /* ---- */
     axios.post('/publications/create', formData, {
         headers: {
             'CSRF-Token': token
@@ -69,7 +78,7 @@ $form.addEventListener("submit", function (e) {
             window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
-            
+            debugger
             document.getElementById('sectionLoader').classList.add('hidden')
 
             if (error.response && error.response.status === 400) {
@@ -81,7 +90,12 @@ $form.addEventListener("submit", function (e) {
                 console.error('Error al enviar la solicitud:', error);
                 viewErrorsInAlert(error.response.data)
             }
-        });
+        })
+        .finally(() => {
+            document.getElementById('sectionLoader').classList.add('hidden')
+        })
+    /* ---- */
+
 })
 
 //Cuando empiezo a escribir un titulo

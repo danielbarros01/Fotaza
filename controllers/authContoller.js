@@ -282,7 +282,8 @@ const newPassword = async (req, res) => {
             imageUrl: "/img/backgrounds/fondo4.jpg",
             nameUserPhoto: "Luise and Nic",
             ocultarBtns: true,
-            errores: resultadoValidaciones.array()
+            errores: resultadoValidaciones.array(),
+            csrfToken: req.csrfToken()
         })
     }
 

@@ -3,8 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { check, validationResult } from 'express-validator'
-import { User, Publication, Category } from '../models/Index.js'
+import axios from 'axios'
+import { User, Publication, Category, UserPayment } from '../models/Index.js'
 import { changePasswordEmail } from '../helpers/sendEmail.js'
+
+import mercadopago from 'mercadopago';
+
 // Obtener la ruta del directorio actual del módulo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -320,6 +324,166 @@ const getUserApiForId = async (req, res) => {
     }
 }
 
+const getConfigurePayment = async (req, res) => {
+    try {
+        const { user } = req
+
+        if (req.query.error) {
+            return res.render('users/account/configure-payment', {
+                csrfToken: req.csrfToken(),
+                user: req.user,
+                error: 'El dato es inválido'
+            })
+        }
+
+        const userPayment = await UserPayment.findByPk(user.id)
+
+        if (!userPayment) {
+            return res.render('users/account/configure-payment', {
+                csrfToken: req.csrfToken(),
+                user: req.user
+            })
+        }
+
+        return res.render('users/account/configure-payment', {
+            csrfToken: req.csrfToken(),
+            user: req.user,
+            configurePayment: true
+        })
+    } catch (error) {
+        console.error(error)
+
+        return res.status(500).redirect('/users/account/configure-payment?error=500')
+    }
+}
+
+const configurePayment = async (req, res) => {
+    //Traigo al usuario
+    const { user } = req
+    //Traigo el access token
+    const { accessToken } = req.body
+
+    if (!accessToken || typeof accessToken !== 'string') {
+        return res.render('users/account/configure-payment', {
+            csrfToken: req.csrfToken(),
+            user: req.user,
+            error: 'El dato es inválido'
+        })
+    }
+    try {
+        /* Hago una prueba para saber que el access_token es real */
+        mercadopago.configure({
+            access_token: accessToken
+        })
+
+        const result = await mercadopago.preferences.create({
+            items: [
+                {
+                    title: "Test",
+                    unit_price: 1,
+                    currency_id: "ARS",
+                    quantity: 1
+                }
+            ]
+        })
+        /* ---- */
+
+        if (result.status >= 200 && result.status < 300) {
+            //Creo la instancia
+            const configurePayment = await UserPayment.create({
+                user_id: user.id,
+                accessToken
+            })
+
+            return res.render('users/account/configure-payment', {
+                csrfToken: req.csrfToken(),
+                user: req.user,
+                success: { message: 'Información guardada con éxito' },
+                configurePayment: true
+            })
+        } else {
+            return res.render('users/account/configure-payment', {
+                csrfToken: req.csrfToken(),
+                user: req.user,
+                error: 'El dato es inválido'
+            })
+        }
+
+    } catch (error) {
+        console.log(error)
+
+        return res.status(500).redirect('/users/account/configure-payment?error=500')
+    }
+
+}
+
+const editPaymentSettings = async (req, res) => {
+    //Traigo al usuario
+    const { user } = req
+    //Traigo el access token
+    const { accessToken } = req.body
+
+    if (!accessToken || typeof accessToken !== 'string') {
+        return res.render('users/account/configure-payment', {
+            csrfToken: req.csrfToken(),
+            user: req.user,
+            error: 'El dato es inválido'
+        })
+    }
+
+    try {
+        /* Hago una prueba para saber que el access_token es real */
+        mercadopago.configure({
+            access_token: accessToken
+        })
+
+        const result = await mercadopago.preferences.create({
+            items: [
+                {
+                    title: "Test",
+                    unit_price: 1,
+                    currency_id: "ARS",
+                    quantity: 1
+                }
+            ]
+        })
+        /* ---- */
+
+        if (result.status >= 200 && result.status < 300) {
+            //Creo la instancia
+            const configurePayment = await UserPayment.findByPk(user.id)
+            await configurePayment.update({ accessToken: accessToken });
+
+            return res.status(result.status).redirect('/users/account/configure-payment')
+        }
+    } catch (error) {
+        console.log(error)
+
+        //Borrar de la bd el registro
+        const userPayment = await UserPayment.findByPk(user.id)
+        await userPayment.destroy()
+
+        return res.status(500).redirect('/users/account/configure-payment?error=500')
+    }
+}
+
+const deletePaymentSettings = async (req, res) => {
+    const { user } = req
+
+    try {
+        const userPayment = await UserPayment.findByPk(user.id)
+
+        if(userPayment){
+            await userPayment.destroy()
+        }
+
+        return res.status(204).redirect('/users/account/configure-payment')
+    } catch (error) {
+        console.error(error)
+        return res.status(500).redirect('/users/account/configure-payment?error=500')
+    }
+}
+
 async function getUserFor(req, username, id) {
     let object
 
@@ -356,5 +520,9 @@ export {
     password,
     changePassword,
     getUserApi,
-    getUserApiForId
+    getUserApiForId,
+    getConfigurePayment,
+    configurePayment,
+    editPaymentSettings,
+    deletePaymentSettings
 }

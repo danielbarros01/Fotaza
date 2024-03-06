@@ -37,6 +37,7 @@ d.addEventListener('DOMContentLoaded', () => {
 
 //Mandar mensajes
 $form.addEventListener('submit', (e) => {
+    debugger
     e.preventDefault()
 
     if ($message.value) {
@@ -45,7 +46,7 @@ $form.addEventListener('submit', (e) => {
     }
 })
 
-socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
+socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser, transaction }) => {
     //Buscar en chats si aparece el msgUserId
     const $chats = d.querySelectorAll('input[name="contact"]')
     const $fragment = d.createDocumentFragment()
@@ -57,7 +58,7 @@ socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
         //Si el userId del mensaje es el mismo que al usuario del chat, entonces estoy recibiendo el mensaje
         if (toUser == userId) {
             if (message.purchase) {//Si es un mensaje para adquirir
-                buyMessage($templateSentBuy, message)
+                buyMessage($templateSentBuy, message, transaction)
                 $clone = d.importNode($templateSentBuy, true)
             } else {
                 commonMessage($templateSent, message)
@@ -66,7 +67,7 @@ socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
 
         } else if (fromUser == userId) { //Si no, lo estoy enviando yo
             if (message.purchase) {
-                buyMessage($templateReceivedBuy, message)
+                buyMessage($templateReceivedBuy, message, transaction)
                 $clone = d.importNode($templateReceivedBuy, true)
             } else {
                 commonMessage($templateReceived, message)
@@ -85,7 +86,6 @@ socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
         //Cuando no tengo abierto ese chat, busco el chat, modifico el ultimo last message, subo el chat a arriba de todos y le sumo +1 a la pelotita verde
         const $chat = Array.from($chats).find($chatActual => {
             let chatId = $chatActual.id.split('-')[1]
-            console.log(chatId)
 
             return chatId == fromUser
         })
@@ -98,7 +98,6 @@ socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
         if ($chat !== undefined) {
             //Mover el chat arriba de todo
             const i = Array.from($chats).indexOf($chat)
-            console.log('pos', i)
 
             if ($divsChats.length >= i) {
                 const $divParent = $chat.parentElement //selecciono el div padre del input para moverlo
@@ -121,7 +120,6 @@ socket.on('new-message-ok', ({ message, msgUserId, fromUser, toUser }) => {
         } else {
             const $fragmentTwo = d.createDocumentFragment()
 
-            console.log($templateNewConversation)
             //Si chat es undefined significa que no tenemos en el DOM la conversacion
             newUser($templateNewConversation, message.user, message.conversation)
 
@@ -178,8 +176,6 @@ $btnDeleteChat.addEventListener('click', () => {
         }
     })
         .then((res) => {
-            debugger
-            console.log(res)
             closeConversation(() => {
                 //Eliminar el div con el usuario de las conversaciones
                 $chat.parentElement.remove()
@@ -209,7 +205,7 @@ $btnClosePersonalInfo.addEventListener('click', () => {
 
 
 function getUserInfo() {
-    axios.get(`/users//api/id/${userId}`)
+    axios.get(`/users/api/id/${userId}`)
         .then((res) => {
             const { user } = res.data
 
@@ -247,6 +243,28 @@ d.addEventListener('click', (e) => {
     if (d.getElementById("contactHeader").contains(e.target)) {
         getUserInfo()
     }
+
+    //Boton para pagar
+    if (e.target.classList.contains("btnCreateOrder")) {
+        debugger
+        const publicationId = e.target.dataset.publicationId
+
+        axios.post(`/payment/new-order/${publicationId}/?_csrf=${token}`)
+            .then((res) => {
+                /* Redirigir */
+                window.location.href = res.data.init_point
+            })
+            .catch((error) => {
+                const $alertConfigurePayment = document.getElementById('alertConfigurePayment'),
+                    $pError = document.getElementById('messageErrorPayment')
+
+                console.log(error)
+                /* Mostrar error */
+                $alertConfigurePayment.classList.remove('hidden')
+                $pError.textContent = error.response.data.message
+            })
+            .finally(() => { })
+    }
 })
 
 $btnOptions.addEventListener('click', () => {
@@ -262,5 +280,6 @@ $btnCloseChat.addEventListener('click', () => {
 
 
 export {
-    socket
+    socket,
+    token
 }

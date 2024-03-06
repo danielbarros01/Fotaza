@@ -1,5 +1,12 @@
 import { checkFields, validationImage, viewErrors } from './validations.js'
 
+const $edit = document.querySelector('meta[name="edit"]')
+let $isEdit
+
+if($edit){
+    $isEdit  = $edit.getAttribute('content')
+}
+
 /* Spans para los errores */
 const $spanErrImg = document.getElementById('errImage')
 const $spanErrTitle = document.getElementById('errTitle')
@@ -23,8 +30,12 @@ const $btnBack = document.getElementById('btnBack')
 /* Cuando le de click a continuar para la segunda parte del formulario */
 $btnContinue.addEventListener('click', (e) => {
     const errors = checkFields($form);
-    //valido que haya una imagen, si no agrego el nombre del campo a los errores
-    validationImage($form, errors)
+
+    if(!Boolean($isEdit)){
+        //valido que haya una imagen, si no agrego el nombre del campo a los errores
+        validationImage($form, errors)
+    }
+
     //debugger
     //Si esta incluido price y es mayor a 1, si solo es price el error lo dejo pasar porque es valdidacion del segundo paso del formulario
 

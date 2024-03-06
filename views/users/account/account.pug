@@ -16,6 +16,9 @@ block contenido
             a(href="/users/account/password") 
                 div(class="text-lg p-4 group")  
                     span(class="group-hover:underline") Cambiar contraseña
+            a(href="/users/account/configure-payment") 
+                div(class="text-lg p-4 group")  
+                    span(class="group-hover:underline") Gestionar pagos
         
         section(class="bg-white shadow-2xl lg:w-3/4 lg:ml-6")
             
@@ -50,7 +53,7 @@ block contenido
                         span Cambiar portada
                 +getErrorMsg('avatar')
 
-                div#fields(class="mt-8 md:space-y-6 p-4")
+                div#fields(class="mt-7 md:space-y-6 p-4")
                     div(class="md:flex space-y-4 md:space-y-0")
 
                         div(class="md:w-1/2 md:mx-8") 
@@ -76,7 +79,7 @@ block contenido
                                 +getErrorMsg('username')
 
                 div(class="w-full h-fit sm:text-right p-4")
-                    button#btnSave(type="submit" class="bg-green-700 text-white font-normal w-full sm:w-44 p-3 mt-10 sm:m-8 md:mt-20 hover:opacity-90") Guardar
+                    button#btnSave(type="submit" class="bg-green-700 text-white font-normal w-full sm:w-44 p-3 mt-8 sm:m-8 md:mt-18 hover:opacity-90") Guardar
         
         if save 
             #alertSucces(class="flex absolute top-16 sm:left-1/3 items-center p-4 rounded-lg shadow-2xl bg-green-50 text-green-400 border w-80 justify-between" role='alert')

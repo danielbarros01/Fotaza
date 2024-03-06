@@ -1,4 +1,4 @@
-import { Conversation, User, Message, Publication } from '../models/Index.js'
+import { Conversation, User, Message, Publication, Transaction } from '../models/Index.js'
 import { Op, literal } from 'sequelize'
 import { io } from '../index.js'
 import moment from 'moment'
@@ -86,7 +86,8 @@ const getApiConversation = async (req, res) => {
                             }
                         },
                         {
-                            model: Publication, as: 'publication'
+                            model: Transaction, as: 'transaction',
+                            include: [{ model: Publication, as: 'publication' }]
                         }
                     ],
                     order: [['date', 'DESC']]
@@ -94,15 +95,31 @@ const getApiConversation = async (req, res) => {
             ]
         })
 
-        const messages = conversation.messages.map(msg => {
+        const messages = await Promise.all(conversation.messages.map(async msg => {
             const msgData = { ...msg.get() }
 
             let myMsg = msgData.user_id == userId
 
             myMsg ? msgData.mine = true : msgData.mine = false
 
+            /* if (msgData.purchase) {
+                const transaction = await Transaction.findOne({
+                    where: {
+                        publication_id: msgData.publication_id,
+                        [Op.or]: [
+                            { user_id: conversation.userId1 },
+                            { user_id: conversation.userId2 }
+                        ],
+                        order: [['date', 'DESC']]
+                    }
+                })
+
+
+                await transaction ? msgData.transaction = transaction : msgData.transaction = null
+            } */
+
             return msgData
-        })
+        }))
 
         const modifiedConversation = (function modifiedConversation() {
             const conversationM = { ...conversation.get() }

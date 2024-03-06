@@ -2,8 +2,7 @@ extends ../layout/index
 
 block contenido
     div.flex.h-screen
-        div(class="w-1/2") 
-            include ../layout/header 
+        div(class="w-1/2 grid place-content-center") 
             main.flex.flex-col.mx-24
                 .mt-10.mb-5
                     h2.text-5xl.text-hard-gray Crear una Cuenta
@@ -46,6 +45,6 @@ block contenido
                     a(href="/auth/login").font-bold Inicia Sesion
         
         aside(class="w-1/2 bg-cover bg-center bg-no-repeat" style=`background-image: url(${imageUrl})`)
-            p(class="absolute bottom-8 right-8 text-white") Fotografía de 
+            //p(class="absolute bottom-8 right-8 text-white") Fotografía de 
                 span.font-bold= nameUserPhoto
 

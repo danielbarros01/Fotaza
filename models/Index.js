@@ -9,6 +9,8 @@ import Comment from './Comment.js'
 import PublicationHasTag from './PublicationHasTag.js'
 import Conversation from './Conversation.js'
 import Message from './Message.js'
+import UserPayment from './UserPayment.js'
+import Transaction from './Transaction.js'
 
 // Definir la relación muchos a muchos entre Usuario y Categoria
 User.belongsToMany(Category, { through: Interest });
@@ -57,7 +59,7 @@ Conversation.associate(User);
 Conversation.hasMany(Message, {
     foreignKey: 'conversation_id',
     as: 'messages',
-    onDelete: 'CASCADE' 
+    onDelete: 'CASCADE'
 });
 
 Message.belongsTo(Conversation, {
@@ -75,11 +77,43 @@ Message.belongsTo(User, {
     as: 'user',
 });
 
-Message.belongsTo(Publication, {
+Message.belongsTo(Transaction, {
+    foreignKey: 'transaction_id',
+    as: 'transaction'
+})
+/* -- */
+
+/* Pagos */
+UserPayment.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user'
+});
+
+User.hasOne(UserPayment, {
+    foreignKey: 'user_id',
+    as: 'userPayment'
+})
+
+/* Transactions */
+User.hasMany(Transaction, {
+    foreignKey: 'user_id',
+    as: 'transaction'
+});
+
+Transaction.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user'
+});
+
+Publication.hasMany(Transaction, {
+    foreignKey: 'publication_id',
+    as: 'transaction'
+});
+
+Transaction.belongsTo(Publication, {
     foreignKey: 'publication_id',
     as: 'publication'
-}) 
-/* -- */
+});
 
 export {
     Interest,
@@ -92,5 +126,7 @@ export {
     Rating,
     Comment,
     Conversation,
-    Message
+    Message,
+    UserPayment,
+    Transaction
 }

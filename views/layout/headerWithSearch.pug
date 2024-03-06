@@ -34,6 +34,10 @@ header(class="px-3.5 bg-white sticky top-0 z-50")
                                         span(class="text-sm")= user.name + " " + user.lastname
                                         span(class="text-xs font-light")= user.username     
                             
+                            a(href="/chat" class="")
+                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Chat
+                            a(href="/transactions" class="")
+                                li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis transacciones
                             a(href="/categories/select" class="")
                                 li(class="text-lg hover:bg-hard-gray cursor-pointer py-4 pl-6") Mis intereses
                             

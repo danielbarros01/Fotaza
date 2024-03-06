@@ -1,174 +1,117 @@
 import axios from 'axios'
+import serialize from 'form-serialize';
+import { viewErrorsInAlert } from './create/errorsBackend.js'
 import { addTags, addDeleteButtons, addTag } from './tags.js'
+import {  viewErrors } from './create/validations.js'
 
 const d = document
-const token = d.querySelector('meta[name="csrf-token"]').getAttribute('content')
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 
-const $btnEdit = d.getElementById('btnEdit')
-const $sectionEdit = d.getElementById('editPublication')
-const $btnClose = d.getElementById('btnCloseEdit')
-const $btnSave = d.getElementById('btnSave')
+const $spanErrImg = document.getElementById('errImage')
+const $spanErrTitle = document.getElementById('errTitle')
+const $spanErrCategory = document.getElementById('errCategory')
+const $spanErrRightOfUse = document.getElementById('errRightOfUse')
+const $spanErrTag = document.getElementById('errTag')
+const $spanErrTypes = document.getElementById('errTypes')
+const $spanErrTypeSale = document.getElementById('errTypeSale')
+const $spanErrPrice = document.getElementById('errPrice')
+const $spanErrCurrency = document.getElementById('errCurrency')
+const $alert = document.getElementById('alertConfigurePayment')
 
-const $form = d.querySelector("#formEdit")
-const $title = d.querySelector("#titleEdit")
-const $categories = d.querySelector("#categoriesEdit")
-const $rightsOfUse = d.querySelector("#rightsOfUse")
-const $tag = d.querySelector("#tagEdit")
-const $tags = d.querySelector("#tagsEdit")
+const categoryInputs = d.querySelectorAll('input[type="radio"][name="category"]')
 
-const title = $title.value
-const category = $categories.value
-const rightOfUse = $rightsOfUse.value
+const $form = document.querySelector("#form")
 
-const $spanErrTitle = d.getElementById('errTitle')
-const $spanErrCategory = d.getElementById('errCategory')
-const $spanErrRightOfUse = d.getElementById('errRightOfUse')
-const $spanErrTag = d.getElementById('errTag')
+const $tags = d.querySelector("#tags"),
+    $tag = d.querySelector("#tag")
 
-const originalTags = []
 const tags = []
 
-const url = window.location.href;
-const parts = url.split("/");
-const publicationId = parts[parts.length - 1];
-
-//click boton mostrar seccion editar
-$btnEdit.addEventListener('click', () => {
-    $sectionEdit.classList.remove('hidden')
-})
-
-//click boton ocultar seccion editar
-$btnClose.addEventListener('click', () => {
-    fillOriginalFields()
-    $sectionEdit.classList.add('hidden')
-})
-
-//Insertar en tags
-d.querySelectorAll('.tag').forEach(tag => {
-    tags.push(tag.querySelector('li').textContent);
-    originalTags.push(tag.querySelector('li').textContent);
-});
-
+//--
 
 d.addEventListener('DOMContentLoaded', () => {
-    //Agrega funcionalidad de agregar tags al array con el teclado
-    addTags(tags, $tag, $tags, $spanErrTag)
+    /* Añadir al array los tags */
+    const $allTags = $tags.querySelectorAll('.tagNameJs')
 
-    //cargo los botones que ya existen
-    //COMPROBAR QUE NO FALLE SI UNA PUBLICACION NO TIENE TAGS
-    const $btnsDeleteTag = d.querySelectorAll('.btnDeleteTag')
-    addDeleteButtons($btnsDeleteTag, tags)
+    Array.from($allTags).forEach(tag => {
+        let $fragment = document.createDocumentFragment();
+        addTag(tags, tag.textContent, $tags, $spanErrTag, $fragment)
+    })
 })
+
 
 /* ENVIO */
-$form.addEventListener("submit", (e) => {
+$form.addEventListener("submit", function (e) {
     e.preventDefault()
+    debugger
 
-    const formData = new FormData(e.currentTarget)
-    const errors = checkFields();
+    document.getElementById('sectionLoader').classList.remove('hidden')
 
-    if (errors.length > 0) {
-        viewErrors(errors)
-    }
-
-
-    const formDataObject = {};
-    for (const [name, value] of formData.entries()) {
-        formDataObject[name] = value;
-    }
-
+   /*  const formData = new FormData($form)
     //agrego el array de tags
-    formDataObject.tags = tags
+    formData.append('tags', JSON.stringify(tags)) */
 
-    console.log(formDataObject)
-    axios.patch(`/publications/${publicationId}`, formDataObject, {
-        headers: {
-            'CSRF-Token': token
-        }
-    })
-        .then((response) => {
-            console.log(response)
-            window.location.reload()
+    const formData = serialize($form, { hash: true });
+    formData.tags = tags;
+
+    /* Verificar que este configurado el metodo de pago en caso de elegir de tipo venta */
+    axios.get('/payment/configured')
+        .then(res => {
+            axios.post($form.action, formData, {
+                headers: {
+                    'CSRF-Token': token
+                }
+            })
+                .then(response => {
+                    const publicationId = response.data.publicationId;
+                    window.location.href = `/publications/${publicationId}`
+                })
+                .catch(error => {
+                    debugger
+                    document.getElementById('sectionLoader').classList.add('hidden')
+
+                    if (error.response && error.response.status === 400) {
+                        console.log('Errores de validación:', error.response.data);
+                        // Muestra los errores de validación en la interfaz de usuario
+                        viewErrors(error.response.data, 'server', $spanErrTitle, $spanErrCategory, $spanErrImg, $spanErrRightOfUse, $spanErrTypes, $spanErrTypeSale, $spanErrPrice, $spanErrCurrency)
+                        viewErrorsInAlert(error.response.data)
+                    } else {
+                        console.error('Error al enviar la solicitud:', error);
+                        viewErrorsInAlert(error.response.data)
+                    }
+                })
         })
-        .catch(error => {
-            if (error.response && error.response.status === 400) {
-                console.log('Errores de validación:', error.response.data);
-                // Muestra los errores de validación en la interfaz de usuario
-                viewErrors(error.response.data, 'server')
-            } else {
-                console.error('Error al enviar la solicitud:', error);
+        .catch(err => {
+            if (err.response.data.success === false) {
+                debugger
+                //Hay error
+                //Mostrar alerta que se debe configurar el metodo de pago
+                $alert.classList.remove('hidden')
+
+                //Cambiar al input de tipo libre
+                const $inputFree = document.getElementById('input-free');
+                $inputFree.checked = true
+                ocultarTypesVenta()
+                ocultarPrice()
+                consultaLicencias('free')
+                viewOtherOptions()
             }
         })
-
+        .finally(() => {
+            document.getElementById('sectionLoader').classList.add('hidden')
+        })
 })
 
-/*  */
+addTags(tags, $tag, $tags, $spanErrTag);
 
 
-//validaciones
-
-//Validar que se elija una categoria
-$categories.addEventListener('change', function (e) {
-    const selectedOption = e.target.value;
-
-    //si el valor es un numero
-    if (!!Number(selectedOption)) {
-        $spanErrCategory.textContent = null
-        $spanErrCategory.classList.add('hidden')
-    } else {
-        $spanErrCategory.textContent = 'Debe seleccionar una categoria'
-        $spanErrCategory.classList.remove('hidden')
-    }
-});
-
-//Validar campos
-function checkFields() {
-    const formData = new FormData($form)
-    const emptyFields = [];
-
-    for (let [name, value] of formData.entries()) {
-        if (!value) {
-            emptyFields.push(name);
+/* Validaciones */
+/* Si selecciono alguna categoria */
+categoryInputs.forEach(input => {
+    input.addEventListener('change', () => {
+        if (input.checked) {
+            $spanErrCategory.textContent = null
+            $spanErrCategory.classList.add('hidden')
         }
-    }
-
-    return emptyFields;
-}
-
-//Muestra los errores en sus span
-function viewErrors(errors, clientOrServer) {
-
-    if (clientOrServer == 'server') {
-        errors = errors.map(err => err.path)
-    }
-
-    errors.forEach(fieldName => {
-        switch (fieldName) {
-            case 'title':
-                $spanErrTitle.textContent = 'El titulo no debe ir vacio'
-                $spanErrTitle.classList.remove('hidden')
-                break;
-            case 'category':
-                $spanErrCategory.textContent = 'Debe seleccionar una categoria'
-                $spanErrCategory.classList.remove('hidden')
-                break;
-            case 'rightsOfUse':
-                $spanErrRightOfUse.textContent = 'Debe seleccionar un derecho de uso disponible'
-                $spanErrRightOfUse.classList.remove('hidden')
-                break;
-        }
-    })
-}
-
-//Funcion para llenar con los datos originales
-function fillOriginalFields() {
-    $title.value = title
-    $categories.value = category
-    $rightsOfUse.value = rightOfUse
-
-    //Reinicio tags
-    let $fragment = document.createDocumentFragment();
-    originalTags.forEach(tag => {
-        addTag(tags, tag, $tags, $spanErrTag, $fragment)
     });
-}
+});
