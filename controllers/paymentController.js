@@ -129,13 +129,7 @@ const webhook = async (req, res) => {
 
             if (data.body.status_detail) {
                 //Guardamos la transaccion en la base de datos
-                /*
-                Si transaccion ya existe en la base de datos no volver a realizar la transaccion
-
-                mercadopago.configure({
-                    access_token: null
-                })
-                */
+                /**/
 
                 const item = data.body.additional_info.items[0]
                 const idUserPayer = data.body.metadata.user_id
@@ -146,6 +140,28 @@ const webhook = async (req, res) => {
                     /* Busco la publicacion */
                     const publication = await Publication.findByPk(item.id)
                     /* ---- */
+
+                    //Si transaccion ya existe en la base de datos no volver a realizar la transaccion
+
+                    /* Busco en transacciones si existe un registro con:
+                        la publicacionId
+                        el usuario que la esta comprando
+                        y si esta approved
+                    */
+
+                    const existTransaction = await Transaction.count({
+                        where: {
+                            publication_id: publication.id,
+                            user_id: idUserPayer,
+                            status: 'approved'
+                        }
+                    })
+
+                    if (existTransaction) {
+                        return mercadopago.configure({
+                            access_token: null
+                        })
+                    }
 
                     const previousOwner = publication.user_id
 
@@ -239,9 +255,14 @@ const webhook = async (req, res) => {
 
                 }
 
-
+                //Despues de que se creo la transaccion elimino el access_token actual del usuario
+                mercadopago.configure({
+                    access_token: null
+                })
             }
         }
+
+
 
         res.sendStatus(204)
     } catch (error) {

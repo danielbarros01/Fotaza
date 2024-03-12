@@ -48,6 +48,39 @@ const getTransactionsApi = async (req, res) => {
     }
 }
 
+const getSalesApi = async (req, res) => {
+    //Traigo al usuario
+    const { user } = req
+    const { page = 0 } = req.query
+    const { per_page = 4 } = req.headers
+
+    try {
+        //Las transacciones que sean de mi publicaciones y el tipo_sale sea general
+        const { count, rows: transactions } = await Transaction.findAndCountAll({
+            where: {
+                type_sale: 'general',
+                status: 'approved'
+            },
+            order: [['date', 'DESC']],
+            include: [
+                {
+                    model: Publication, as: 'publication',
+                    where: { user_id: user.id },
+                    include: [{ model: Category, as: 'category' }]
+                }
+            ],
+            limit: +per_page,
+            offset: (+page) * (+per_page)
+        })
+
+        return res.status(200).json({ transactions, count, mine: true })
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).redirect('/')
+    }
+}
+
 const acceptTransaction = async (req, res) => {
     const { user } = req
     const { publicationId } = req.params
@@ -92,5 +125,6 @@ const acceptTransaction = async (req, res) => {
 export {
     getTransactions,
     getTransactionsApi,
-    acceptTransaction
+    acceptTransaction,
+    getSalesApi
 }

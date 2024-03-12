@@ -9,9 +9,9 @@ const d = document,
     $parentContainerShopping = d.getElementById('myShopping'),
     $template = d.getElementById('templateTransaction').content,
     $templateBtn = d.getElementById('btnPagination').content,
-    $btnsPagination = d.getElementById('btnsPagination'),
-    $btnPrevious = d.getElementById('previous'),
-    $btnNext = d.getElementById('next')
+    $btnsPagination = d.getElementById('btnsPaginationPurchases'),
+    $btnPrevious = d.getElementById('previousPurchases'),
+    $btnNext = d.getElementById('nextPurchases')
 
 moment.locale('es');
 
@@ -80,7 +80,7 @@ function getTransactions() {
             })
 
             count = cant
-            addPagination(count, size)
+            addPagination($btnsPagination, count, size)
         })
         .catch(err => {
             console.log(err)
@@ -89,8 +89,7 @@ function getTransactions() {
         })
 }
 
-function addTransactionDOM(transaction, $template, $fragment) {
-    debugger
+function addTransactionDOM(transaction, $template, $fragment, mine) {
     const $clonedTemplate = d.importNode($template, true);
 
     const publication = transaction.publication
@@ -100,34 +99,42 @@ function addTransactionDOM(transaction, $template, $fragment) {
     const $date = $clonedTemplate.querySelector('.dateTransaction')
     $date.textContent = moment(transaction.date).format('LLL')
 
-    if (transaction.status == 'approved' && transaction.typeSale == 'unique') {
-        $clonedTemplate.querySelector('.status').textContent = 'Compra unica efectuada'
-
-        //rounded propietario
-        const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
-        containerStatus.classList.add('bg-green-700')
-        containerStatus.classList.remove('hidden')
-        containerStatus.querySelector('span').textContent = `Propietario`
-    }
-
-    if (transaction.status == 'sold' && transaction.typeSale == 'unique') {
+    //Si es para la seccion ventas
+    if (mine) {
         const $text = $clonedTemplate.querySelector('.status')
+        $text.textContent = 'Venta efectuada'
         $text.classList.add('text-red-700')
-        $text.textContent = 'Publicación unica vendida'
-
-        //rounded propietario
-        const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
-        containerStatus.classList.add('bg-red-600')
-        containerStatus.classList.remove('hidden')
-        containerStatus.querySelector('span').textContent = `Vendida`
-
-        $date.textContent = `Vendida el ${moment(transaction.date).format('LLL')}`
     }
+    //seccion compras
+    else {
+        if (transaction.status == 'approved' && transaction.typeSale == 'unique') {
+            $clonedTemplate.querySelector('.status').textContent = 'Compra unica efectuada'
 
-    if(transaction.typeSale == 'general'){
-        $clonedTemplate.querySelector('.status').textContent = 'Compra efectuada'
+            //rounded propietario
+            const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
+            containerStatus.classList.add('bg-green-700')
+            containerStatus.classList.remove('hidden')
+            containerStatus.querySelector('span').textContent = `Propietario`
+        }
+
+        if (transaction.status == 'sold' && transaction.typeSale == 'unique') {
+            const $text = $clonedTemplate.querySelector('.status')
+            $text.classList.add('text-red-700')
+            $text.textContent = 'Publicación unica vendida'
+
+            //rounded propietario
+            const containerStatus = $clonedTemplate.querySelector('.info-transaction-status')
+            containerStatus.classList.add('bg-red-600')
+            containerStatus.classList.remove('hidden')
+            containerStatus.querySelector('span').textContent = `Vendida`
+
+            $date.textContent = `Vendida el ${moment(transaction.date).format('LLL')}`
+        }
+
+        if (transaction.typeSale == 'general') {
+            $clonedTemplate.querySelector('.status').textContent = 'Compra efectuada'
+        }
     }
-
     //rounded price
     $clonedTemplate.querySelector('.price').textContent = '$' + transaction.price
     //rounded category
@@ -162,7 +169,7 @@ function removeLoader(section) {
     section.querySelector('.loader').remove()
 }
 
-function addPagination(count, cantPublicacionesPorPag) {
+function addPagination($btnsPagination, count, cantPublicacionesPorPag) {
     $btnsPagination.innerHTML = ''
 
     cantBtns = Math.ceil(count / cantPublicacionesPorPag)
@@ -196,4 +203,9 @@ function addBtn(value, $fragment) {
     });
 
     $fragment.appendChild($clone)
+}
+
+export {
+    addTransactionDOM,
+    addPagination
 }

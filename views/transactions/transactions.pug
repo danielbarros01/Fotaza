@@ -19,25 +19,39 @@ block contenido
             section#containerSectionShopping(class="transition-all duration-300 ease-in-out")
                 section#shopping(class="space-y-6")   
                 
-                #pagination(class="flex justify-center m-8")  
-                    button#previous(class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                #paginationPurchases(class="flex justify-center m-8")  
+                    button#previousPurchases(class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
                         i(class="fa-solid fa-arrow-left")
                         span Anterior
 
-                    #btnsPagination(class="flex")
+                    #btnsPaginationPurchases(class="flex")
 
-                    button#next(class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                    button#nextPurchases(class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
                         span Siguiente
                         i(class="fa-solid fa-arrow-right")
 
-        //section.mySales
+        section#mySales
             header
                 div(class="w-full") 
-                    button(type="button" class="shadow-md rounded-md font-bold bg-gray-200 text-lg px-3 py-1 flex gap-2 text-principal-gray hover:text-black")
+                    button#btnSales(type="button" class="shadow-md rounded-md font-bold bg-gray-200 text-lg px-3 py-1 flex gap-2 text-principal-gray hover:text-black")
                         i(class="fa-solid fa-arrow-down m-auto")
                         span Ventas
                 hr(class="my-4 border-t border-dashed border-secondary-gray")
-    
+
+            section#containerSectionSales(class="transition-all duration-300 ease-in-out")
+                section#sales(class="space-y-6")   
+                
+                #paginationSales(class="flex justify-center m-8")  
+                    button#previousSales(class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                        i(class="fa-solid fa-arrow-left")
+                        span Anterior
+
+                    #btnsPaginationSales(class="flex")
+
+                    button#nextSales(class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:z-20 focus:outline-offset-0 space-x-2") 
+                        span Siguiente
+                        i(class="fa-solid fa-arrow-right")
+
         .loader(class="w-full grid place-content-center mb-2 transform transition-all duration-1000 hidden")
             img(src="/img/project/spinning-circles.svg" class="")   
 
