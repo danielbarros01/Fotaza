@@ -14,18 +14,31 @@ Algunas de las tantas funciones de FOTAZA
 
 **LOGIN**
 
+https://github.com/danielbarros01/Fotaza/assets/54125409/b4298274-97c5-4e59-81d0-a58b374d27b4
+
 **VER PERFIL**
+
+https://github.com/danielbarros01/Fotaza/assets/54125409/187919a6-8ea3-46c1-8bad-ed8186d72458
 
 **COMENTARIOS**
 
+https://github.com/danielbarros01/Fotaza/assets/54125409/a408ba19-7fb4-426e-a756-05a9eeb4f5b8
+
 **BUSQUEDA**
+
+https://github.com/danielbarros01/Fotaza/assets/54125409/c18aef14-d560-41e4-ba98-78f7ef8f65bc
 
 **EDITAR PERFIL**
 
+https://github.com/danielbarros01/Fotaza/assets/54125409/7e9206e6-a7c4-4741-81ef-0de38dc0e8f0
+
 **CREAR**
+
+https://github.com/danielbarros01/Fotaza/assets/54125409/4bf56f18-9ae3-4652-be0c-5da769d5fb67
 
 **ADQUISICIÓN**
 
+https://github.com/danielbarros01/Fotaza/assets/54125409/e1d066d4-3273-46a6-8700-60bc8a18056c
 
 ## Puntos a destacar
 - Sistema de autenticación de usuarios: Permite a los usuarios registrarse y acceder a la plataforma utilizando credenciales seguras e incluso con Google.
