@@ -43,7 +43,6 @@ d.addEventListener('DOMContentLoaded', () => {
 /* ENVIO */
 $form.addEventListener("submit", function (e) {
     e.preventDefault()
-    debugger
 
     document.getElementById('sectionLoader').classList.remove('hidden')
 
@@ -67,7 +66,6 @@ $form.addEventListener("submit", function (e) {
                     window.location.href = `/publications/${publicationId}`
                 })
                 .catch(error => {
-                    debugger
                     document.getElementById('sectionLoader').classList.add('hidden')
 
                     if (error.response && error.response.status === 400) {
@@ -83,7 +81,6 @@ $form.addEventListener("submit", function (e) {
         })
         .catch(err => {
             if (err.response.data.success === false) {
-                debugger
                 //Hay error
                 //Mostrar alerta que se debe configurar el metodo de pago
                 $alert.classList.remove('hidden')

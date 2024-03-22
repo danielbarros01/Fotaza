@@ -46,7 +46,6 @@ function addListenerChange($chat) {
 
             //Leer mensajes
             socket.emit('read-messages', conversation.id)
-            debugger
             buttonFunctionality()
         })
     })

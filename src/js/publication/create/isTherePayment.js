@@ -23,7 +23,6 @@ $inputsType.forEach($i => {
                 })
                 .catch(err => {
                     if (err.response.data.success === false) {
-                        debugger
                         //Hay error
                         //Mostrar alerta que se debe configurar el metodo de pago
                         $alert.classList.remove('hidden')

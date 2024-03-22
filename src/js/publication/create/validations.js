@@ -56,14 +56,12 @@ function validationImage($form, arrayErrors) {
     }
 
     if (file.size / (1024 * 1024) > 15) {
-        debugger
         arrayErrors.push('imageMaxSize')
     }
 }
 
 //Para mostrar los errores en los span
 function viewErrors(errors, clientOrServer, spanTitle, spanCategory, spanImg, spanRightOfUse, spanTypePost, spanErrTypeSale, spanErrPrice, spanErrCurrency) {
-    debugger
 
     errors.forEach(error => {
         switch (clientOrServer == 'server' ? error.path : error) {

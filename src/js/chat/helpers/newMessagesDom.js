@@ -12,7 +12,6 @@ function commonMessage($template, msg) {
 }
 
 function buyMessage($template, msg, transaction) {
-    debugger
     $template.querySelector('li').dataset.publicationId = msg.transaction.publication.id
     $template.querySelector('.textMsg').textContent = msg.text
     $template.querySelector('.dateMessage span').textContent = moment(msg.date).format('LLL')
@@ -32,7 +31,6 @@ function buyMessage($template, msg, transaction) {
         if (msg.transaction && msg.transaction.status == 'hold') {
             const icon = $template.querySelector('.status .fa-clock')
             const span = $template.querySelector('.status span')
-            debugger
             if (icon) {
                 icon.classList.remove('fa-clock')
                 icon.classList.add('fa-circle-check')
@@ -116,7 +114,6 @@ function buyMessage($template, msg, transaction) {
     }
     //Si el mensaje no es mio significa que alguien me esta mandando la solicitud
     else {
-        debugger
 
         if (msg.transaction && msg.transaction.status == 'hold') {
             const div = $template.querySelector('.status')

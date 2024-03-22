@@ -52,7 +52,6 @@ stars.forEach((star, index) => {
                 getOverallRating()
             })
             .catch(function (error) {
-                debugger
                 const errKey = error.response.data.key
                 if (errKey && errKey == 'not user') {
                     alertLogin.classList.remove('hidden')

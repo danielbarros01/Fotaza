@@ -139,7 +139,6 @@ document.addEventListener('tagAdded', function (event) {
 
 //Cuando elimino una etiqueta
 document.addEventListener('tagRemoved', function (event) {
-    debugger
     const tag = event.detail.tag
 
     //Si existe la etiqueta eliminala

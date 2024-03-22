@@ -13,7 +13,6 @@ function maxTags(tags, $spanErrTag) {
 }
 
 function deleteTag(ev, tags, fromUrl) {
-    debugger
     const $tagDelete = ev.target.closest('.tag');
     const textTag = $tagDelete.querySelector('li').textContent;
     const index = tags.indexOf(textTag);

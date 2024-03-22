@@ -7,7 +7,6 @@ const d = document,
     $alertConfigurePayment = d.getElementById('alertConfigurePayment')
 
 function buttonFunctionality() {
-    debugger
     const $btnsAccept = d.querySelectorAll('.accept'),
         $btnsDecline = d.querySelectorAll('.decline')
 
@@ -36,7 +35,6 @@ function buttonFunctionality() {
 
 d.addEventListener('DOMContentLoaded', () => {
     socket.on('accept-transaction-ok', (transaction) => {
-        debugger
         //Si userId es el mismo que de transaction tengo el chat abierto
         //Si tengo abierto el chat y yo solicite una compra
         if (userId == transaction.publication.user_id) {
@@ -115,7 +113,6 @@ function createPayButton(publicationId, csrfToken) {
     const div = d.createElement('div')
     div.classList.add('grid', 'place-content-center')
 
-    debugger
 
     const button = d.createElement('button')
     button.type = 'button'

@@ -7,7 +7,6 @@ const $form = document.getElementById('formPayment'),
 
 if ($form) {
     $form.addEventListener('submit', function (e) {
-        debugger
         e.preventDefault()
 
         axios.post($form.action)
@@ -16,7 +15,6 @@ if ($form) {
                 window.location.href = res.data.init_point
             })
             .catch((error) => {
-                debugger
                 console.log(error)
                 /* Mostrar error */
                 $alertConfigurePayment.classList.remove('hidden')

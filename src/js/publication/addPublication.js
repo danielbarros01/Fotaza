@@ -78,7 +78,6 @@ $form.addEventListener("submit", function (e) {
             window.location.href = `/publications/${publicationId}`
         })
         .catch(error => {
-            debugger
             document.getElementById('sectionLoader').classList.add('hidden')
 
             if (error.response && error.response.status === 400) {

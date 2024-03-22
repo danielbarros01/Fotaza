@@ -37,7 +37,6 @@ d.addEventListener('DOMContentLoaded', () => {
 
 //Mandar mensajes
 $form.addEventListener('submit', (e) => {
-    debugger
     e.preventDefault()
 
     if ($message.value) {
@@ -246,7 +245,6 @@ d.addEventListener('click', (e) => {
 
     //Boton para pagar
     if (e.target.classList.contains("btnCreateOrder")) {
-        debugger
         const publicationId = e.target.dataset.publicationId
 
         axios.post(`/payment/new-order/${publicationId}/?_csrf=${token}`)
