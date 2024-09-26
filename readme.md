@@ -30,11 +30,11 @@ https://github.com/danielbarros01/Fotaza/assets/54125409/c18aef14-d560-41e4-ba98
 
 **EDITAR PERFIL**
 
-https://github.com/danielbarros01/Fotaza/assets/54125409/7e9206e6-a7c4-4741-81ef-0de38dc0e8f0
+https://github.com/user-attachments/assets/ce089c4c-4452-4910-a3a1-467e10dd608b
 
 **CREAR**
 
-https://github.com/danielbarros01/Fotaza/assets/54125409/4bf56f18-9ae3-4652-be0c-5da769d5fb67
+https://github.com/user-attachments/assets/9a2056d2-3661-4a62-b865-b9a7dca0a463
 
 **ADQUISICIÓN**
 
