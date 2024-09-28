@@ -1,81 +1,81 @@
 # FOTAZA
-**Fotaza, una comunidad donde los usuarios pueden compartir y vender sus imagenes**
+**Fotaza, a community where users can share and sell their images**
 
-Fotaza es una aplicación web que funciona como una plataforma para almacenar, ordenar, buscar, vender y compartir fotografías en línea. La aplicación incluye un sistema de autenticación de usuarios, un gestor de contenidos para imágenes con etiquetado y comentarios, un motor de búsqueda, y funcionalidades para la creación de perfiles de usuario, publicación de imágenes con información detallada, interacción entre usuarios mediante mensajes, comentarios y valoraciones de imágenes, y promoción de imágenes destacadas en la portada del sitio.
+![FlyerFotaza](https://github.com/user-attachments/assets/916274f8-99c7-4317-be5d-5d2b50ff11fa)
 
-## Tecnologías utilizadas
-**Cliente:** PUG, Javascript, Socket.IO, Tailwind CSS, CSS
+Fotaza is a web application that serves as a platform for storing, organizing, searching, selling, and sharing photos online. The application includes a user authentication system, a content manager for images with tagging and comments, a search engine, and features for creating user profiles, posting images with detailed information, interacting with users through messages, comments and image ratings, and promoting featured images on the site's homepage.
 
-**Servidor:** Node JS, Express, Passport, MySQL, Sequelize, API Mercado Pago, Socket.IO
+## Technologies Used
+**Client:** PUG, Javascript, Socket.IO, Tailwind CSS, CSS
 
-## Muestras del proyecto
+**Server:** Node JS, Express, Passport, MySQL, Sequelize, Mercado Pago API, Socket.IO
 
-Algunas de las tantas funciones de FOTAZA
+## Project Samples
+
+Some of the many features of FOTAZA:
 
 **LOGIN**
 
 https://github.com/danielbarros01/Fotaza/assets/54125409/b4298274-97c5-4e59-81d0-a58b374d27b4
 
-**VER PERFIL**
+**VIEW PROFILE**
 
 https://github.com/danielbarros01/Fotaza/assets/54125409/187919a6-8ea3-46c1-8bad-ed8186d72458
 
-**COMENTARIOS**
+**COMMENTS**
 
 https://github.com/danielbarros01/Fotaza/assets/54125409/a408ba19-7fb4-426e-a756-05a9eeb4f5b8
 
-**BUSQUEDA**
+**SEARCH**
 
 https://github.com/danielbarros01/Fotaza/assets/54125409/c18aef14-d560-41e4-ba98-78f7ef8f65bc
 
-**EDITAR PERFIL**
+**EDIT PROFILE**
 
 https://github.com/user-attachments/assets/ce089c4c-4452-4910-a3a1-467e10dd608b
 
-**CREAR**
+**CREATE**
 
 https://github.com/user-attachments/assets/9a2056d2-3661-4a62-b865-b9a7dca0a463
 
-**ADQUISICIÓN**
+**PURCHASE**
 
 https://github.com/danielbarros01/Fotaza/assets/54125409/e1d066d4-3273-46a6-8700-60bc8a18056c
 
-## Puntos a destacar
-- Sistema de autenticación de usuarios: Permite a los usuarios registrarse y acceder a la plataforma utilizando credenciales seguras e incluso con Google.
+## Key Features
+- User Authentication System: Allows users to register and access the platform using secure credentials, or even log in with Google.
 
-- Etiquetado de contenido: Los usuarios pueden asignar etiquetas a las imágenes para facilitar su búsqueda.
+- Content Tagging: Users can assign tags to images to make them easier to search.
 
-- Comentarios de contenido: Los usuarios pueden dejar comentarios en las imágenes, lo que fomenta la interacción y el feedback.
+- Content Comments: Users can leave comments on images, encouraging interaction and feedback.
 
-- Motor de búsqueda de contenidos: Los usuarios pueden buscar imágenes utilizando diferentes criterios como etiquetas, título, categoría, etc.
+- Content Search Engine: Users can search for images using various criteria such as tags, titles, categories, etc.
 
-- Perfil de usuario: Los usuarios pueden crear un perfil que incluye datos personales e intereses.
+- User Profile: Users can create a profile that includes personal data and interests.
 
-Publicación de imágenes:
+Image Posting:
 
-- Los usuarios pueden publicar imágenes con información detallada como título, categoría, derechos de uso y etiquetas.
-- Las imágenes pueden ser publicadas como públicas o protegidas.
-- Las imágenes con derechos de autor deben ser publicadas como privadas.
-- Comentarios y valoraciones: Los usuarios autenticados pueden dejar comentarios y valorar las imágenes. Se registra la fecha, usuario y descripción de los comentarios.
+- Users can publish images with detailed information such as title, category, usage rights, and tags.
+- Images can be posted as public or protected.
+- Copyrighted images must be posted as private.
+- Comments and Ratings: Authenticated users can leave comments and rate images. The date, user, and description of the comments are recorded.
 
-Portada y recomendaciones:
+Homepage and Recommendations:
 
-- Las imágenes con más de n valoraciones y un promedio superior a n se destacarán en la portada.
-- Las demás imágenes se mostrarán siguiendo un criterio aleatorio, con limitaciones para evitar la repetición de usuarios y la antigüedad de las imágenes.
-- Las recomendaciones de imagenes en inicio se basan en los intereses del usuario, como tambien de la calificación y fecha de cada imagen.
+- Images with more than n ratings and an average rating above n will be featured on the homepage.
+- Other images will be displayed randomly, with restrictions to prevent user repetition and image age.
+- Homepage image recommendations are based on user interests, as well as the rating and date of each image.
 
-Marca de agua:
+Watermark:
 
-- Todas las imágenes públicas accedidas por usuarios no autenticados tendrán una marca de agua con la mención "Fotaza".
-- Las imágenes privadas y con derechos de autor pueden tener una marca de agua personalizada configurada por el autor.
-- Contacto con el autor: Las imágenes con derechos de autor tendrán un mecanismo para que los interesados puedan contactar al autor para adquirir la imagen mediante el chat.
+- All public images accessed by unauthenticated users will have a watermark with the "Fotaza" mention.
+- Private and copyrighted images can have a personalized watermark set by the author.
+- Contact with the author: Copyrighted images will have a mechanism for interested parties to contact the author for image acquisition via chat.
 
-## Base de datos
+## Database
 
 ![App Screenshot](https://i.pinimg.com/736x/79/15/cb/7915cbbaf041b01937d5f7586d5ffd51.jpg)
 
-
-## Autor
+## Author
 
 - [@danielbarros01](https://www.github.com/danielbarros01)
-
